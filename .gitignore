@@ -1,4 +1,4 @@
 doc
 Meta
-renv
 *.DS_store
+.Rproj.user
