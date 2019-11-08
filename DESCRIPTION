@@ -1,0 +1,66 @@
+Package: edmaps
+Type: Package
+Title: Estimate Likelihood of Pest Establishment
+Version: 1.0.0
+Authors@R: as.person(c(
+    "James Camac <james.camac@gmail.com> [aut, cre]", 
+    "John Baumgartner <johnbaums@gmail.com> [aut]"
+  ))
+Maintainer: James Camac <james.camac@gmail.com>
+Description: This package combines spatial environmental data (e.g. distance 
+    from airports/marine ports, distribution of pest habitat/hosts) with 
+    biosecurity leakage rates (e.g. expert-elicited) to generate maps of the 
+    likelihood of pest establishment across the landscape. Final outputs include 
+    raster datasets (GTiff) indicating establishment likelihood across the area 
+    of interest, as well as interactive (html) and static (pdf) versions of 
+    these maps.
+Depends: R (>= 3.5.0)
+SystemRequirements:	Java (>= 1.5), JRI, GNU make
+Imports:
+  countrycode,
+  CoordinateCleaner,
+  dplyr,
+  drake,
+  fasterize,
+  furrr,
+  gdalUtilities,
+  geometry,
+  ggplot2,
+  glue,
+  htmlwidgets,
+  leaflet,
+  leaflet.opacity,
+  leafem,
+  magrittr,
+  mapedit,
+  methods,
+  purrr,
+  raster,
+  rasterVis,
+  readr,
+  readxl,
+  rgbif,
+  rlang,
+  rnaturalearth,
+  sf,
+  sp,
+  stars,
+  tidyr,
+  tmap,
+  tmaptools,
+  viridis
+Suggests: 
+  knitr,
+  rmarkdown,
+  testthat,
+  future.callr,
+  rnaturalearthdata,
+  lubridate,
+  styler,
+  OpenStreetMap
+VignetteBuilder: knitr
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+ByteCompile: true
