@@ -33,9 +33,8 @@ RUN R -e "remotes::install_deps(upgrade='never', repos='http://cran.microsoft.co
 ## Install other required packages.
 RUN R -e "install.packages(c('OpenStreetMap', 'testthat', 'future.callr', 'rnaturalearthdata', 'lubridate', 'styler'), repos='http://cran.microsoft.com/snapshot/2019-09-30/')"
 
-## Copy and install edmaps
-COPY edmaps_1.0.0.tar.gz ./
-RUN R CMD INSTALL edmaps_1.0.0.tar.gz
+## Install edmaps
+RUN R -e "remotes::install_github('jscamac/edmaps')"
 
 WORKDIR /home
 
