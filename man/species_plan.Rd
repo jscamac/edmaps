@@ -4,20 +4,56 @@
 \alias{species_plan}
 \title{Generate a drake plan for a species}
 \usage{
-species_plan(species, clum_classes, nvis_classes, pathways,
-  include_abiotic_weight = TRUE, climate_suitability_path,
-  exclude_bioclim_vars = NULL, include_ndvi = TRUE,
-  aggregated_res = c(5000, 5000), make_interactive_maps = TRUE,
-  clum_path, nvis_path, ndvi_path, airport_beta = log(0.5)/200,
-  airport_tsi_beta = log(0.5)/10, port_data_path, port_weight_beta,
-  fertiliser_data_path, nrm_path, containers_data_path, postcode_path,
-  occurrence_path, cabi_path, use_gbif = FALSE, gbif_species,
-  gbif_min_year = 1970, gbif_max_uncertainty = 20000,
-  manual_check_flagged_records = FALSE, total_tourists, prob_tourists,
-  total_returning, prob_returning, total_torres, prob_torres, total_mail,
-  prob_mail, total_vessels, prob_vessels, total_fertiliser,
-  prob_fertiliser, total_machinery, prob_machinery, prob_containers,
-  total_nurserystock, prob_nurserystock, total_food, prob_food)
+species_plan(
+  species,
+  clum_classes,
+  nvis_classes,
+  pathways,
+  include_abiotic_weight = TRUE,
+  climate_suitability_path,
+  exclude_bioclim_vars = NULL,
+  include_ndvi = TRUE,
+  aggregated_res = c(5000, 5000),
+  make_interactive_maps = TRUE,
+  clum_path,
+  nvis_path,
+  ndvi_path,
+  airport_beta = log(0.5)/200,
+  airport_tsi_beta = log(0.5)/10,
+  port_data_path,
+  port_weight_beta,
+  fertiliser_data_path,
+  nrm_path,
+  containers_data_path,
+  postcode_path,
+  occurrence_path,
+  infected_countries,
+  cabi_path,
+  use_gbif = FALSE,
+  gbif_species,
+  gbif_min_year = 1970,
+  gbif_max_uncertainty = 20000,
+  manual_check_flagged_records = FALSE,
+  total_tourists,
+  prob_tourists,
+  total_returning,
+  prob_returning,
+  total_torres,
+  prob_torres,
+  total_mail,
+  prob_mail,
+  total_vessels,
+  prob_vessels,
+  total_fertiliser,
+  prob_fertiliser,
+  total_machinery,
+  prob_machinery,
+  prob_containers,
+  total_nurserystock,
+  prob_nurserystock,
+  total_food,
+  prob_food
+)
 }
 \arguments{
 \item{species}{The name of the species. This will be used for naming output
@@ -102,11 +138,17 @@ of containers by postcode.}
 \item{occurrence_path}{Path to a .csv file containing occurrence data. Must
 include columns \code{Longitude}, \code{Latitude}, and \code{Species}.}
 
+\item{infected_countries}{A character vector of countries within which the 
+\code{species} occurs. Ignored if \code{climate_suitability_path} is
+provided.Only one of \code{infected_countries} or \code{cabi_path} should
+be provided.}
+
 \item{cabi_path}{Path to a .csv file downloaded from CABI, indicating the
 countries within which the \code{species} occurs. Download links to these
 files can be found at the bottom of CABI species datasheet webpages, e.g.
 https://www.cabi.org/isc/datasheet/17685. Ignored if 
-\code{climate_suitability_path} is provided.}
+\code{climate_suitability_path} is provided. Only one of 
+\code{infected_countries} or \code{cabi_path} should be provided.}
 
 \item{use_gbif}{Logical. Should species occurrence records be sourced from 
 GBIF? Ignored if \code{climate_suitability_path} is provided.}

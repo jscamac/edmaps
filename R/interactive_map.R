@@ -38,7 +38,8 @@
 #'   \href{https://pandoc.org/installing.html}{pandoc} software must be 
 #'   installed and available to R. If pandoc is unavailable, the html file 
 #'   will be accompanied by a folder of accessory files.
-#' @importFrom raster raster setMinMax minValue maxValue getValues setValues ncell extent projection
+#' @importFrom raster raster setMinMax minValue maxValue getValues setValues ncell extent projection writeRaster projectRaster
+#' @importFrom gdalUtilities gdalwarp
 #' @importFrom methods slot "slot<-"
 #' @importFrom utils read.csv
 #' @importFrom dplyr filter
@@ -192,10 +193,15 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     suppressMessages(tmap::tmap_mode(tmode))
   })
   if(isTRUE(discrete)) {
+    ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
     m <- tmap::tm_shape(ras, name=layer_name) + 
       tmap::tm_raster(palette=palette, style='cat', title=layer_name, 
                       alpha=transparency)
   } else {
+    raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
+    gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'), 
+                            t_srs = "+init=epsg:3857", r = "bilinear")
+    ras <- raster::setMinMax(raster::raster(f2))
     m <- tmap::tm_shape(ras, name=layer_name) + 
       tmap::tm_raster(palette=palette, style='cont', midpoint=NA, 
                       title=layer_name, 

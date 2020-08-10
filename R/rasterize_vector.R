@@ -25,8 +25,9 @@
 #'   \code{vector_data} will be used.
 #' @param field Character. Name of attribute to be burned into raster.
 #' @param burn_value Numeric. A constant value to burn into raster.
-#' @param datatype Character. Output data type (see \href{https://gdal.org/
-#'   programs/gdal_rasterize.html}{gdal_rasterize} documentation).
+#' @param datatype Character. Output data type (see 
+#'   \href{https://gdal.org/programs/gdal_rasterize.html}{gdal_rasterize} 
+#'   documentation).
 #' @param overwrite Logical. Should outfile be overwritten if it exists?
 #' @param return_rast Logical. Return object to R?
 #' @return A binarized raster is written to \code{outfile}, and returned to R 

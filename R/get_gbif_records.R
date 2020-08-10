@@ -17,15 +17,29 @@
 #' @details This function is a wrapper of \code{rgbif} such that it can be
 #'   readily used with \code{CoordinateCleaner} package.
 #' @return A \code{data.frame} of species occurrence records.
-#' @importFrom rgbif occ_search
+#' @importFrom rgbif occ_data name_suggest
 #' @importFrom dplyr bind_rows filter mutate select
 #' @importFrom countrycode countrycode
 #' @export
 get_gbif_records <- function(species, limit = 200000, min_year, 
   coord_uncertainty) {
 
-  out <- rgbif::occ_search(scientificName = species, limit = limit, 
-    return = "data", hasCoordinate = TRUE)
+  match_species <- function(sp) {
+    sapply(sp, function(x) {
+      species_matches <- rgbif::name_suggest(q=x, rank='species')$data
+      if(nrow(species_matches)==0) {
+        stop('No matches found in GBIF for ', species)
+      }
+      key <- species_matches$key[1]
+      message(sprintf('%s matched to %s (key: %s)', x, 
+                      species_matches$canonicalName[1], key))    
+      key
+    })
+  }
+  
+  key <- match_species(species)
+  out <- lapply(key, function(k) rgbif::occ_data(taxonKey = k, limit = limit, 
+                         hasCoordinate = TRUE)$data)
   
   if(is.list(out)) {
     out <- out %>% 

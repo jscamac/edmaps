@@ -4,8 +4,17 @@
 \alias{initialise_raster}
 \title{Create an empty raster}
 \usage{
-initialise_raster(x, outfile, extent, res, crs, init = NA,
-  datatype = "FLT4S", overwrite = TRUE, return_rast = FALSE)
+initialise_raster(
+  x,
+  outfile,
+  extent,
+  res,
+  crs,
+  init = NA,
+  datatype = "FLT4S",
+  overwrite = TRUE,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{x}{Optional. Raster* object or a file path to template raster. If this

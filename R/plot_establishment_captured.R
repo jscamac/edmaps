@@ -4,7 +4,7 @@
 #' greater number of top ranking risk cells is considered.
 #' 
 #' @param data A \code{data.frame} as derived from 
-#'   \code{\link{risk_captured_in_ncells}}.
+#'   \code{\link{captured_by_ncells}}.
 #' @param xlab Character. x axis label.
 #' @param ylab Character. y axis label.
 #' @param legend_title Character. Optional legend title.

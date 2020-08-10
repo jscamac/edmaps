@@ -4,8 +4,12 @@
 \alias{establishment_likelihood}
 \title{Estimate establishment likelihood}
 \usage{
-establishment_likelihood(total_arrivals, suitability, outfile,
-  return_rast = FALSE)
+establishment_likelihood(
+  total_arrivals,
+  suitability,
+  outfile,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{total_arrivals}{A \code{RasterLayer} (or path to raster file)

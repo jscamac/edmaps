@@ -4,10 +4,23 @@
 \alias{static_map}
 \title{Produce a static map of establishment likelihood}
 \usage{
-static_map(ras, xlim, ylim, layer, legend_title, set_value_range,
-  scale_type = "none", transparency = 0.7,
-  colramp_entire_range = TRUE, surveillance_locs, pt_col = "red",
-  aggregate_raster, height, units = c("in", "cm", "mm"), outfile)
+static_map(
+  ras,
+  xlim,
+  ylim,
+  layer,
+  legend_title,
+  set_value_range,
+  scale_type = "none",
+  transparency = 0.7,
+  colramp_entire_range = TRUE,
+  surveillance_locs,
+  pt_col = "red",
+  aggregate_raster,
+  height,
+  units = c("in", "cm", "mm"),
+  outfile
+)
 }
 \arguments{
 \item{ras}{A \code{RasterLayer} or file path to a raster file.}

@@ -4,9 +4,16 @@
 \alias{plot_raster}
 \title{Plot a raster}
 \usage{
-plot_raster(object, legend_title, occurrence_data = NULL,
-  pt_col = "red", height, units = c("in", "cm", "mm"),
-  compass = FALSE, outfile)
+plot_raster(
+  object,
+  legend_title,
+  occurrence_data = NULL,
+  pt_col = "red",
+  height,
+  units = c("in", "cm", "mm"),
+  compass = FALSE,
+  outfile
+)
 }
 \arguments{
 \item{object}{A \code{RasterLayer} or file path to raster file.}

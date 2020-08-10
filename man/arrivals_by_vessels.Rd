@@ -4,8 +4,13 @@
 \alias{arrivals_by_vessels}
 \title{Estimates pest arrivals by vessels}
 \usage{
-arrivals_by_vessels(port_weight, n_vessels, probability, outfile,
-  return_rast = FALSE)
+arrivals_by_vessels(
+  port_weight,
+  n_vessels,
+  probability,
+  outfile,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{port_weight}{A \code{RasterLayer} or file path to a raster file 
@@ -31,14 +36,15 @@ If \code{outfile} is specified, the resulting raster is saved as a
 Estimates pest arrivals by vessels.
 }
 \seealso{
-Other functions estimating arrivals: \code{\link{arrivals_by_containers}},
-  \code{\link{arrivals_by_fertiliser}},
-  \code{\link{arrivals_by_food}},
-  \code{\link{arrivals_by_machinery}},
-  \code{\link{arrivals_by_mail}},
-  \code{\link{arrivals_by_nurserystock}},
-  \code{\link{arrivals_by_residents}},
-  \code{\link{arrivals_by_torres}},
-  \code{\link{arrivals_by_tourists}}
+Other functions estimating arrivals: 
+\code{\link{arrivals_by_containers}()},
+\code{\link{arrivals_by_fertiliser}()},
+\code{\link{arrivals_by_food}()},
+\code{\link{arrivals_by_machinery}()},
+\code{\link{arrivals_by_mail}()},
+\code{\link{arrivals_by_nurserystock}()},
+\code{\link{arrivals_by_residents}()},
+\code{\link{arrivals_by_torres}()},
+\code{\link{arrivals_by_tourists}()}
 }
 \concept{functions estimating arrivals}

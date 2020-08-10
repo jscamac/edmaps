@@ -49,8 +49,8 @@ plot_raster <- function(object, legend_title, occurrence_data = NULL,
   world_map <- suppressMessages(suppressWarnings(
     rnaturalearth::ne_countries(scale = 50, returnclass = "sf") %>%
       sf::st_transform(crs = raster::projection(ras)) %>%
-      sf::st_crop(sf::st_bbox(ras)) %>% 
-      sf::st_buffer(0) # repair ring self-intersection in India poly
+      sf::st_buffer(0) %>% # repair ring self-intersection in India poly
+      sf::st_crop(sf::st_bbox(ras))
   ))
   
   m <- tmap::tm_shape(ras) +

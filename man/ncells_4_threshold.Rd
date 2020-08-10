@@ -4,8 +4,11 @@
 \alias{ncells_4_threshold}
 \title{Extract number of cells required to meet threshold proportion of risk}
 \usage{
-ncells_4_threshold(risk_rasters, names, proportion_captured = c(0.6, 0.8,
-  0.9, 0.95))
+ncells_4_threshold(
+  risk_rasters,
+  names,
+  proportion_captured = c(0.6, 0.8, 0.9, 0.95)
+)
 }
 \arguments{
 \item{risk_rasters}{Character. File path(s) to rasters to be loaded.}

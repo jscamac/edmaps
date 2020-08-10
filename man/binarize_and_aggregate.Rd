@@ -4,8 +4,17 @@
 \alias{binarize_and_aggregate}
 \title{Binarize a categorical raster and optionally aggregate}
 \usage{
-binarize_and_aggregate(infile, rle, outfile, extent, res, categories,
-  overwrite = FALSE, return_rast = FALSE, quiet = FALSE)
+binarize_and_aggregate(
+  infile,
+  rle,
+  outfile,
+  extent,
+  res,
+  categories,
+  overwrite = FALSE,
+  return_rast = FALSE,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{infile}{Character. File path to a categorical raster. If \code{rle} is

@@ -5,8 +5,11 @@
 \title{Calculate the proportion of total establishment likelihood captured by
 current surveillance}
 \usage{
-surveillance_coverage(establishment_rasters, layer_names,
-  surveillance_locations)
+surveillance_coverage(
+  establishment_rasters,
+  layer_names,
+  surveillance_locations
+)
 }
 \arguments{
 \item{establishment_rasters}{Character vector. A vector of one or more file 

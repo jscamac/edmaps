@@ -74,6 +74,8 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
   
   e <- tmaptools::bb(xlim=xlim, ylim=ylim)
   osm_rast <- tmaptools::read_osm(e, zoom=NULL)
+  osm_rast_res <- c(abs(attr(osm_rast, 'dimensions')$x$delta), 
+                    abs(attr(osm_rast, 'dimensions')$y$delta))
   
   # Aggregate raster (if required)
   if(!missing(aggregate_raster)) {
@@ -117,17 +119,21 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
   
   full_range <- c(raster::minValue(ras), raster::maxValue(ras))
 
-  # Reproject raster to lat long
+  # Reproject raster to web mercator
+  # https://github.com/mtennekes/tmap/issues/410
+  # https://github.com/mtennekes/tmap/issues/412
   if(scale_type == "discrete") {
     raster::projectRaster(
-      ras, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", 
+      ras, crs = "+init=epsg:3857", res = osm_rast_res,
       method = "ngb")
   } else {
     raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(
       f, f2 <- tempfile(fileext='.tif'), 
-      t_srs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", 
-      r = "bilinear", te=e)
+      t_srs = "+init=epsg:3857", tr = osm_rast_res,
+      r = "bilinear", te=sf::st_bbox(osm_rast))
+      # ^ This will interpolate the aggregated data if 
+      #   aggregate_raster is not NULL
     ras <- raster::setMinMax(raster::raster(f2))
   }
 

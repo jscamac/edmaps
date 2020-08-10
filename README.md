@@ -24,7 +24,7 @@ Broadly, these steps are grouped as follows:
 
 
 ## System requirements
-- *R* version 3.6.0 
+- *R* version 4.0.0 or newer
 - 16 GB available RAM
 - 10 GB available hard disk space
 - Internet connection
@@ -71,44 +71,45 @@ The `edmaps` package depends upon a set of other *R* packages in order to calcul
 Package functionality often changes as packages evolve, so specific versions of these dependencies (i.e.\ current versions as at 30 September, 2019) were used in the development of `edmaps` and its application to the case study species explored in this report. 
 Binaries or source tarballs of these package versions are archived by the \href{https://mran.microsoft.com/timemachine}{MRAN (Microsoft R Application Network) Time Machine}, and are available at \href{http://cran.microsoft.com/snapshot/2019-09-30/}{http://cran.microsoft.com/snapshot/2019-09-30/}. To ensure expected behaviour and accurate reproduction of outputs, these package versions are recommended. Similarly, recursive dependencies (i.e.,\ dependencies of the direct dependencies, and so on) should also be installed from the above snapshot. Installation of the appropriate versions of dependencies can be automated, as described \hyperref[recreatingenv]{below}.
 
-- CoordinateCleaner 2.0-11
-- OpenStreetMap 0.3.4
-- countrycode 1.1.0
-- dplyr 0.8.3
-- drake 7.6.2
-- fasterize 1.0.0
+- CoordinateCleaner 2.0-15
+- countrycode 1.2.0
+- dplyr 1.0.0
+- drake 7.12.4
+- fasterize 1.0.2
 - furrr 0.1.0
 - future.callr 0.5.0
-- gdalUtilities 1.0.0
-- geometry 0.4.4
-- ggplot2 3.2.1
-- glue 1.3.1
-- htmlwidgets 1.3
-- knitr 1.25
-- leafem 0.0.1
-- leaflet 2.0.2
+- gdalUtilities 1.1.0
+- geometry 0.4.5
+- ggplot2 3.3.2
+- glue 1.4.1
+- htmlwidgets 1.5.1
+- knitr 1.29
+- leafem 0.1.1
+- leaflet 2.0.3
 - leaflet.opacity 0.1.0
-- lubridate 1.7.4
+- lubridate 1.7.9
 - magrittr 1.5
-- mapedit 0.5.0
-- purrr 0.3.2
-- raster 3.0-7
-- rasterVis 0.46
+- mapedit 0.6.0
+- OpenStreetMap 0.3.4
+- purrr 0.3.4
+- raster 3.3-7
+- rasterVis 0.48
 - readr 1.3.1
 - readxl 1.3.1
-- rgbif 1.3.0
-- rlang 0.4.0
-- rmarkdown 1.15
+- rgbif 3.1.0
+- rlang 0.4.7
+- rmarkdown 2.3
 - rnaturalearth 0.1.0
 - rnaturalearthdata 0.1.0
-- sf 0.8-0
-- sp 1.3-1
-- stars 0.3-1
-- styler 1.1.1
-- testthat 2.2.1
-- tidyr 1.0.0
-- tmap 2.3-1
-- tmaptools 2.0-2
+- rnaturalearthhires 0.2.0
+- sf 0.9-4
+- sp 1.4-2
+- stars 0.4-3
+- styler 1.3.2
+- testthat 2.3.2
+- tidyr 1.1.0
+- tmap 3.0
+- tmaptools 3.0
 - viridis 0.5.1
 
 
@@ -131,8 +132,8 @@ This data directory contains all the raw spatial layers and data needed to creat
   - Ports/ (port locations/use csv file)
   - Tourist_Beds/ (tourist bed shapefile)
 - **user_input/**`parameters.xlsx` (file for specifying global and species parameters)
-- `edmaps_1.0.0.tar.gz` (tarball for installing `edmaps`)
-- `make_vanilla.R` (Script for running `edmaps` without `renv`)
+- `edmaps_1.4.0.tar.gz` (tarball for installing `edmaps`)
+- `make.R` (Script for running `edmaps` without `renv`)
 - `make_renv.R` (Script for running `edmaps` with `renv`)
 - `renv.lock` (`renv` lock file containing package dependency details)
 
@@ -201,20 +202,20 @@ Next run the system-specific command line:
 **macOS & Linux**
 
 ```
-docker run -d -v $(pwd):/home/ jscamac/edmaps R CMD BATCH --vanilla make_vanilla.R make.log
+docker run -d -v $(pwd):/home/ jscamac/edmaps R CMD BATCH --vanilla make.R make.log
 ```
 
 **Windows**
 
 ```
-docker run -d -v %cd%:/home/ jscamac/edmaps R CMD BATCH --vanilla make_vanilla.R make.log
+docker run -d -v %cd%:/home/ jscamac/edmaps R CMD BATCH --vanilla make.R make.log
 ```
 
-The above command line will launch the virtual machine and run `make_vanilla.R` in non-interactive mode. 
+The above command line will launch the virtual machine and run `make.R` in non-interactive mode. 
 This means that you may close the terminal or shell window and the virtual machine will continue running 
 until all tasks have been completed upon which it will automatically shut down. 
 The status and any error messages (if encountered) associated with the workflow progression can be examined by opening the log file `make.log`. 
-This file will be saved in the data directory, alongside `make_vanilla.R`. 
+This file will be saved in the data directory, alongside `make.R`. 
 Once completed, all static and interactive maps as well as GIS-compatible rasters (GeoTIFF) can be found within the `outputs/` directory.
 
 
@@ -247,7 +248,7 @@ If you see an error message stating that *R* is not a recognized command, you ma
 executable, for example: 
 
 ```
-c:/Program Files/R/R-3.6.0/bin/R CMD BATCH --vanilla make_renv.R make.log
+c:/Program Files/R/R-4.0.2/bin/R CMD BATCH --vanilla make_renv.R make.log
 ```
 
 ## Using `edmaps` by itself
@@ -257,7 +258,7 @@ Assuming all dependencies have been correctly installed, one need only install `
 This can be done by using Command Prompt or the terminal to navigate to the data directory and running:
 
 ```
-R CMD INSTALL  edmaps_1.0.0.tar.gz
+R CMD INSTALL  edmaps_1.4.0.tar.gz
 ```
 
 Alternatively, the latest version of `edmaps` can be directly downloaded from GitHub by running the following in 
@@ -270,7 +271,7 @@ devtools::install_github("jscamac/edmaps")
 Once edmaps has been installed, a workflow can be initiated by running:
 
 ```
-R CMD BATCH --vanilla make_vanilla.R make.log
+R CMD BATCH --vanilla make.R make.log
 ```
 
 As with other approaches, a log file (`make.log`) will be saved to the data directory and can be interrogated to assess analysis progression or any errors that may have been encountered.

@@ -61,7 +61,7 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
 
   out <- dplyr::left_join(nrm, fert, by = "NRM_ID") %>%
     dplyr::filter(!is.na(Fert_t)) %>%
-    sf::st_transform(crs = 3577) 
+    sf::st_transform(crs = '+init=epsg:3577') 
   
   if(!missing(outfile)) {
     # Create directory if it does not exist

@@ -4,14 +4,23 @@
 \alias{plot_establishment_captured}
 \title{Plots the cumulative proportion of establishment likelihood captured}
 \usage{
-plot_establishment_captured(data, xlab = "Number of cells",
-  ylab = "Proportion", legend_title = NULL, legend = "right",
-  prop_line, y_limit = NULL, width = NA, height = NA,
-  units = c("in", "cm", "mm"), outfile)
+plot_establishment_captured(
+  data,
+  xlab = "Number of cells",
+  ylab = "Proportion",
+  legend_title = NULL,
+  legend = "right",
+  prop_line,
+  y_limit = NULL,
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm"),
+  outfile
+)
 }
 \arguments{
 \item{data}{A \code{data.frame} as derived from 
-\code{\link{risk_captured_in_ncells}}.}
+\code{\link{captured_by_ncells}}.}
 
 \item{xlab}{Character. x axis label.}
 

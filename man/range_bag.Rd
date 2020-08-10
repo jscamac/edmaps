@@ -4,8 +4,15 @@
 \alias{range_bag}
 \title{Fit and project range bag model}
 \usage{
-range_bag(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
-  p = 0.5, exclude_vars = NULL, outfile)
+range_bag(
+  occurrence_data,
+  bioclim_dir,
+  n_dims = 2,
+  n_models = 100,
+  p = 0.5,
+  exclude_vars = NULL,
+  outfile
+)
 }
 \arguments{
 \item{occurrence_data}{\code{sf} object, \code{data.frame} or character 

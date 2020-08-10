@@ -53,8 +53,7 @@ port_weights <- function(template_raster, port_data, beta, outfile,
   val <- exp(d/(1000/beta))*aus_ports[["Count"]][1]
   # replacing rowSums(sapply, ...) with for loop for memory management
   for (i in seq_along(aus_ports)[-1]) { # subsequent ports
-    if(interactive()) cat(sprintf('\r%.02f%%', i/length(aus_ports)*100))
-    # ^ progress indicator if interactive
+    cat(sprintf('\r%.02f%%', i/length(aus_ports)*100)) # progress indicator
     d <- sp::spDists(cells, aus_ports[i, ])  
     val <- val + exp(d/(1000/beta))*aus_ports[["Count"]][i]
   }

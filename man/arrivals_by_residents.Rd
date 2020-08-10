@@ -4,8 +4,13 @@
 \alias{arrivals_by_residents}
 \title{Estimates pest arrivals by returning residents}
 \usage{
-arrivals_by_residents(pop_density, total_returning, probability, outfile,
-  return_rast = FALSE)
+arrivals_by_residents(
+  pop_density,
+  total_returning,
+  probability,
+  outfile,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{pop_density}{A \code{RasterLayer} or file path to a raster file 
@@ -32,14 +37,15 @@ Estimates arrival rate attributable to returning residents as a function of
 population density.
 }
 \seealso{
-Other functions estimating arrivals: \code{\link{arrivals_by_containers}},
-  \code{\link{arrivals_by_fertiliser}},
-  \code{\link{arrivals_by_food}},
-  \code{\link{arrivals_by_machinery}},
-  \code{\link{arrivals_by_mail}},
-  \code{\link{arrivals_by_nurserystock}},
-  \code{\link{arrivals_by_torres}},
-  \code{\link{arrivals_by_tourists}},
-  \code{\link{arrivals_by_vessels}}
+Other functions estimating arrivals: 
+\code{\link{arrivals_by_containers}()},
+\code{\link{arrivals_by_fertiliser}()},
+\code{\link{arrivals_by_food}()},
+\code{\link{arrivals_by_machinery}()},
+\code{\link{arrivals_by_mail}()},
+\code{\link{arrivals_by_nurserystock}()},
+\code{\link{arrivals_by_torres}()},
+\code{\link{arrivals_by_tourists}()},
+\code{\link{arrivals_by_vessels}()}
 }
 \concept{functions estimating arrivals}

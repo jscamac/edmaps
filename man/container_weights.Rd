@@ -4,8 +4,15 @@
 \alias{container_weights}
 \title{Creates a weight by postcode for each major port}
 \usage{
-container_weights(path, sheet_nums, range = "A7:M2217", postcode_shp,
-  na = c("", "-", "np"), outfile, return_sf = FALSE)
+container_weights(
+  path,
+  sheet_nums,
+  range = "A7:M2217",
+  postcode_shp,
+  na = c("", "-", "np"),
+  outfile,
+  return_sf = FALSE
+)
 }
 \arguments{
 \item{path}{Character. File path to xls file containing containers by 

@@ -4,8 +4,17 @@
 \alias{get_airport_dist}
 \title{Estimate distance to nearest Australian international airport}
 \usage{
-get_airport_dist(vector_data, outfile, template_raster, extent, res, crs,
-  airport_codes, return_rast = FALSE, overwrite = FALSE)
+get_airport_dist(
+  vector_data,
+  outfile,
+  template_raster,
+  extent,
+  res,
+  crs,
+  airport_codes,
+  return_rast = FALSE,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{vector_data}{Character. Path to airport data (available

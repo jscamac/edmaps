@@ -58,7 +58,7 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
     dplyr::left_join(x, by = c("POA_CODE" = "Postcode")) %>%
     dplyr::filter(SQKM>0) %>%
     dplyr::mutate_all(tidyr::replace_na, replace = 0) %>%
-    sf::st_transform(crs = 3577)
+    sf::st_transform(crs = '+init=epsg:3577')
 
   if(!missing(outfile)) {
     # Create directory if it does not exist

@@ -4,9 +4,17 @@
 \alias{plan_globals}
 \title{Create a drake plan describing targets relating to global parameters}
 \usage{
-plan_globals(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
-  nrm_path, containers_data_path, postcode_path, airport_beta,
-  airport_tsi_beta)
+plan_globals(
+  clum_path,
+  nvis_path,
+  ndvi_path,
+  fertiliser_data_path,
+  nrm_path,
+  containers_data_path,
+  postcode_path,
+  airport_beta,
+  airport_tsi_beta
+)
 }
 \arguments{
 \item{clum_path}{Character. File path to \href{http://www.agriculture.gov.au/abares/aclump/Pages/land-use/Catchment-scale-land-use-of-Australia-2018.aspx}{Catchment Scale Land Use of Australia (ACLUM)} raster.}

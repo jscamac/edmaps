@@ -24,7 +24,9 @@
 rle_compress <- function(x, outfile, quiet=FALSE) {
   now <- Sys.time()
   if(is.character(x)) x <- raster::raster(x)
-  if(!dir.exists(dirname(outfile))) dir.create(dirname(outfile), recursive=TRUE)
+  if(!missing(outfile) && !dir.exists(dirname(outfile))) {
+    dir.create(dirname(outfile), recursive=TRUE)
+  }
   bs <- raster::blockSize(x)
   if(!isTRUE(quiet)) message(sprintf('Processing raster (%s blocks)', bs$n))
   outdir_len <- sprintf('%s/%s_len', tempdir(), round(as.numeric(now)))

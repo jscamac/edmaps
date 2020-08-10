@@ -4,9 +4,19 @@
 \alias{rasterize_vector}
 \title{Rasterize spatial vector dataset}
 \usage{
-rasterize_vector(vector_data, outfile, template_raster, extent, res, crs,
-  field, burn_value, datatype = "Float32", overwrite = FALSE,
-  return_rast = FALSE)
+rasterize_vector(
+  vector_data,
+  outfile,
+  template_raster,
+  extent,
+  res,
+  crs,
+  field,
+  burn_value,
+  datatype = "Float32",
+  overwrite = FALSE,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{vector_data}{Character. File path to vector spatial data.}
@@ -40,8 +50,9 @@ supplied, the crs of \code{template_raster} will be used. If
 
 \item{burn_value}{Numeric. A constant value to burn into raster.}
 
-\item{datatype}{Character. Output data type (see \href{https://gdal.org/
-programs/gdal_rasterize.html}{gdal_rasterize} documentation).}
+\item{datatype}{Character. Output data type (see 
+\href{https://gdal.org/programs/gdal_rasterize.html}{gdal_rasterize} 
+documentation).}
 
 \item{overwrite}{Logical. Should outfile be overwritten if it exists?}
 

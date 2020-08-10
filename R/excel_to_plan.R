@@ -69,7 +69,7 @@ excel_to_plan <- function(file) {
                   gbif_species=`GBIF species name(s)`,
                   gbif_min_year=`GBIF min year`,
                   occurrence_path=`Occurrence path`,
-                  cabi_path=`CABI path`,
+                  infected_countries=`Infected countries`,
                   climate_suitability_path=`Climate suitability path`,
                   exclude_bioclim_vars =`Exclude BIOCLIM vars`,
                   prob_tourists=`Prob tourists`,
@@ -93,7 +93,8 @@ excel_to_plan <- function(file) {
         gsub('^\\s+|\\s+$', '', nvis_classes), '\\s*,\\s*')),
       pathways=strsplit(gsub('^\\s+|\\s+$', '', pathways), '\\s*,\\s*'),
       exclude_bioclim_vars=strsplit(
-        gsub('^\\s+|\\s+$', '', exclude_bioclim_vars), '\\s*,\\s*')
+        gsub('^\\s+|\\s+$', '', exclude_bioclim_vars), '\\s*,\\s*'),
+      infected_countries=gsub('^\\s+|\\s+$', '', infected_countries)
     )
   
   paths_species <- species %>% 
@@ -106,11 +107,51 @@ excel_to_plan <- function(file) {
          paste0(paths_species[!file.exists(paths_species)], collapse='\n    - '))
   }
   
+  invalid_abiotic <- species$include_abiotic_weight & 
+    (is.na(species$occurrence_path) & 
+       is.na(species$gbif_species) & 
+       is.na(species$climate_suitability_path))
+  
+  if(any(invalid_abiotic)) {
+    # ^ if abiotic weight is used, then if no occurrence/gbif data are used and 
+    #   climate suitability path not provided, stop.
+    stop('If include_abiotic_weight is TRUE, either climate_suitability_path ',
+         'or else gbif_species and/or occurrence_path must be provided.')
+  }
+  
+  cabi_paths_idx <- which(grepl('\\.csv$', species$infected_countries) & 
+         species$include_abiotic_weight)
+  exist <- file.exists(species$infected_countries[cabi_paths_idx])
+  
+  if(any(!exist)) {
+    stop('File not found:\n    - ', 
+         paste0(species$infected_countries[cabi_paths_idx[!exist]], collapse='\n    - ')) 
+  }
+  species$cabi_path <- NA
+  species$cabi_path[cabi_paths_idx] <- species$infected_countries[cabi_paths_idx]
+  species$infected_countries[cabi_paths_idx] <- NA
+  
+  # Test if any countries are invalid
+  if(any(!is.na(species$infected_countries))) {
+    countries <- unique(unlist(strsplit(setdiff(species$infected_countries, NA), 
+                                 '\\s*,\\s*')))
+    testmatch <- countrycode::countrycode(
+      countries, 'country.name', 'iso3n', warn=FALSE)
+    
+    if(any(is.na(testmatch))) {
+      stop('Unrecognised countries:\n    - ',
+           paste0(countries[is.na(testmatch)],
+                  collapse='\n    - '),
+           '\nSee countrycode::codelist$country.name.en for allowed values.')
+    }
+  }
+  
   n <- nrow(species)
   plans <- lapply(seq_len(n), function(i) {
     x <- as.list(species[i, ])
     x <- x[!sapply(x, is.na)]
     x[sapply(x, is.list)] <- lapply(x[sapply(x, is.list)], unlist)
+    
     if('gbif_species' %in% names(x)) {
       if(!'use_gbif' %in% names(x) || x$use_gbif) {
         x$gbif_species <- gsub('^\\s+|\\s+$', '', x$gbif_species)
@@ -118,11 +159,18 @@ excel_to_plan <- function(file) {
         x$gbif_species <- strsplit(x$gbif_species, '\\s*,\\s*')[[1]]
       }
     }
+    
+    if('infected_countries' %in% names(x)) {
+      x$infected_countries <- gsub('^\\s+|\\s+$', '', x$infected_countries)
+      x$infected_countries <- strsplit(x$infected_countries, '\\s*,\\s*')[[1]]
+    }
+    
     if(length(x$clum_classes)==0) x$clum_classes <- NULL
     if(length(x$nvis_classes)==0) x$nvis_classes <- NULL
-    do.call(species_plan, c(
+    args <-  c(
       x[setdiff(names(x), 'include_nvis')], 
-      globals[intersect(names(globals), names(formals(species_plan)))]))
+      globals[intersect(names(globals), names(formals(species_plan)))])
+    do.call(species_plan, args)
   })
   return(unique(dplyr::bind_rows(plans)))
 }

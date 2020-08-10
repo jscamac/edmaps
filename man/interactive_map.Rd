@@ -4,10 +4,20 @@
 \alias{interactive_map}
 \title{Produce an interactive html map}
 \usage{
-interactive_map(ras, layer_name = NULL, palette = "inferno",
-  transparency = 0.8, legend = TRUE, set_value_range = NULL,
-  discrete = FALSE, scale_type = "none", outfile = NULL,
-  surveillance_locs = NULL, pt_col = "red", cleanup = FALSE)
+interactive_map(
+  ras,
+  layer_name = NULL,
+  palette = "inferno",
+  transparency = 0.8,
+  legend = TRUE,
+  set_value_range = NULL,
+  discrete = FALSE,
+  scale_type = "none",
+  outfile = NULL,
+  surveillance_locs = NULL,
+  pt_col = "red",
+  cleanup = FALSE
+)
 }
 \arguments{
 \item{ras}{A \code{RasterLayer} or file path to a raster file.}

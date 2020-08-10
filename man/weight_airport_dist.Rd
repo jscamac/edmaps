@@ -4,8 +4,13 @@
 \alias{weight_airport_dist}
 \title{Transform airport distances}
 \usage{
-weight_airport_dist(airport_dist, beta = log(0.5)/200, outfile,
-  overwrite = FALSE, return_rast = FALSE)
+weight_airport_dist(
+  airport_dist,
+  beta = log(0.5)/200,
+  outfile,
+  overwrite = FALSE,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{airport_dist}{Character. File path to a raster file containing 

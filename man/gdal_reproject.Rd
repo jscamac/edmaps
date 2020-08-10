@@ -4,9 +4,20 @@
 \alias{gdal_reproject}
 \title{Reproject and resample a raster}
 \usage{
-gdal_reproject(infile, outfile, src_proj, tgt_proj, res,
-  resampling_method = "near", tgt_extent, buffer, src_nodata,
-  datatype = "Float32", return_rast = FALSE, overwrite = TRUE)
+gdal_reproject(
+  infile,
+  outfile,
+  src_proj,
+  tgt_proj,
+  res,
+  resampling_method = "near",
+  tgt_extent,
+  buffer,
+  src_nodata,
+  datatype = "Float32",
+  return_rast = FALSE,
+  overwrite = TRUE
+)
 }
 \arguments{
 \item{infile}{Character. File path to a raster file.}

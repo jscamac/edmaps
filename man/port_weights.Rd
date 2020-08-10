@@ -4,8 +4,7 @@
 \alias{port_weights}
 \title{Create raster giving the establishment likelihoods relating to ports.}
 \usage{
-port_weights(template_raster, port_data, beta, outfile,
-  return_rast = FALSE)
+port_weights(template_raster, port_data, beta, outfile, return_rast = FALSE)
 }
 \arguments{
 \item{template_raster}{A \code{RasterLayer} or path to supported raster 

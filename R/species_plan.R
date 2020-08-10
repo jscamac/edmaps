@@ -63,11 +63,16 @@
 #' @param postcode_path File path to postal areas shapefile.
 #' @param occurrence_path Path to a .csv file containing occurrence data. Must
 #'   include columns \code{Longitude}, \code{Latitude}, and \code{Species}.
+#' @param infected_countries A character vector of countries within which the 
+#'   \code{species} occurs. Ignored if \code{climate_suitability_path} is
+#'   provided.Only one of \code{infected_countries} or \code{cabi_path} should
+#'   be provided.
 #' @param cabi_path Path to a .csv file downloaded from CABI, indicating the
 #'   countries within which the \code{species} occurs. Download links to these
 #'   files can be found at the bottom of CABI species datasheet webpages, e.g.
 #'   https://www.cabi.org/isc/datasheet/17685. Ignored if 
-#'   \code{climate_suitability_path} is provided.
+#'   \code{climate_suitability_path} is provided. Only one of 
+#'   \code{infected_countries} or \code{cabi_path} should be provided.
 #' @param use_gbif Logical. Should species occurrence records be sourced from 
 #'   GBIF? Ignored if \code{climate_suitability_path} is provided.
 #' @param gbif_species Character vector. Taxon names to use when querying GBIF.
@@ -138,6 +143,7 @@
 #' @importFrom dplyr select bind_rows
 #' @importFrom drake file_in file_out code_to_plan
 #' @importFrom gdalUtilities gdal_translate
+#' @importFrom magrittr '%>%'
 #' @export
 species_plan <- function(species, clum_classes, nvis_classes, pathways,
   include_abiotic_weight=TRUE, climate_suitability_path,
@@ -145,8 +151,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
   airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
   port_weight_beta, fertiliser_data_path, nrm_path, containers_data_path,
-  postcode_path, occurrence_path, cabi_path, use_gbif=FALSE, gbif_species,
-  gbif_min_year=1970, gbif_max_uncertainty=20000,
+  postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE, 
+  gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000,
   manual_check_flagged_records=FALSE, total_tourists, prob_tourists,
   total_returning, prob_returning, total_torres, prob_torres, total_mail,
   prob_mail, total_vessels, prob_vessels, total_fertiliser, prob_fertiliser,
@@ -183,7 +189,11 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
                 'nurserystock', 'residents', 'torres', 'tourists', 'vessels'), 
     several.ok=TRUE
   )
-  
+ 
+  if(!missing(infected_countries) && !missing(cabi_path)) {
+    stop('Only one of cabi_path or infected_countries should be provided.')
+  }
+   
   if(missing(clum_classes) && missing(nvis_classes))
     stop('Provide clum_classes and/or nvis_classes to define ',
          'distribution of host plants.')
@@ -204,7 +214,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     rm(r)
   }
   
-  
   # hardcode some paths to processed data (some of these won't exist until 
   # they're created by the plan)
   airport_weight_path <- sprintf(
@@ -224,6 +233,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     'risk_layers/biotic/processed/clum_rle_%s.rds', res[1])
   nvis_rle_path <- sprintf(
     'risk_layers/biotic/processed/nvis_rle_%s.rds', res[1])
+    
   
   file.create(f <- tempfile())
   
@@ -477,6 +487,15 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     
     if(isTRUE(use_gbif)) {
       cat(glue::glue('
+        country_reference <- 
+          sf::as_Spatial(
+            sf::st_buffer(
+              rnaturalearth::ne_countries(scale=50, returnclass="sf"), 0
+            ) # fix self-intersection
+          )
+      \n\n'), file=f, append=TRUE)
+      
+      cat(glue::glue('
         gbif_records <- get_gbif_records(
           species=<<paste0(deparse(c(glue::glue("{gbif_species}"))), collapse="")>>,
           min_year=<<gbif_min_year>>, coord_uncertainty=<<gbif_max_uncertainty>>)
@@ -490,8 +509,11 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
             lon = "decimalLongitude",
             lat = "decimalLatitude",
             countries = "countryCode",
+            country_ref = country_reference, 
+            country_refcol = "iso_a3",
             tests = c("capitals",
                       "centroids", 
+                      "countries",
                       "equal", 
                       "gbif", 
                       "institutions",
@@ -547,27 +569,95 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     }
     
     if(!missing(cabi_path)) {
+      if(!include_abiotic_weight) {
+        warning('{species}: ',
+                'CABI paths and infected country list ignored when ',
+                'abiotic_weight is FALSE.')
+      }
       cat(glue::glue('
-        records <- cabi_flagger(occurrence_records = {species}_all_records,
+        records <- record_flagger(occurrence_records = {species}_all_records,
           manual_check = {manual_check_flagged_records},
           return_df = FALSE,
           cabi_ref = drake::file_in("{cabi_path}"))
       \n\n'), file=f, append=TRUE) 
     }
     
-    cat(glue::glue('
-      rangebag <- range_bag(
-        occurrence_data = {species}_records,
-        bioclim_dir = drake::file_in("{climate_path}"),
-        n_dims = 2,
-        n_models = 100,
-        p = 0.5,
-        exclude_vars = {deparse(exclude_bioclim_vars)},
-        outfile = drake::file_out(
-          "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
+    if(!missing(infected_countries)) {
+      if(!include_abiotic_weight) {
+        warning('{species}: ',
+                'CABI paths and infected country list ignored when ',
+                'abiotic_weight is FALSE.')
+      }
+      cat(glue::glue('
+        records <- record_flagger(occurrence_records = <<species>>_all_records,
+          manual_check = <<manual_check_flagged_records>>,
+          return_df = FALSE,
+          infected_countries = <<paste0(deparse(c(glue::glue("{infected_countries}"))), collapse="")>>)
+      \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+    }
+    
+    do_flag <- !missing(infected_countries) | !missing(cabi_path)
+    
+    if(do_flag) {
+      cat(glue::glue('
+        rangebag <- range_bag(
+          occurrence_data = {species}_records,
+          bioclim_dir = drake::file_in("{climate_path}"),
+          n_dims = 2,
+          n_models = 100,
+          p = 0.5,
+          exclude_vars = {deparse(exclude_bioclim_vars)},
+          outfile = drake::file_out(
+            "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
+          )
         )
-      )
-    \n\n'), file=f, append=TRUE)
+      \n\n'), file=f, append=TRUE)
+      
+      cat(glue::glue('
+        plot_global_climsuit <- plot_raster(
+          object = drake::file_in(
+            "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
+          ),
+          legend_title = "Suitability (10\')",
+          occurrence_data = {species}_records,
+          pt_col = "blue",
+          height = 4.5,
+          units = "in",
+          outfile = drake::file_out(
+          "outputs/{species}/static_maps/{species}_world_climsuit_10min.pdf")
+        ) 
+      \n\n'), file=f, append=TRUE)
+    } else {
+      cat(glue::glue('
+        rangebag <- range_bag(
+          occurrence_data = {species}_all_records,
+          bioclim_dir = drake::file_in("{climate_path}"),
+          n_dims = 2,
+          n_models = 100,
+          p = 0.5,
+          exclude_vars = {deparse(exclude_bioclim_vars)},
+          outfile = drake::file_out(
+            "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
+          )
+        )
+      \n\n'), file=f, append=TRUE)
+      
+      cat(glue::glue('
+        plot_global_climsuit <- plot_raster(
+          object = drake::file_in(
+            "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
+          ),
+          legend_title = "Suitability (10\')",
+          occurrence_data = {species}_all_records,
+          pt_col = "blue",
+          height = 4.5,
+          units = "in",
+          outfile = drake::file_out(
+          "outputs/{species}/static_maps/{species}_world_climsuit_10min.pdf")
+        ) 
+      \n\n'), file=f, append=TRUE)
+    }
+    
     
     cat(glue::glue('
       climsuit <- gdal_reproject(
@@ -583,20 +673,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       )
     \n\n'), file=f, append=TRUE)
     
-    cat(glue::glue('
-      plot_global_climsuit <- plot_raster(
-        object = drake::file_in(
-          "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
-        ),
-        legend_title = "Suitability (10\')",
-        occurrence_data = {species}_records,
-        pt_col = "blue",
-        height = 4.5,
-        units = "in",
-        outfile = drake::file_out(
-        "outputs/{species}/static_maps/{species}_world_climsuit_10min.pdf")
-      ) 
-    \n\n'), file=f, append=TRUE)
     
     # If climate_suitability_path is provided (regardless of setting of 
     # include_abiotic_weight), just copy it to appropriate path.
@@ -976,7 +1052,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   \n\n'), file=f, append=TRUE)
   
   plan <- drake::code_to_plan(f)
-  plan$target <- paste0(species, '_', plan$target)
+  plan$target <- ifelse(plan$target=='country_reference', 'country_reference',
+                        paste0(species, '_', plan$target))
   rbind(plan_globals(
     clum_path=clum_path,
     nvis_path=nvis_path,

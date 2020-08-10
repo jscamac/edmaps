@@ -4,8 +4,14 @@
 \alias{arrivals_by_containers}
 \title{Estimates pest arrivals by containers}
 \usage{
-arrivals_by_containers(container_weights, port_data, template_raster,
-  probability, outfile, return_rast = FALSE)
+arrivals_by_containers(
+  container_weights,
+  port_data,
+  template_raster,
+  probability,
+  outfile,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{container_weights}{An \code{\link{sf}} object or file path to a
@@ -37,14 +43,15 @@ If \code{outfile} is specified, the resulting raster is saved as a
 Estimates pest arrivals by containers.
 }
 \seealso{
-Other functions estimating arrivals: \code{\link{arrivals_by_fertiliser}},
-  \code{\link{arrivals_by_food}},
-  \code{\link{arrivals_by_machinery}},
-  \code{\link{arrivals_by_mail}},
-  \code{\link{arrivals_by_nurserystock}},
-  \code{\link{arrivals_by_residents}},
-  \code{\link{arrivals_by_torres}},
-  \code{\link{arrivals_by_tourists}},
-  \code{\link{arrivals_by_vessels}}
+Other functions estimating arrivals: 
+\code{\link{arrivals_by_fertiliser}()},
+\code{\link{arrivals_by_food}()},
+\code{\link{arrivals_by_machinery}()},
+\code{\link{arrivals_by_mail}()},
+\code{\link{arrivals_by_nurserystock}()},
+\code{\link{arrivals_by_residents}()},
+\code{\link{arrivals_by_torres}()},
+\code{\link{arrivals_by_tourists}()},
+\code{\link{arrivals_by_vessels}()}
 }
 \concept{functions estimating arrivals}

@@ -4,8 +4,13 @@
 \alias{aggregate_raster}
 \title{Downscale raster resolution}
 \usage{
-aggregate_raster(rast, outfile, aggregate_factor, fun = sum,
-  return_rast = FALSE)
+aggregate_raster(
+  rast,
+  outfile,
+  aggregate_factor,
+  fun = sum,
+  return_rast = FALSE
+)
 }
 \arguments{
 \item{rast}{Raster* object or file path to a raster file.}
