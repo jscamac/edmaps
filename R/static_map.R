@@ -183,12 +183,13 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
     
     locs <- suppressWarnings(suppressMessages(
       sf::st_as_sf(surveillance_locs, coords = c("Longitude", "Latitude"), 
-                   crs = sf::st_crs(ras)) %>%
+                   crs = 4326) %>%
+      sf::st_transform(crs = sf::st_crs(ras)) %>%
       sf::st_crop(y = raster::extent(ras))
     ))
     m <- m + 
       tmap::tm_shape(locs) +
-      tmap::tm_dots(fill=pt_col, shape=21)
+      tmap::tm_dots(col = pt_col, shape=21, size=0.25)
   }
   
   # outfile supplied

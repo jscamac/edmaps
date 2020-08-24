@@ -220,7 +220,8 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     }
     locs <- suppressWarnings(
       sf::st_as_sf(surveillance_locs, coords = c("Longitude","Latitude"), 
-                   crs = sf::st_crs(ras)) %>%
+                   crs = 4326) %>%
+        sf::st_transform(crs = sf::st_crs(ras)) %>%
         sf::st_crop(y = raster::extent(ras))
     )
     
