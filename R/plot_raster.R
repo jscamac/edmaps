@@ -77,11 +77,11 @@ plot_raster <- function(object, legend_title, occurrence_data = NULL,
           sf::st_as_sf(coords = c("longitude","latitude"), 
                        crs = raster::projection(ras))
       )
-    } else if(any(("sf") %in% class(occurrence_data))) {
+    } else if("sf" %in% class(occurrence_data)) {
       occ <- suppressMessages(
         sf::st_transform(occurrence_data, crs = raster::projection(ras))
       )
-    } else if(class == "SpatialPointsDataFrame") {
+    } else if("SpatialPointsDataFrame" %in% class(occurrence_data)) {
       occ <- suppressMessages(
         sf::st_as_sf(occurrence_data) %>%
           sf::st_transform(., crs = raster::projection(ras))
