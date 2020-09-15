@@ -4,25 +4,44 @@
 \alias{get_gbif_records}
 \title{Downloads GBIF records of species}
 \usage{
-get_gbif_records(species, limit = 2e+05, min_year, coord_uncertainty)
+get_gbif_records(
+  species,
+  min_year,
+  coord_uncertainty,
+  method = c("search", "download"),
+  username,
+  pwd,
+  email
+)
 }
 \arguments{
 \item{species}{Character. Species taxonomic name.}
 
-\item{limit}{Integer. Number of records to return. Max \code{limit} is
-\code{200000}.}
-
 \item{min_year}{Integer. The minimum year for which records should be
-collated. Default is \code{NULL}, i.e. no minimum.}
+collated. Default is `NULL`, i.e. no minimum.}
 
-\item{coord_uncertainty}{Integer. The maximum allowable documented 
-coordinate uncertainty (in metres). If specified, this argument will 
-result in removal of any records that have a documented uncertainty above 
-this limit. Records with no uncertainty documented will be returned 
-regardless of the value of \code{coord_uncertainty}.}
+\item{coord_uncertainty}{Integer. The maximum allowable documented coordinate
+uncertainty (in metres). If specified, this argument will result in removal
+of any records that have a documented uncertainty above this limit. Records
+with no uncertainty documented will be returned regardless of the value of
+`coord_uncertainty`.}
+
+\item{method}{Either `'search'` (uses the GBIF `/occurrence/search` API
+endpoint) or `'download'` (uses the GBIF `/occurrence/download`API
+endpoint). The former makes paginated queries to the API, while the latter
+performs an asynchronous query (but waits for the resulting dataset to be
+ready for download). The `'search'` method is limited to 100,000 records;
+for large datasets, consider using `'download'`. When using 
+`method='download'`, the arguments `username`, `pwd`, and `email` must be 
+provided.}
+
+\item{username}{An email address for GBIF notification when download is 
+ready, required when method is `'download'`.}
+
+\item{pwd}{GBIF password, required when method is `'download'`.}
 }
 \value{
-A \code{data.frame} of species occurrence records.
+A `data.frame` of species occurrence records.
 }
 \description{
 Downloads GBIF records of species, removing auxiliary columns and records 
@@ -30,6 +49,6 @@ recorded prior to a specified year, or that have coordinate uncertainty
 above a specified amount.
 }
 \details{
-This function is a wrapper of \code{rgbif} such that it can be
-  readily used with \code{CoordinateCleaner} package.
+This function is a wrapper of `rgbif` such that it can be readily
+  used with the `CoordinateCleaner` package.
 }
