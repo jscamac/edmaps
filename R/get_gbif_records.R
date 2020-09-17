@@ -26,6 +26,8 @@
 #'   ready, required when method is `'download'`.
 #' @param email Email address, required when `method = 'download'`. This _may_ 
 #'   be used to notify user when download is ready.
+#' @param retries If `method='download'` and file download fails, how many 
+#'   attempts should be made to download the file?
 #' @details This function is a wrapper of `rgbif` such that it can be readily
 #'   used with the `CoordinateCleaner` package.
 #' @return A `data.frame` of species occurrence records.
@@ -38,7 +40,7 @@
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty, 
                              method=c('search', 'download'), username, pwd, 
-                             email) {
+                             email, retries=3) {
   # warning about 100k limit
   method <- match.arg(method)
   if(method=='download' & any(missing(username), missing(pwd), missing(email))) {
@@ -119,6 +121,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
           rgbif::pred('taxonKey', k),
           rgbif::pred('hasCoordinate', TRUE),
           rgbif::pred('hasGeospatialIssue', FALSE),
+          format='SIMPLE_CSV',
           user=username, pwd=pwd, email=email
         )
         if(!missing(min_year)) args <- 
@@ -127,11 +130,22 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         dl_key <- do.call(rgbif::occ_download, args)
         message('GBIF download key: ', dl_key)
         dl <- rgbif::occ_download_wait(dl_key)
-        utils::download.file(dl$downloadLink, destfile=f <- tempfile())
-        utils::unzip(f, exdir=d <- tempfile())
+        status <- utils::download.file(
+          dl$downloadLink, destfile=f <- tempfile())
+        retry <- 0
+        while(status != 0) {
+          retry <- retry + 1
+          message('Trying URL, retry ', retry)
+          if(retry > retries) {
+            stop('Error downloading url ', dl$downloadLink)
+          }
+          status <- utils::download.file(
+            dl$downloadLink, destfile=f <- tempfile())
+        }
+        csv <- utils::unzip(f, exdir=tempfile())
         
         dat <- readr::read_delim(
-          file.path(d, 'occurrence.txt'), '\t', 
+          csv, '\t', 
           col_types=readr::cols_only(
             gbifID=readr::col_character(), 
             scientificName=readr::col_character(), 

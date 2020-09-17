@@ -11,7 +11,8 @@ get_gbif_records(
   method = c("search", "download"),
   username,
   pwd,
-  email
+  email,
+  retries = 3
 )
 }
 \arguments{
@@ -42,6 +43,9 @@ ready, required when method is `'download'`.}
 
 \item{email}{Email address, required when `method = 'download'`. This _may_ 
 be used to notify user when download is ready.}
+
+\item{retries}{If `method='download'` and file download fails, how many 
+attempts should be made to download the file?}
 }
 \value{
 A `data.frame` of species occurrence records.
