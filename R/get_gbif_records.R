@@ -39,6 +39,7 @@
 #' @importFrom countrycode countrycode
 #' @importFrom readr read_delim cols_only col_character col_double col_integer
 #' @importFrom utils download.file unzip
+#' @importFrom httr RETRY write_disk
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty, 
                              method=c('search', 'download'), username, pwd, 
@@ -132,18 +133,9 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         dl_key <- do.call(rgbif::occ_download, args)
         message('GBIF download key: ', dl_key)
         dl <- rgbif::occ_download_wait(dl_key)
-        status <- utils::download.file(
-          dl$downloadLink, destfile=f <- tempfile())
-        retry <- 0
-        while(status != 0) {
-          retry <- retry + 1
-          message('Trying URL, retry ', retry)
-          if(retry > retries) {
-            stop('Error downloading url ', dl$downloadLink)
-          }
-          status <- utils::download.file(
-            dl$downloadLink, destfile=f <- tempfile())
-        }
+        httr::RETRY(verb = 'GET', url=dl$downloadLink, times=retries, 
+                    quiet=FALSE, terminate_on=NULL, 
+                    httr::write_disk(path=f <- tempfile(), overwrite=TRUE))
         csv <- utils::unzip(f, exdir=tempfile())
         
         dat <- readr::read_delim(
