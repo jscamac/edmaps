@@ -28,6 +28,8 @@
 #'   be used to notify user when download is ready.
 #' @param retries If `method='download'` and file download fails, how many 
 #'   attempts should be made to download the file?
+#' @param cleanup Logical. Should temporary files associated with 
+#'   `method='download'` be deleted? Default is `TRUE`.
 #' @details This function is a wrapper of `rgbif` such that it can be readily
 #'   used with the `CoordinateCleaner` package.
 #' @return A `data.frame` of species occurrence records.
@@ -40,7 +42,7 @@
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty, 
                              method=c('search', 'download'), username, pwd, 
-                             email, retries=3) {
+                             email, retries=3, cleanup=TRUE) {
   # warning about 100k limit
   method <- match.arg(method)
   if(method=='download' & any(missing(username), missing(pwd), missing(email))) {
@@ -155,6 +157,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
             year=readr::col_integer(), 
             countryCode=readr::col_character())
         )
+        if(isTRUE(cleanup)) unlink(c(f, dirname(csv)), recursive=TRUE)
         if(!missing(coord_uncertainty)) {
           dat <- dat %>% dplyr::filter(coordinateUncertaintyInMeters <= 
                                      coord_uncertainty |

@@ -12,7 +12,8 @@ get_gbif_records(
   username,
   pwd,
   email,
-  retries = 3
+  retries = 3,
+  cleanup = TRUE
 )
 }
 \arguments{
@@ -46,6 +47,9 @@ be used to notify user when download is ready.}
 
 \item{retries}{If `method='download'` and file download fails, how many 
 attempts should be made to download the file?}
+
+\item{cleanup}{Logical. Should temporary files associated with 
+`method='download'` be deleted? Default is `TRUE`.}
 }
 \value{
 A `data.frame` of species occurrence records.
