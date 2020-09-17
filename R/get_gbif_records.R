@@ -33,7 +33,7 @@
 #' @importFrom rgbif name_suggest pred pred_gte occ_download occ_search occ_download_wait
 #' @importFrom dplyr bind_rows filter mutate select
 #' @importFrom countrycode countrycode
-#' @importFrom readr read_delim
+#' @importFrom readr read_delim cols_only col_character col_double col_integer
 #' @importFrom utils download.file unzip
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty, 
@@ -130,9 +130,16 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         utils::download.file(dl$downloadLink, destfile=f <- tempfile())
         utils::unzip(f, exdir=d <- tempfile())
         
-        dat <- readr::read_delim(file.path(d, 'occurrence.txt'), delim='\t') %>% 
-          dplyr::select(key=gbifID, scientificName, decimalLongitude, decimalLatitude, 
-                        coordinateUncertaintyInMeters, year, countryCode)
+        dat <- readr::read_delim(
+          f, '\t', col_types=readr::cols_only(
+            gbifID=readr::col_character(), 
+            scientificName=readr::col_character(), 
+            decimalLongitude=readr::col_double(), 
+            decimalLatitude=readr::col_double(), 
+            coordinateUncertaintyInMeters=readr::col_double(), 
+            year=readr::col_integer(), 
+            countryCode=readr::col_character())
+        )
         if(!missing(coord_uncertainty)) {
           dat <- dat %>% dplyr::filter(coordinateUncertaintyInMeters <= 
                                      coord_uncertainty |
