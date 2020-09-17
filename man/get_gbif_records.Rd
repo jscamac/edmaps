@@ -5,7 +5,7 @@
 \title{Downloads GBIF records of species}
 \usage{
 get_gbif_records(
-  species,
+  taxon,
   min_year,
   coord_uncertainty,
   method = c("search", "download"),
@@ -15,7 +15,7 @@ get_gbif_records(
 )
 }
 \arguments{
-\item{species}{Character. Species taxonomic name.}
+\item{taxon}{Character. Species taxonomic name.}
 
 \item{min_year}{Integer. The minimum year for which records should be
 collated. Default is `NULL`, i.e. no minimum.}
@@ -39,6 +39,9 @@ provided.}
 ready, required when method is `'download'`.}
 
 \item{pwd}{GBIF password, required when method is `'download'`.}
+
+\item{email}{Email address, required when `method = 'download'`. This _may_ 
+be used to notify user when download is ready.}
 }
 \value{
 A `data.frame` of species occurrence records.

@@ -4,7 +4,7 @@
 #' recorded prior to a specified year, or that have coordinate uncertainty
 #' above a specified amount.
 #' 
-#' @param species Character. Species taxonomic name.
+#' @param taxon Character. Species taxonomic name.
 #' @param min_year Integer. The minimum year for which records should be
 #'   collated. Default is `NULL`, i.e. no minimum.
 #' @param coord_uncertainty Integer. The maximum allowable documented coordinate
@@ -24,6 +24,8 @@
 #' @param pwd  GBIF password, required when method is `'download'`.
 #' @param username  An email address for GBIF notification when download is 
 #'   ready, required when method is `'download'`.
+#' @param email Email address, required when `method = 'download'`. This _may_ 
+#'   be used to notify user when download is ready.
 #' @details This function is a wrapper of `rgbif` such that it can be readily
 #'   used with the `CoordinateCleaner` package.
 #' @return A `data.frame` of species occurrence records.
@@ -34,7 +36,7 @@
 #' @importFrom readr read_delim
 #' @importFrom utils download.file unzip
 #' @export
-get_gbif_records <- function(species, min_year, coord_uncertainty, 
+get_gbif_records <- function(taxon, min_year, coord_uncertainty, 
                              method=c('search', 'download'), username, pwd, 
                              email) {
   # warning about 100k limit
@@ -47,9 +49,9 @@ get_gbif_records <- function(species, min_year, coord_uncertainty,
   
   match_species <- function(sp) {
     sapply(sp, function(x) {
-      species_matches <- rgbif::name_suggest(q=x, rank='species')$data
+      species_matches <- rgbif::name_suggest(q=x)$data
       if(nrow(species_matches)==0) {
-        stop('No matches found in GBIF for ', species)
+        stop('No matches found in GBIF for ', sp)
       }
       key <- species_matches$key[1]
       message(sprintf('%s matched to %s (key: %s)', x, 
@@ -58,7 +60,7 @@ get_gbif_records <- function(species, min_year, coord_uncertainty,
     })
   }
   
-  key <- match_species(species)
+  key <- match_species(taxon)
   .f <- function(k, min_year, coord_uncertainty) {
     switch(
       method, 
