@@ -131,7 +131,8 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         utils::unzip(f, exdir=d <- tempfile())
         
         dat <- readr::read_delim(
-          f, '\t', col_types=readr::cols_only(
+          file.path(d, 'occurrence.txt'), '\t', 
+          col_types=readr::cols_only(
             gbifID=readr::col_character(), 
             scientificName=readr::col_character(), 
             decimalLongitude=readr::col_double(), 
