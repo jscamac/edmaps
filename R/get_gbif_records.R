@@ -27,7 +27,7 @@
 #' @param email Email address, required when `method = 'download'`. This _may_ 
 #'   be used to notify user when download is ready.
 #' @param retries If `method='download'` and file download fails, how many 
-#'   attempts should be made to download the file?
+#'   additional attempts should be made to download the file?
 #' @param cleanup Logical. Should temporary files associated with 
 #'   `method='download'` be deleted? Default is `TRUE`.
 #' @details This function is a wrapper of `rgbif` such that it can be readily
@@ -43,7 +43,7 @@
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty, 
                              method=c('search', 'download'), username, pwd, 
-                             email, retries=3, cleanup=TRUE) {
+                             email, retries=10, cleanup=TRUE) {
   # warning about 100k limit
   method <- match.arg(method)
   if(method=='download' & any(missing(username), missing(pwd), missing(email))) {
@@ -133,7 +133,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         dl_key <- do.call(rgbif::occ_download, args)
         message('GBIF download key: ', dl_key)
         dl <- rgbif::occ_download_wait(dl_key)
-        httr::RETRY(verb = 'GET', url=dl$downloadLink, times=retries, 
+        httr::RETRY(verb = 'GET', url=dl$downloadLink, times=retries + 1, 
                     quiet=FALSE, terminate_on=NULL, 
                     httr::write_disk(path=f <- tempfile(), overwrite=TRUE))
         csv <- utils::unzip(f, exdir=tempfile())

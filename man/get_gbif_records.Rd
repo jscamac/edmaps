@@ -12,7 +12,7 @@ get_gbif_records(
   username,
   pwd,
   email,
-  retries = 3,
+  retries = 10,
   cleanup = TRUE
 )
 }
@@ -46,7 +46,7 @@ ready, required when method is `'download'`.}
 be used to notify user when download is ready.}
 
 \item{retries}{If `method='download'` and file download fails, how many 
-attempts should be made to download the file?}
+additional attempts should be made to download the file?}
 
 \item{cleanup}{Logical. Should temporary files associated with 
 `method='download'` be deleted? Default is `TRUE`.}
