@@ -22,8 +22,6 @@
 #'   provided.
 #' @param username  GBIF username, required when method is `'download'`.
 #' @param pwd  GBIF password, required when method is `'download'`.
-#' @param username  An email address for GBIF notification when download is 
-#'   ready, required when method is `'download'`.
 #' @param email Email address, required when `method = 'download'`. This _may_ 
 #'   be used to notify user when download is ready.
 #' @param retries If `method='download'` and file download fails, how many 

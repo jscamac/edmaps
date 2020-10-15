@@ -37,8 +37,7 @@ for large datasets, consider using `'download'`. When using
 `method='download'`, the arguments `username`, `pwd`, and `email` must be 
 provided.}
 
-\item{username}{An email address for GBIF notification when download is 
-ready, required when method is `'download'`.}
+\item{username}{GBIF username, required when method is `'download'`.}
 
 \item{pwd}{GBIF password, required when method is `'download'`.}
 
