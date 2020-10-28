@@ -497,7 +497,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       
       cat(glue::glue('
         gbif_records <- get_gbif_records(
-          species=<<paste0(deparse(c(glue::glue("{gbif_species}"))), collapse="")>>,
+          taxon=<<paste0(deparse(c(glue::glue("{gbif_species}"))), collapse="")>>,
           min_year=<<gbif_min_year>>, coord_uncertainty=<<gbif_max_uncertainty>>)
       \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
       
