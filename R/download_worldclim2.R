@@ -25,7 +25,7 @@ download_worldclim2 <- function(outfile, variable, resolution) {
   if(!dir.exists(dirname(outfile))) dir.create(dirname(outfile))
 
   # Construct URL
-  base_url <- "http://biogeo.ucdavis.edu/data/worldclim/v2.0/tif/base/wc2.0"
+  base_url <- "https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1"
   url <- sprintf('%s_%s_%s.zip', base_url, resolution, variable)
 
   # Download ZIP file
