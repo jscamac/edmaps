@@ -505,10 +505,11 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
         clean_gbif <- dplyr::select(
         # ^ target is renamed before returning from species_plan
           CoordinateCleaner::clean_coordinates(
-            x = {species}_gbif_records,
+            x = dplyr::mutate({species}_gbif_records, species="{species}"),
             lon = "decimalLongitude",
             lat = "decimalLatitude",
             countries = "countryCode",
+            species = "species",
             country_ref = country_reference, 
             country_refcol = "iso_a3",
             tests = c("capitals",
