@@ -1,13 +1,13 @@
-#' Estimates pest arrivals through imported food
+#' Estimates pest arrivals through imported goods
 #'
-#' Estimates pest arrivals through imported food as a function of population
+#' Estimates pest arrivals through imported goods as a function of population
 #' density.
 #'
 #' @param pop_density A \code{RasterLayer} or file path to a raster file 
 #'   containing population density.
-#' @param total_imports Integer. Amount of imported food entering country.
-#' @param probability Numeric. The probability a imported food item contains
-#'   pest
+#' @param total_imports Integer. Amount of imported goods entering country.
+#' @param probability Numeric. The probability that a consignment of imported 
+#'   goods item contains the pest.
 #' @param outfile Character. Output raster file path. If not provided, raster 
 #'   object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?
@@ -19,7 +19,7 @@
 #' @family functions estimating arrivals
 #' @importFrom raster raster writeRaster
 #' @export
-arrivals_by_food <- function(pop_density, total_imports, probability, outfile, 
+arrivals_by_goods <- function(pop_density, total_imports, probability, outfile, 
   return_rast=FALSE) {
   #Load raster
   if(is.character(pop_density)) {
@@ -32,9 +32,9 @@ arrivals_by_food <- function(pop_density, total_imports, probability, outfile,
   # Calculate proportion of population density
   prop_pop <- calc_proportion(pop)
 
-  # Disperse machinery and calculate arrival rate
+  # Disperse and calculate arrival rate
   out <- disperse_arrivals(prop_pop, total_imports, probability)
-  names(out) <- c("arrivals_by_importedfood")
+  names(out) <- c("arrivals_by_importedgoods")
 
   if(!missing(outfile)) {
     # Create directory if it does not exist

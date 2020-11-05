@@ -7,8 +7,8 @@
 #'   containing population density.
 #' @param total_imports Integer. Amount of imported nursery stock entering
 #'   country.
-#' @param probability Numeric. The probability a imported food item contains
-#'   pest.
+#' @param probability Numeric. The probability a imported nursery stock item 
+#'   contains pest.
 #' @param outfile Character. Output raster file path. If not provided, raster 
 #'   object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?

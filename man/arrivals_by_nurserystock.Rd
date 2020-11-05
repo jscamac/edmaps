@@ -19,8 +19,8 @@ containing population density.}
 \item{total_imports}{Integer. Amount of imported nursery stock entering
 country.}
 
-\item{probability}{Numeric. The probability a imported food item contains
-pest.}
+\item{probability}{Numeric. The probability a imported nursery stock item 
+contains pest.}
 
 \item{outfile}{Character. Output raster file path. If not provided, raster 
 object will be returned to R.}
@@ -42,7 +42,7 @@ population density.
 Other functions estimating arrivals: 
 \code{\link{arrivals_by_containers}()},
 \code{\link{arrivals_by_fertiliser}()},
-\code{\link{arrivals_by_food}()},
+\code{\link{arrivals_by_goods}()},
 \code{\link{arrivals_by_machinery}()},
 \code{\link{arrivals_by_mail}()},
 \code{\link{arrivals_by_residents}()},

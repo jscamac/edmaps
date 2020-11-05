@@ -29,7 +29,7 @@
 #' @param include_ndvi Logical. Should biotic suitability be dependent on NDVI?
 #' @param pathways A character vector of invasion pathways that should be
 #'   included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
-#'   \code{'food'}, \code{'machinery'}, \code{'mail'}, \code{'nurserystock'},
+#'   \code{'goods'}, \code{'machinery'}, \code{'mail'}, \code{'nurserystock'},
 #'   \code{'residents'}, \code{'torres'}, \code{'tourists'}, \code{'vessels'}.
 #' @param aggregated_res A numeric vector of 2 elements, indicating the desired
 #'   resolution of aggregated establishment likelihood rasters, in metres.
@@ -120,8 +120,8 @@
 #' entering Australia.
 #' @param prob_nurserystock The rate of pest entry per unit volume of nursery
 #'   stock.
-#' @param total_food Numeric. The total volume of food entering Australia.
-#' @param prob_food The rate of pest entry per unit volume of food.
+#' @param total_goods Numeric. The total volume of goods entering Australia.
+#' @param prob_goods The rate of pest entry per unit volume of goods.
 #' @details To simplify reproducibility, \code{edmaps} provides an 
 #'   \emph{Excel} interface for specifying species parameters relevant to
 #'   estimating establishment likelihood. An example spreadsheet is 
@@ -157,7 +157,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   total_returning, prob_returning, total_torres, prob_torres, total_mail,
   prob_mail, total_vessels, prob_vessels, total_fertiliser, prob_fertiliser,
   total_machinery, prob_machinery, prob_containers, total_nurserystock,
-  prob_nurserystock, total_food, prob_food) {
+  prob_nurserystock, total_goods, prob_goods) {
   
   # prepare extent and resolution
   res <- c(1000, 1000) # enforce 1km for now - memory safe
@@ -185,7 +185,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   species <- gsub('\\s+', '_', gsub('^\\s+|\\s+$', '', species))
   
   pathways <- match.arg(
-    pathways, c('containers', 'fertiliser', 'food', 'machinery', 'mail', 
+    pathways, c('containers', 'fertiliser', 'goods', 'machinery', 'mail', 
                 'nurserystock', 'residents', 'torres', 'tourists', 'vessels'), 
     several.ok=TRUE
   )
@@ -443,14 +443,14 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     \n\n'), file=f, append=TRUE)
   }
   
-  if('food' %in% pathways) {
+  if('goods' %in% pathways) {
     cat(glue::glue('
-      food_arrivals <- arrivals_by_food(
+      goods_arrivals <- arrivals_by_goods(
         pop_density = drake::file_in("{pop_density_path}"),
-        total_imports = {total_food},
-        probability = {prob_food},
+        total_imports = {total_goods},
+        probability = {prob_goods},
         outfile = drake::file_out(
-          "outputs/{species}/auxiliary/{species}_food_arrivals_{res[1]}.tif"
+          "outputs/{species}/auxiliary/{species}_goods_arrivals_{res[1]}.tif"
         )
       )
     \n\n'), file=f, append=TRUE)

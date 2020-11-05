@@ -3,7 +3,7 @@
 export(aggregate_raster)
 export(arrivals_by_containers)
 export(arrivals_by_fertiliser)
-export(arrivals_by_food)
+export(arrivals_by_goods)
 export(arrivals_by_machinery)
 export(arrivals_by_mail)
 export(arrivals_by_nurserystock)
