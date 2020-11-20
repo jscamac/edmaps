@@ -25,7 +25,7 @@
 combine_arrivals <- function(x, outfile, summarise_uncertainty=FALSE, 
                              return_rast = FALSE) {
 
-  nbands <- sapply(x, function(f) dim(raster::stack(f))[3])
+  nbands <- unique(sapply(x, function(f) dim(raster::stack(f))[3]))
   if(length(nbands) != 1) {
     stop('When multiple values are passed for prob_*, the same number of values ',
          'must be passed for each prob_* argument that is used.')
