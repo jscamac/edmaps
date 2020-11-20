@@ -152,6 +152,18 @@ excel_to_plan <- function(file) {
     x <- x[!sapply(x, is.na)]
     x[sapply(x, is.list)] <- lapply(x[sapply(x, is.list)], unlist)
     
+    # split probabilities and coerce to numeric vector
+    x[grep('^prob_', names(x))] <- 
+      lapply(x[grep('^prob_', names(x))], function(y) {
+        as.numeric(strsplit(as.character(y), ',\\s*')[[1]])
+      })
+    prob_lens <- lengths(x[grep('^prob_', names(x))])
+    max_len <- max(prob_lens)
+    if(any(prob_lens < max_len)) {
+      stop('When multiple probabilities are passed for a given pathway, ',
+           'this number must be consistent across pathways.',)
+    }
+    
     if('gbif_species' %in% names(x)) {
       if(!'use_gbif' %in% names(x) || x$use_gbif) {
         x$gbif_species <- gsub('^\\s+|\\s+$', '', x$gbif_species)

@@ -306,7 +306,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
         tourist_beds = drake::file_in("{tourist_beds_path}"),
         airport_weight = drake::file_in("{airport_weight_path}"),
         total_tourists = {total_tourists},
-        probability = {prob_tourists},
+        probability = {paste(deparse(prob_tourists), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_tourists_arrivals_{res[1]}.tif"
         )
@@ -319,7 +319,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       residents_arrivals <- arrivals_by_residents(
         pop_density = drake::file_in("{pop_density_path}"),
         total_returning = {total_returning},
-        probability = {prob_returning},
+        probability = {paste(deparse(prob_returning), collapse="")},
         outfile = drake::file_out(
          "outputs/{species}/auxiliary/{species}_residents_arrivals_{res[1]}.tif"
         )
@@ -333,7 +333,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
         pop_density = drake::file_in("{pop_density_path}"),
         airport_weight = drake::file_in("{cairns_airport_weight_path}"),
         total_passengers = {total_torres},
-        probability = {prob_torres},
+        probability = {paste(deparse(prob_torres), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_torres_arrivals_{res[1]}.tif"
         )
@@ -346,7 +346,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       mail_arrivals <- arrivals_by_mail(
         pop_density = drake::file_in("{pop_density_path}"),
         total_mail = {total_mail},
-        probability = {prob_mail},
+        probability = {paste(deparse(prob_mail), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_mail_arrivals_{res[1]}.tif"
         )
@@ -393,7 +393,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
           "outputs/{species}/auxiliary/{species}_port_weights_{res[1]}.tif"
         ),
         n_vessels = {total_vessels},
-        probability = {prob_vessels},
+        probability = {paste(deparse(prob_vessels), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_vessels_arrivals_{res[1]}.tif"
         )
@@ -406,7 +406,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       fert_arrivals <- arrivals_by_fertiliser(
         fertiliser_weight = drake::file_in("{fert_weight_path}"),
         fertiliser_units = {total_fertiliser},
-        probability = {prob_fertiliser},
+        probability = {paste(deparse(prob_fertiliser), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_fertiliser_arrivals_{res[1]}.tif"
         )
@@ -419,7 +419,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       machinery_arrivals <- arrivals_by_machinery(
         pop_density = drake::file_in("{pop_density_path}"),
         total_machinery = {total_machinery},
-        probability = {prob_machinery},
+        probability = {paste(deparse(prob_machinery), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_machinery_arrivals_{res[1]}.tif"
         )
@@ -435,7 +435,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
         template_raster = drake::file_in(
           "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
         ),
-        probability = {prob_containers},
+        probability = {paste(deparse(prob_containers), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_containers_arrivals_{res[1]}.tif"
         )
@@ -448,7 +448,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       goods_arrivals <- arrivals_by_goods(
         pop_density = drake::file_in("{pop_density_path}"),
         total_imports = {total_goods},
-        probability = {prob_goods},
+        probability = {paste(deparse(prob_goods), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_goods_arrivals_{res[1]}.tif"
         )
@@ -461,7 +461,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       nurserystock_arrivals <- arrivals_by_nurserystock(
         pop_density = drake::file_in("{pop_density_path}"),
         total_imports = {total_nurserystock},
-        probability = {prob_nurserystock},
+        probability = {paste(deparse(prob_nurserystock), collapse="")},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_nurserystock_arrivals_{res[1]}.tif"
         )
@@ -469,7 +469,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     \n\n'), file=f, append=TRUE)
   }
   
-  cat('total_arrivals <- combine_arrivals(x=c(\n', 
+  cat('total_arrivals <- combine_arrivals(summarise_uncertainty=TRUE, x=c(\n', 
       paste(sprintf(
         'drake::file_in("outputs/%1$s/auxiliary/%1$s_%2$s_arrivals_%3$s.tif")', 
         species, pathways, res[1]), 

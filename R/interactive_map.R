@@ -38,19 +38,20 @@
 #'   \href{https://pandoc.org/installing.html}{pandoc} software must be 
 #'   installed and available to R. If pandoc is unavailable, the html file 
 #'   will be accompanied by a folder of accessory files.
-#' @importFrom raster raster setMinMax minValue maxValue getValues setValues ncell extent projection writeRaster projectRaster
+#' @importFrom raster stack unstack setMinMax minValue maxValue getValues setValues ncell extent projection writeRaster projectRaster
 #' @importFrom gdalUtilities gdalwarp
 #' @importFrom methods slot "slot<-"
 #' @importFrom utils read.csv
 #' @importFrom dplyr filter
 #' @importFrom sf st_as_sf st_crs st_crop
 #' @importFrom stats qlogis
-#' @importFrom tmap tmap_options tm_shape tm_raster tm_scale_bar tm_dots tmap_leaflet tmap_mode
+#' @importFrom tmap tmap_options tm_shape tm_raster tm_scale_bar tm_dots tmap_leaflet tmap_mode tm_facets
 #' @importFrom tmaptools tmap.pal.info
 #' @importFrom leafem addImageQuery addMouseCoordinates
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom leaflet addMiniMap
 #' @importFrom leaflet.opacity addOpacitySlider
+#' @importFrom stars read_stars
 #' @export
 interactive_map <- function(ras, layer_name = NULL, palette = 'inferno', 
   transparency = 0.8, legend = TRUE, set_value_range = NULL,  discrete = FALSE,
@@ -72,14 +73,14 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   }
   
   # Must be a path to a raster file, or a RasterLayer
-  if(is.character(ras)) ras <- raster::raster(ras)
+  if(is.character(ras)) ras <- raster::stack(ras)
   ras <- raster::setMinMax(ras)
   
-  if(!is.null(layer_name)) {
-    names(ras) <- layer_name 
-  } else {
-    layer_name <- 'layer'
-  }
+  # if(!is.null(layer_name)) {
+  #   names(ras) <- layer_name 
+  # } else {
+  #   layer_name <- 'layer'
+  # }
   
   # If projection is missing, assume WGS84
   if(is.na(raster::projection(ras))) {
@@ -90,11 +91,14 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   # if palette has length = 1, it must be a supported palette name.
   if(length(palette) == 1) palette <-
     match.arg(palette, rownames(tmaptools::tmap.pal.info))
-
+  
   
   # Restrict Raster value range?
   if(!is.null(set_value_range)) {
-    ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
+    ras <- raster::stack(lapply(raster::unstack(ras), function(x) {
+      x[x <= min(set_value_range) | x >= max(set_value_range)] <- NA  
+      x
+    }))
   }
   
   if(!isTRUE(discrete)) {
@@ -201,13 +205,14 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'), 
                             t_srs = "+init=epsg:3857", r = "bilinear")
-    ras <- raster::setMinMax(raster::raster(f2))
-    m <- tmap::tm_shape(ras, name=layer_name) + 
-      tmap::tm_raster(palette=palette, style='cont', midpoint=NA, 
-                      title=layer_name, 
-                      breaks=seq(raster::minValue(ras), raster::maxValue(ras), 
-                                 length.out=20),
-                      alpha=transparency)
+    ras <- stars::read_stars(f2)
+    nbands <- ifelse(length(dim(ras))==2, 1, dim(ras)[3])
+    m <- tmap::tm_shape(ras, name = layer_name) +
+      tmap::tm_raster(palette = palette,
+                      style = "cont", midpoint = NA, alpha = transparency, 
+                      legend.show=c(TRUE, rep(FALSE, nbands - 1)), 
+                      title = layer_name) + 
+      tmap::tm_facets(as.layers=TRUE)
   }
   
   
@@ -235,18 +240,17 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   l <- (m + tmap::tm_scale_bar()) %>% 
     tmap::tmap_leaflet()
   
-  i <- grep('addRasterImage', sapply(l$x$calls, '[[', 'method'))
-  j <- which(lengths(sapply(l$x$calls[[i]]$args, grep, pattern='^tmap')) > 0)
-  l$x$calls[[i]]$args[[j]] <- layer_name
+  # i <- grep('addRasterImage', sapply(l$x$calls, '[[', 'method'))
+  # j <- which(lengths(sapply(l$x$calls[[i]]$args, grep, pattern='^tmap')) > 0)
+  # l$x$calls[[i]]$args[[j]] <- layer_name
   out <- l %>%
     flip_legend %>% 
     leaflet::addMiniMap(position='bottomleft', toggleDisplay=TRUE) %>% 
-    leafem::addImageQuery(
-      ras, project=TRUE, 
-      layerId=layer_name, 
-      digits=5, prefix='') %>% 
-    leafem::addMouseCoordinates() %>% 
-    leaflet.opacity::addOpacitySlider(layer_name)
+    # leafem::addImageQuery(
+    #   ras, project=TRUE,
+    #   layerId=layer_name,
+    #   digits=5, prefix='') %>%
+    leafem::addMouseCoordinates()
   
   # outfile supplied
   if(!is.null(outfile)) {

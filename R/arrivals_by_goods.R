@@ -6,21 +6,23 @@
 #' @param pop_density A \code{RasterLayer} or file path to a raster file 
 #'   containing population density.
 #' @param total_imports Integer. Amount of imported goods entering country.
-#' @param probability Numeric. The probability that a consignment of imported 
-#'   goods item contains the pest.
-#' @param outfile Character. Output raster file path. If not provided, raster 
-#'   object will be returned to R.
+#' @param probability Numeric vector of one or more probabilities that a 
+#'   consignment of imported goods carries a pest.
+#' @param outfile Character. Output raster file path. If \code{probability} has
+#'   length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
+#'   not provided, raster object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?
 #'   Ignored if \code{outfile} is not provided.
-#' @return If \code{outfile} is specified, the resulting raster is saved as a
-#'   to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is 
-#'   not specified the resulting raster is returned, otherwise \code{NULL} is 
-#'   returned invisibly.
+#' @return If \code{outfile} is specified, the resulting raster (multiband if
+#'   \code{probability} has length > 1) is saved as a tiff at that path. If
+#'   \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
+#'   resulting raster object is returned, otherwise \code{NULL} is returned 
+#'   invisibly.
 #' @family functions estimating arrivals
-#' @importFrom raster raster writeRaster
+#' @importFrom raster raster writeRaster stack
 #' @export
 arrivals_by_goods <- function(pop_density, total_imports, probability, outfile, 
-  return_rast=FALSE) {
+  summarise_uncertainty=FALSE, return_rast=FALSE) {
   #Load raster
   if(is.character(pop_density)) {
     pop <- raster::raster(pop_density)
@@ -33,8 +35,14 @@ arrivals_by_goods <- function(pop_density, total_imports, probability, outfile,
   prop_pop <- calc_proportion(pop)
 
   # Disperse and calculate arrival rate
-  out <- disperse_arrivals(prop_pop, total_imports, probability)
-  names(out) <- c("arrivals_by_importedgoods")
+  out <- disperse_arrivals(prop_pop, total_imports, probability[1])
+  if(length(probability > 1)) {
+    out <- raster::stack(
+      c(list(out), lapply(probability[-1]/probability[1], function(x) {
+        out*x
+      }))
+    )
+  }
 
   if(!missing(outfile)) {
     # Create directory if it does not exist

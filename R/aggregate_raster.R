@@ -18,7 +18,7 @@
 #'   geotiff to that path. If \code{return_rast} is \code{TRUE} or
 #'   \code{outfile} is not specified the resulting raster is returned,
 #'   otherwise \code{NULL} is returned invisibly.
-#' @importFrom raster raster aggregate writeRaster
+#' @importFrom raster stack aggregate writeRaster
 #' @export
 aggregate_raster <- function(rast, outfile, aggregate_factor, fun = sum, 
   return_rast = FALSE) {
@@ -26,7 +26,7 @@ aggregate_raster <- function(rast, outfile, aggregate_factor, fun = sum,
     stop('aggregate_factor must be provided')
   }
 
-  if(is.character(rast)) rast <- raster::raster(rast)
+  if(is.character(rast)) rast <- raster::stack(rast)
   out <- raster::aggregate(rast, fact = aggregate_factor, fun = fun)
 
   # Create directory if it does not exist
