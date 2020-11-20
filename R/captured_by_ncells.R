@@ -17,7 +17,8 @@ captured_by_ncells <- function(infiles, names, n_cells, all=TRUE) {
   lst <- lapply(seq_along(infiles), function(x) {
     rast <- raster::stack(infiles[x])
     n_notna <- raster::cellStats(!is.na(rast), sum)
-    q <- mapply(raster::quantile, raster::unstack(rast), 1 - n_cells/n_notna)
+    q <- mapply(raster::quantile, raster::unstack(rast), 
+                pmax(0, 1 - n_cells/n_notna))
     i <- lapply(raster::unstack(rast > q), raster::Which, cells=TRUE)
     vals <- mapply(function(r, i_) r[i_], raster::unstack(rast), i, 
                    SIMPLIFY=FALSE)
