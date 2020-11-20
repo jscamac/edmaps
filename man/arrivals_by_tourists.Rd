@@ -10,6 +10,7 @@ arrivals_by_tourists(
   total_tourists,
   probability,
   outfile,
+  summarise_uncertainty = FALSE,
   return_rast = FALSE
 )
 }
@@ -22,19 +23,22 @@ containing airport distance weights.}
 
 \item{total_tourists}{Integer. The number of tourists.}
 
-\item{probability}{Numeric. The probability a tourist carries a pest.}
+\item{probability}{Numeric vector of one or more probabilities that a tourist
+carries a pest.}
 
-\item{outfile}{Character. Output raster file path. If not provided, raster 
-object will be returned to R.}
+\item{outfile}{Character. Output raster file path. If \code{probability} has
+length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
+not provided, raster object will be returned to R.}
 
 \item{return_rast}{Logical. Should the raster object be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster is saved as a
-  to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is 
-  not specified the resulting raster is returned, otherwise \code{NULL} is 
-  returned invisibly.
+If \code{outfile} is specified, the resulting raster (multiband if
+  \code{probability} has length > 1) is saved as a tiff at that path. If
+  \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
+  resulting raster object is returned, otherwise \code{NULL} is returned 
+  invisibly.
 }
 \description{
 Estimates pest arrival due to tourists as a function of distance from airport

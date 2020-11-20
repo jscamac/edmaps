@@ -9,6 +9,7 @@ arrivals_by_goods(
   total_imports,
   probability,
   outfile,
+  summarise_uncertainty = FALSE,
   return_rast = FALSE
 )
 }
@@ -18,20 +19,22 @@ containing population density.}
 
 \item{total_imports}{Integer. Amount of imported goods entering country.}
 
-\item{probability}{Numeric. The probability that a consignment of imported 
-goods item contains the pest.}
+\item{probability}{Numeric vector of one or more probabilities that a 
+consignment of imported goods carries a pest.}
 
-\item{outfile}{Character. Output raster file path. If not provided, raster 
-object will be returned to R.}
+\item{outfile}{Character. Output raster file path. If \code{probability} has
+length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
+not provided, raster object will be returned to R.}
 
 \item{return_rast}{Logical. Should the raster object be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster is saved as a
-  to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is 
-  not specified the resulting raster is returned, otherwise \code{NULL} is 
-  returned invisibly.
+If \code{outfile} is specified, the resulting raster (multiband if
+  \code{probability} has length > 1) is saved as a tiff at that path. If
+  \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
+  resulting raster object is returned, otherwise \code{NULL} is returned 
+  invisibly.
 }
 \description{
 Estimates pest arrivals through imported goods as a function of population

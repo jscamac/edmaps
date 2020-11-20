@@ -10,7 +10,6 @@ plot_raster(
   occurrence_data = NULL,
   pt_col = "red",
   height,
-  units = c("in", "cm", "mm"),
   compass = FALSE,
   outfile
 )
@@ -28,12 +27,8 @@ be plotted.}
 
 \item{pt_col}{Character. Colour of points (if plotted).}
 
-\item{height}{Height of plot, specified in \code{units}. Required if
-\code{outfile} is provided.}
-
-\item{units}{Character. Units corresponding to \code{height} and 
-\code{width}. Can be \code{"in"}, \code{"cm"}, or \code{"mm"}. Default is 
-inches (\code{"in"}).}
+\item{height}{Height of plot in inches (will be rendered at 300 dpi).
+Required if \code{outfile} is provided.}
 
 \item{compass}{Logical. Should a North arrow be shown?}
 

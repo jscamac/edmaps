@@ -18,7 +18,6 @@ static_map(
   pt_col = "red",
   aggregate_raster,
   height,
-  units = c("in", "cm", "mm"),
   outfile
 )
 }
@@ -60,12 +59,9 @@ containing columns named "Latitude" and "Longitude".}
 factor (i.e. number of raster cells to aggregate) and the aggregation
 function e.g. \code{list(10, sum)}.}
 
-\item{height}{height of plot. If not defined will use size of current 
-graphic device. Width will be dertermined automatically, based on the 
-aspect ratio given by the plotting extent.}
-
-\item{units}{Character. Units in which \code{height} is specified. Can be 
-\code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
+\item{height}{height of plot in inches (will be rendered at 300 dpi). If not
+defined will use size of current graphic device. Width will be determined
+automatically, based on the aspect ratio given by the plotting extent.}
 
 \item{outfile}{Character. File path to save map.}
 }

@@ -12,22 +12,23 @@ establishment_likelihood(
 )
 }
 \arguments{
-\item{total_arrivals}{A \code{RasterLayer} (or path to raster file)
+\item{total_arrivals}{A \code{Raster*} object or path to raster file
 containing total arrival estimates.}
 
-\item{suitability}{A \code{RasterLayer} (or path to raster file) containing
+\item{suitability}{A \code{RasterLayer} or path to raster file containing
 suitability scores.}
 
-\item{outfile}{Character. Output raster file path. If not provided, 
-the \code{RasterLayer} will be returned to R.}
+\item{outfile}{Character. Output raster file path. Must support multiband 
+raster if \code{total_arrivals} has multiple layers. If not provided, the
+\code{Raster*} object will be returned to R.}
 
 \item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is 
-  saved as to that path. If \code{return_rast} is \code{TRUE} or
-  \code{outfile} is not specified the resulting \code{RasterLayer} is 
+If \code{outfile} is specified, the resulting \code{Raster*} object
+  is saved as to that path. If \code{return_rast} is \code{TRUE} or
+  \code{outfile} is not specified the resulting \code{RasterLayer} is
   returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{
