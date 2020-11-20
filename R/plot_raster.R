@@ -10,11 +10,8 @@
 #'   columns named "Latitude" and "Longitude". If \code{NULL}, no points will 
 #'   be plotted.
 #' @param pt_col Character. Colour of points (if plotted).
-#' @param height Height of plot, specified in \code{units}. Required if
-#'   \code{outfile} is provided.
-#' @param units Character. Units corresponding to \code{height} and 
-#'   \code{width}. Can be \code{"in"}, \code{"cm"}, or \code{"mm"}. Default is 
-#'   inches (\code{"in"}).
+#' @param height Height of plot in inches (will be rendered at 300 dpi).
+#'   Required if \code{outfile} is provided.
 #' @param compass Logical. Should a North arrow be shown?
 #' @param outfile Character. Path to save output.
 #' @return A \code{tmap} object. If \code{outfile} is provided, a map will also
@@ -28,13 +25,11 @@
 #' @export
 
 plot_raster <- function(object, legend_title, occurrence_data = NULL, 
-  pt_col ="red", height, units = c("in", "cm", "mm"),
-  compass = FALSE, outfile) {
+  pt_col ="red", height, compass = FALSE, outfile) {
  
   if(!missing(outfile) & missing(height)) {
     stop('If outfile is provided, height must be specified.')
   }
-  units <- match.arg(units)  
   
   if(is.character(object)) {
     ras <- raster::raster(object)
@@ -106,7 +101,7 @@ plot_raster <- function(object, legend_title, occurrence_data = NULL,
     if(!dir.exists(dirname(outfile))) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
-    tmap::tmap_save(m, outfile, height=height, units=units, outer.margins=NA)
+    tmap::tmap_save(m, outfile, height=height*300, outer.margins=NA)
     m
   } else {
     m

@@ -28,11 +28,9 @@
 #' @param aggregate_raster \code{NULL} or a list containing the aggregation
 #'   factor (i.e. number of raster cells to aggregate) and the aggregation
 #'   function e.g. \code{list(10, sum)}.
-#' @param height height of plot. If not defined will use size of current 
-#'   graphic device. Width will be dertermined automatically, based on the 
-#'   aspect ratio given by the plotting extent.
-#' @param units Character. Units in which \code{height} is specified. Can be 
-#'   \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.
+#' @param height height of plot in inches (will be rendered at 300 dpi). If not
+#'   defined will use size of current graphic device. Width will be determined
+#'   automatically, based on the aspect ratio given by the plotting extent.
 #' @param outfile Character. File path to save map.
 #' @return If \code{outfile} is provided, a map is saved to that file. 
 #'   Otherwise, a \code{tmap} object is returned to R.
@@ -56,13 +54,11 @@
 
 static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range, 
   scale_type = "none",  transparency = 0.7, colramp_entire_range = TRUE, 
-  surveillance_locs, pt_col = "red", aggregate_raster, height, 
-  units = c("in", "cm", "mm"), outfile) {
+  surveillance_locs, pt_col = "red", aggregate_raster, height, outfile) {
   
   if(missing(height)) {
     stop('height must be specified.')
   }
-  units <- match.arg(units)
   
   # If an incorrect scale_type is specified
   scale_type <- match.arg(scale_type, c(
@@ -198,7 +194,7 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
     if(!dir.exists(dirname(outfile))) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
-    tmap::tmap_save(m, filename = outfile, height=height, units=units)
+    tmap::tmap_save(m, filename = outfile, height=height*300)
   } else {
     m
   }

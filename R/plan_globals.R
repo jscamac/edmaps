@@ -262,7 +262,6 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         transparency = 1, 
         aggregate_raster = list(!!agg_factor, sum), 
         height = 6.5,
-        units = "in",
         outfile = drake::file_out(!!sprintf(
           "outputs/not_pest_specific/tourist_rooms_%s.pdf", 
           output_resolution_agg[1]
@@ -279,7 +278,6 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         transparency = 1, 
         aggregate_raster = list(!!agg_factor, sum), 
         height = 7,
-        units = "in",
         outfile = drake::file_out(!!sprintf(
           "outputs/not_pest_specific/pop_density_%s.pdf", 
           output_resolution_agg[1]
@@ -317,9 +315,8 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
           "outputs/not_pest_specific/airport_distance_%s.pdf", 
           output_resolution_agg[1]
         )),
-        width = 6.5,
-        height = 8,
-        units = "in"),
+        width = 6.5*300,
+        height = 8*300),
     
     plot_cairns_airport_distances = 
       tmap::tmap_save(
@@ -353,9 +350,8 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
           "outputs/not_pest_specific/cairns_airport_distance_%s.pdf", 
           output_resolution_agg[1]
         )),
-        width = 6.5,
-        height = 8,
-        units = "in"),
+        width = 6.5*300,
+        height = 8*300),
     
     plot_fert_weight = 
       static_map(
@@ -370,7 +366,6 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         scale_type = 'log10',
         aggregate_raster = list(!!agg_factor, stats::median),
         height = 6.5,
-        units = "in",
         outfile = drake::file_out(!!sprintf(
           "outputs/not_pest_specific/fert_weight_%s.pdf", 
           output_resolution_agg[1]
@@ -388,7 +383,6 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         transparency = 1, 
         aggregate_raster = list(!!agg_factor, stats::median),
         height = 7,
-        units = "in",
         outfile = drake::file_out(!!sprintf(
           "outputs/not_pest_specific/NDVI_%s.pdf", output_resolution_agg[1]
         ))

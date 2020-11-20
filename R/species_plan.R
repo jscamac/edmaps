@@ -382,7 +382,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
           scale_type = "log10",
           aggregate_raster = list({agg_factor_aux}, max), 
           height = 6.5,
-          units = "in",
           outfile = drake::file_out(
             "outputs/{species}/auxiliary/{species}_port_weights_{aggregated_res_aux[1]}.pdf"
           )
@@ -623,7 +622,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
           occurrence_data = {species}_records,
           pt_col = "blue",
           height = 4.5,
-          units = "in",
           outfile = drake::file_out(
           "outputs/{species}/static_maps/{species}_world_climsuit_10min.pdf")
         ) 
@@ -652,7 +650,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
           occurrence_data = {species}_all_records,
           pt_col = "blue",
           height = 4.5,
-          units = "in",
           outfile = drake::file_out(
           "outputs/{species}/static_maps/{species}_world_climsuit_10min.pdf")
         ) 
@@ -725,7 +722,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       aggregate_raster = list({agg_factor_aux}, max), 
       set_value_range = c(0, Inf),
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_biotic_suitability_{aggregated_res_aux[1]}.pdf"
       )
@@ -745,7 +741,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
         transparency = 1, 
         aggregate_raster = list({agg_factor_aux}, max), 
         height = 7,
-        units = "in",
         outfile = drake::file_out(
           "outputs/{species}/static_maps/{species}_climsuit_{aggregated_res_aux[1]}.pdf"
         )
@@ -790,7 +785,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       aggregate_raster = list({agg_factor_aux}, max), 
       set_value_range = c(0, Inf),
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_suitability_{aggregated_res_aux[1]}.pdf"
       )
@@ -887,7 +881,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 1, 
       aggregate_raster = list({agg_factor}, max), 
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_national_{aggregated_res[1]}.pdf"
       )
@@ -905,7 +898,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_cairns_{res[1]}.pdf"
       )
@@ -925,7 +917,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_brisbane_{res[1]}.pdf"
       )
@@ -945,7 +936,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_sydney_{res[1]}.pdf"
       )
@@ -965,7 +955,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_melbourne_{res[1]}.pdf"
       )
@@ -985,7 +974,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_hobart_{res[1]}.pdf"
       )
@@ -1005,7 +993,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_adelaide_{res[1]}.pdf"
       )
@@ -1025,7 +1012,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_perth_{res[1]}.pdf"
       )
@@ -1045,7 +1031,6 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
-      units = "in",
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_darwin_{res[1]}.pdf"
       )
