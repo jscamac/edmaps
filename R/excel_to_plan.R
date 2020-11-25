@@ -29,6 +29,8 @@ excel_to_plan <- function(file) {
     tidyr::spread(Variable, Value) %>% 
     # standardise variable names
     dplyr::select(make_interactive_maps=`Make interactive maps?`,
+                  gbif_username=`GBIF username`,
+                  gbif_password=`GBIF password`,
                   clum_path=`CLUM raster path`,
                   nvis_path=`NVIS raster path`,
                   ndvi_path=`NDVI raster path`,
@@ -179,8 +181,10 @@ excel_to_plan <- function(file) {
     
     if(length(x$clum_classes)==0) x$clum_classes <- NULL
     if(length(x$nvis_classes)==0) x$nvis_classes <- NULL
+    x$gbif_username <- sub('^\\s+$', '', globals$gbif_username)
+    x$gbif_password <- sub('^\\s+$', '', globals$gbif_password)
     args <-  c(
-      x[setdiff(names(x), 'include_nvis')], 
+      x[setdiff(names(x), c('include_nvis', 'gbif_username', 'gbif_password'))], 
       globals[intersect(names(globals), names(formals(species_plan)))])
     do.call(species_plan, args)
   })

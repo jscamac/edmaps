@@ -83,6 +83,8 @@
 #' @param gbif_max_uncertainty Numeric. The maximum permissable coordinate 
 #'   uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is 
 #'   provided.
+#' @param gbif_username TODO
+#' @param gbif_password TODO
 #' @param manual_check_flagged_records Logical. Should an interactive map be
 #'   used for manually checking flagged occurrence records? If \code{TRUE}, the 
 #'   user will have the opportunity to select dubious points (i.e. occurrences 
@@ -152,12 +154,12 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
   port_weight_beta, fertiliser_data_path, nrm_path, containers_data_path,
   postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE, 
-  gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000,
-  manual_check_flagged_records=FALSE, total_tourists, prob_tourists,
-  total_returning, prob_returning, total_torres, prob_torres, total_mail,
-  prob_mail, total_vessels, prob_vessels, total_fertiliser, prob_fertiliser,
-  total_machinery, prob_machinery, prob_containers, total_nurserystock,
-  prob_nurserystock, total_goods, prob_goods) {
+  gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000, gbif_username,
+  gbif_password, manual_check_flagged_records=FALSE, total_tourists, 
+  prob_tourists, total_returning, prob_returning, total_torres, prob_torres, 
+  total_mail, prob_mail, total_vessels, prob_vessels, total_fertiliser, 
+  prob_fertiliser, total_machinery, prob_machinery, prob_containers, 
+  total_nurserystock, prob_nurserystock, total_goods, prob_goods) {
   
   # prepare extent and resolution
   res <- c(1000, 1000) # enforce 1km for now - memory safe
@@ -494,11 +496,24 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
           )
       \n\n'), file=f, append=TRUE)
       
-      cat(glue::glue('
+      if(!missing(gbif_username) && !missing(gbif_password) &&
+         nchar(sub('^\\s+$', '', gbif_username)) > 0 && 
+         nchar(sub('^\\s+$', '', gbif_password)) > 0) {
+        cat(glue::glue('
+        gbif_records <- get_gbif_records(
+          taxon=<<paste0(deparse(c(glue::glue("{gbif_species}"))), collapse="")>>,
+          min_year=<<gbif_min_year>>, coord_uncertainty=<<gbif_max_uncertainty>>,
+          username="<<gbif_username>>", email="cebra.apps@gmail.com", 
+          pwd="<<gbif_password>>")
+      \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+      } else {
+        cat(glue::glue('
         gbif_records <- get_gbif_records(
           taxon=<<paste0(deparse(c(glue::glue("{gbif_species}"))), collapse="")>>,
           min_year=<<gbif_min_year>>, coord_uncertainty=<<gbif_max_uncertainty>>)
       \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+      }
+      
       
       cat(glue::glue('
         clean_gbif <- dplyr::select(

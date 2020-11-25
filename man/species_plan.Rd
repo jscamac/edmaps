@@ -33,6 +33,8 @@ species_plan(
   gbif_species,
   gbif_min_year = 1970,
   gbif_max_uncertainty = 20000,
+  gbif_username,
+  gbif_password,
   manual_check_flagged_records = FALSE,
   total_tourists,
   prob_tourists,
@@ -163,6 +165,10 @@ provided.}
 \item{gbif_max_uncertainty}{Numeric. The maximum permissable coordinate 
 uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is 
 provided.}
+
+\item{gbif_username}{TODO}
+
+\item{gbif_password}{TODO}
 
 \item{manual_check_flagged_records}{Logical. Should an interactive map be
 used for manually checking flagged occurrence records? If \code{TRUE}, the 
