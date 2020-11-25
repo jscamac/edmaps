@@ -504,7 +504,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
           taxon=<<paste0(deparse(c(glue::glue("{gbif_species}"))), collapse="")>>,
           min_year=<<gbif_min_year>>, coord_uncertainty=<<gbif_max_uncertainty>>,
           username="<<gbif_username>>", email="cebra.apps@gmail.com", 
-          pwd="<<gbif_password>>")
+          pwd="<<gbif_password>>", method="download")
       \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
       } else {
         cat(glue::glue('
