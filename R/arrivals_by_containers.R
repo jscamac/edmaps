@@ -6,7 +6,8 @@
 #'   shapefile supported by OGR, as produced by
 #'   \code{\link{container_weights}}.
 #' @param port_data Character. Path to csv file containing Port Names, Port
-#'   Codes, Longitude, Latitude and Container volumes.
+#'   Codes, Longitude, Latitude and Container volumes. Column names must be (in
+#'   this order): Name, PortCode, Longitude, Latitude, Count.
 #' @param template_raster \code{RasterLayer} or file path to a raster file.
 #'   This is used to define the extent and resolution of output. Must be in
 #'   CRS EPSG:3577.
@@ -57,7 +58,7 @@ arrivals_by_containers <- function(container_weights, port_data,
   out <- sum(raster::stack(sapply(port_data$Name, function(x) {
     calc_proportion(fasterize::fasterize(
       sf = container_weights, raster = template_raster, field = x)) *
-      port_data[port_data$Name==x, 5] #todo use column name
+      port_data[port_data$Name==x, 'Count']
   }))) * probability[1]
   if(length(probability > 1)) {
     out <- raster::stack(

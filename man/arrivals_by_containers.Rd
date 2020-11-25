@@ -20,7 +20,8 @@ shapefile supported by OGR, as produced by
 \code{\link{container_weights}}.}
 
 \item{port_data}{Character. Path to csv file containing Port Names, Port
-Codes, Longitude, Latitude and Container volumes.}
+Codes, Longitude, Latitude and Container volumes. Column names must be (in
+this order): Name, PortCode, Longitude, Latitude, Count.}
 
 \item{template_raster}{\code{RasterLayer} or file path to a raster file.
 This is used to define the extent and resolution of output. Must be in
