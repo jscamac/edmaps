@@ -457,6 +457,19 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     \n\n'), file=f, append=TRUE)
   }
   
+  if('food' %in% pathways) {
+    cat(glue::glue('
+      food_arrivals <- arrivals_by_food(
+        pop_density = drake::file_in("{pop_density_path}"),
+        total_imports = {total_food},
+        probability = {paste(deparse(prob_food), collapse="")},
+        outfile = drake::file_out(
+          "outputs/{species}/auxiliary/{species}_food_arrivals_{res[1]}.tif"
+        )
+      )
+    \n\n'), file=f, append=TRUE)
+  }
+  
   if('nurserystock' %in% pathways) {
     cat(glue::glue('
       nurserystock_arrivals <- arrivals_by_nurserystock(

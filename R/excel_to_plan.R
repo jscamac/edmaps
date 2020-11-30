@@ -49,6 +49,7 @@ excel_to_plan <- function(file) {
                   total_fertiliser=`Total fertiliser`,
                   total_machinery=`Total machinery`,
                   total_nurserystock=`Total nurserystock`,
+                  total_food=`Total food`,
                   total_goods=`Total goods`) %>% 
     lapply(unlist)
   
@@ -84,6 +85,7 @@ excel_to_plan <- function(file) {
                   prob_machinery=`Prob machinery`,
                   prob_containers=`Prob containers`,
                   prob_nurserystock=`Prob nurserystock`,
+                  prob_food=`Prob food`,
                   prob_goods=`Prob goods`,
                   aggregated_res=`Aggregated res`) %>% 
     dplyr::mutate(

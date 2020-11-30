@@ -49,6 +49,7 @@ Cairns.
 Other functions estimating arrivals: 
 \code{\link{arrivals_by_containers}()},
 \code{\link{arrivals_by_fertiliser}()},
+\code{\link{arrivals_by_food}()},
 \code{\link{arrivals_by_goods}()},
 \code{\link{arrivals_by_machinery}()},
 \code{\link{arrivals_by_mail}()},
