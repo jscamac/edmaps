@@ -169,6 +169,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
       countryCode, origin =  'iso2c', destination = 'iso3c')
     )
   
+  out <- dplyr::filter(out, !is.na(decimalLongitude), !is.na(decimalLatitude))
   return(out)
 }
 
