@@ -53,6 +53,8 @@ species_plan(
   prob_containers,
   total_nurserystock,
   prob_nurserystock,
+  total_food,
+  prob_food,
   total_goods,
   prob_goods
 )
@@ -71,8 +73,9 @@ considered host plants for \code{species}. Either \code{clum_classes} or
 
 \item{pathways}{A character vector of invasion pathways that should be
 included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
-\code{'goods'}, \code{'machinery'}, \code{'mail'}, \code{'nurserystock'},
-\code{'residents'}, \code{'torres'}, \code{'tourists'}, \code{'vessels'}.}
+\code{'food'}, \code{'goods'}, \code{'machinery'}, \code{'mail'},
+\code{'nurserystock'}, \code{'residents'}, \code{'torres'},
+\code{'tourists'}, \code{'vessels'}.}
 
 \item{include_abiotic_weight}{Logical. Should suitability be dependent on
 climate? Considered TRUE if \code{climate_suitability_path} is provided,
@@ -224,6 +227,10 @@ entering Australia.}
 
 \item{prob_nurserystock}{The rate of pest entry per unit volume of nursery
 stock.}
+
+\item{total_food}{Numeric. The total volume of food entering Australia.}
+
+\item{prob_food}{The rate of pest entry per unit volume of food.}
 
 \item{total_goods}{Numeric. The total volume of goods entering Australia.}
 

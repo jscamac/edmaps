@@ -29,8 +29,9 @@
 #' @param include_ndvi Logical. Should biotic suitability be dependent on NDVI?
 #' @param pathways A character vector of invasion pathways that should be
 #'   included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
-#'   \code{'goods'}, \code{'machinery'}, \code{'mail'}, \code{'nurserystock'},
-#'   \code{'residents'}, \code{'torres'}, \code{'tourists'}, \code{'vessels'}.
+#'   \code{'food'}, \code{'goods'}, \code{'machinery'}, \code{'mail'},
+#'   \code{'nurserystock'}, \code{'residents'}, \code{'torres'},
+#'   \code{'tourists'}, \code{'vessels'}.
 #' @param aggregated_res A numeric vector of 2 elements, indicating the desired
 #'   resolution of aggregated establishment likelihood rasters, in metres.
 #' @param make_interactive_maps Logical. Should interactive html maps be 
@@ -122,6 +123,8 @@
 #' entering Australia.
 #' @param prob_nurserystock The rate of pest entry per unit volume of nursery
 #'   stock.
+#' @param total_food Numeric. The total volume of food entering Australia.
+#' @param prob_food The rate of pest entry per unit volume of food.
 #' @param total_goods Numeric. The total volume of goods entering Australia.
 #' @param prob_goods The rate of pest entry per unit volume of goods.
 #' @details To simplify reproducibility, \code{edmaps} provides an 
@@ -159,7 +162,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   prob_tourists, total_returning, prob_returning, total_torres, prob_torres, 
   total_mail, prob_mail, total_vessels, prob_vessels, total_fertiliser, 
   prob_fertiliser, total_machinery, prob_machinery, prob_containers, 
-  total_nurserystock, prob_nurserystock, total_goods, prob_goods) {
+  total_nurserystock, prob_nurserystock, total_food, prob_food, 
+  total_goods, prob_goods) {
   
   # prepare extent and resolution
   res <- c(1000, 1000) # enforce 1km for now - memory safe
@@ -187,8 +191,9 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   species <- gsub('\\s+', '_', gsub('^\\s+|\\s+$', '', species))
   
   pathways <- match.arg(
-    pathways, c('containers', 'fertiliser', 'goods', 'machinery', 'mail', 
-                'nurserystock', 'residents', 'torres', 'tourists', 'vessels'), 
+    pathways, c('containers', 'fertiliser', 'food', 'goods', 'machinery', 
+                'mail', 'nurserystock', 'residents', 'torres', 'tourists', 
+                'vessels'), 
     several.ok=TRUE
   )
  
