@@ -42,7 +42,7 @@
 #'   the Java architecture (32-bit/64-bit) matches that of R. Additionally, 
 #'   some Java errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
-#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster raster setMinMax crop writeRaster
+#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster stack setMinMax crop writeRaster
 #' @importFrom sf st_as_sf st_crop st_crs
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_dots tm_raster tm_rgb tm_shape tmap_mode tmap_options tmap_save tm_scale_bar tm_compass
@@ -65,7 +65,7 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
     "none", "log10", "max normalize", "minmax normalize", "logit", 
     "discrete"))
 
-  if(is.character(ras)) ras <- raster::raster(ras)
+  if(is.character(ras)) ras <- raster::stack(ras)
   ras <- raster::setMinMax(ras)
   
   e <- tmaptools::bb(xlim=xlim, ylim=ylim)
@@ -130,7 +130,7 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
       r = "bilinear", te=sf::st_bbox(osm_rast))
       # ^ This will interpolate the aggregated data if 
       #   aggregate_raster is not NULL
-    ras <- raster::setMinMax(raster::raster(f2))
+    ras <- raster::setMinMax(raster::stack(f2))
   }
 
   if(isTRUE(colramp_entire_range)) {
@@ -154,21 +154,33 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
     suppressMessages(tmap::tmap_mode(tmode))
   })
   
-  m <- tmap::tm_shape(osm_rast) +
-    tmap::tm_rgb() +
-    tmap::tm_shape(ras) + 
-    tmap::tm_raster(palette='inferno', style='cont', midpoint=NA, 
-                    title=legend_title, 
-                    breaks=pretty(limit_cols, n=7),
-                    alpha=transparency, 
-                    legend.is.portrait=FALSE) + 
-    tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
-    tmap::tm_compass() +
-    tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
-                    design.mode=FALSE,
-                    legend.position=c('left', 'bottom'),
-                    inner.margin=c(1/height, 0, 0, 0),
-                    legend.text.size=0.8)
+  minval <- raster::minValue(ras)
+  if(any(!is.na(minval))) {
+    m <- tmap::tm_shape(osm_rast) +
+      tmap::tm_rgb() +
+      tmap::tm_shape(ras) + 
+      tmap::tm_raster(palette='inferno', style='cont', midpoint=NA, 
+                      title=legend_title, 
+                      breaks=pretty(limit_cols, n=7),
+                      alpha=transparency, 
+                      legend.is.portrait=FALSE) + 
+      tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
+      tmap::tm_compass() +
+      tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
+                      legend.position=c('left', 'bottom'),
+                      inner.margin=c(1/height, 0, 0, 0),
+                      legend.text.size=0.8)
+  } else {
+    m <- tmap::tm_shape(osm_rast) +
+      tmap::tm_rgb() +
+      tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
+      tmap::tm_compass() +
+      tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
+                      legend.position=c('left', 'bottom'),
+                      inner.margin=c(1/height, 0, 0, 0),
+                      legend.text.size=0.8)
+  }
+  
 
   # Add surveillance locations (if required)
   if(!missing(surveillance_locs)) {
