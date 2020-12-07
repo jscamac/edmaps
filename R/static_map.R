@@ -157,15 +157,15 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
   })
   
   minval <- raster::minValue(ras)
-  if(any(!is.na(minval))) {
+  if(all(is.na(minval))) {
     m <- tmap::tm_shape(osm_rast) +
       tmap::tm_rgb() +
       tmap::tm_shape(ras) + 
-      tmap::tm_raster(palette='inferno', style='cont', midpoint=NA, 
+      tmap::tm_raster(style='cont', midpoint=NA, 
                       title=legend_title, 
                       breaks=pretty(limit_cols, n=7),
                       alpha=transparency, 
-                      legend.is.portrait=FALSE) + 
+                      legend.is.portrait=FALSE) +
       tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
       tmap::tm_compass() +
       tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
@@ -175,6 +175,12 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
   } else {
     m <- tmap::tm_shape(osm_rast) +
       tmap::tm_rgb() +
+      tmap::tm_shape(ras) + 
+      tmap::tm_raster(palette='inferno', style='cont', midpoint=NA, 
+                      title=legend_title, 
+                      breaks=pretty(limit_cols, n=7),
+                      alpha=transparency, 
+                      legend.is.portrait=FALSE) +
       tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
       tmap::tm_compass() +
       tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
