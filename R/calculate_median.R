@@ -12,10 +12,8 @@
 #' @importFrom raster stack overlay writeRaster
 #' @export
 calculate_median <- function(files, outfile) {
-  result <- lapply(files, function(ff) {
-    ss <- lapply(ff, function(s) raster::stack(s))
-    do.call(function(...) raster::overlay(..., fun=median), ss)
-  })  
+  ss <- lapply(files, raster::stack)
+  result <- do.call(function(...) raster::overlay(..., fun=median), ss)
   if(!dir.exists(dirname(outfile))) dir.create(dirname(outfile), recursive=TRUE)
   if(!missing(outfile)) {
     raster::writeRaster(result, outfile)
