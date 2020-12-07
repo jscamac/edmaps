@@ -21,6 +21,7 @@
 #' @importFrom readxl read_excel
 #' @importFrom dplyr select rename mutate bind_rows
 #' @importFrom tidyr spread
+#' @importFrom drake file_in file_out drake_plan
 #' @importFrom magrittr '%>%'
 #' @export
 excel_to_plan <- function(file) {
@@ -63,6 +64,7 @@ excel_to_plan <- function(file) {
   species <- readxl::read_excel(file, sheet='Species-specific parameters') %>% 
     # standardise names
     dplyr::rename(species=Species,
+                  species_group=`Species group`,
                   pathways=Pathways,
                   include_abiotic_weight=`Include abiotic weight?`,
                   include_ndvi=`Include NDVI?`,
@@ -186,9 +188,31 @@ excel_to_plan <- function(file) {
     x$gbif_username <- sub('^\\s+$', '', globals$gbif_username)
     x$gbif_password <- sub('^\\s+$', '', globals$gbif_password)
     args <-  c(
-      x[setdiff(names(x), c('include_nvis', 'gbif_username', 'gbif_password'))], 
+      x[setdiff(names(x), c('include_nvis', 'gbif_username', 'gbif_password', 
+                            'species_group'))], 
       globals[intersect(names(globals), names(formals(species_plan)))])
+    
     do.call(species_plan, args)
   })
+  
+  # Group species if necessary
+  groups <- species[!is.na(gsub('^\\s+|\\s+$', '', species$species_group)), 
+                    c('species', 'species_group')]
+  if(nrow(groups > 0)) {
+    plans$group_plans <- lapply(unique(groups$species_group), function(x) {
+      species_in_group <- groups$species[groups$species_group==x]
+      ff <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif', 
+                    gsub(' ', '_', species_in_group), 1000)
+      f_out <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif', gsub(' ', '_', x), 1000)
+      group_plan <- drake::drake_plan(
+        group_establishment_likelihood = 
+          calculate_median(files=drake::file_in(!!ff), 
+                           outfile=drake::file_out(!!f_out))
+      )
+      group_plan$target <- gsub(' ', '_', paste(x, group_plan$target))
+      group_plan
+    }) %>% dplyr::bind_rows()
+  }
+  
   return(unique(dplyr::bind_rows(plans)))
 }
