@@ -914,6 +914,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 1, 
       aggregate_raster = list({agg_factor}, max), 
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_national_{aggregated_res[1]}.pdf"
       )
@@ -931,6 +933,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_cairns_{res[1]}.pdf"
       )
@@ -950,6 +954,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_brisbane_{res[1]}.pdf"
       )
@@ -969,6 +975,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_sydney_{res[1]}.pdf"
       )
@@ -988,6 +996,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_melbourne_{res[1]}.pdf"
       )
@@ -1007,6 +1017,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_hobart_{res[1]}.pdf"
       )
@@ -1026,6 +1038,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_adelaide_{res[1]}.pdf"
       )
@@ -1045,6 +1059,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_perth_{res[1]}.pdf"
       )
@@ -1064,6 +1080,8 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
       transparency = 0.7,
       colramp_entire_range = TRUE,
       height = 7,
+      layer_names = c("Median", "Min", "Max"),
+      nrow = 1,
       outfile = drake::file_out(
         "outputs/{species}/static_maps/{species}_edmap_darwin_{res[1]}.pdf"
       )
