@@ -89,7 +89,7 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
   # Scale raster values?
   # Convert to log10 scale
   if(scale_type == "log10") {
-    if(raster::minValue(ras) <= 0) {
+    if(any(raster::minValue(ras)) <= 0) {
       stop('Cannot log transform raster containing zero or negative values.')
     } else { 
       ras <- log10(ras)
