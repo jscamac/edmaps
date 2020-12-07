@@ -35,7 +35,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
  airport_tsi_beta) {
   
   # prepare extent and resolution
-  # force national extent, 1km base res and 5km aggregated res for nowe
+  # force national extent, 1km base res and 5km aggregated res for now
   extent <- c(-1888000, 2122000, -4847000, -1010000)
   output_resolution <- c(1000, 1000)
   output_resolution_agg <- c(5000, 5000)

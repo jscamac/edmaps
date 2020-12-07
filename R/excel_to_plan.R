@@ -165,7 +165,7 @@ excel_to_plan <- function(file) {
     max_len <- max(prob_lens)
     if(any(prob_lens < max_len)) {
       stop('When multiple probabilities are passed for a given pathway, ',
-           'this number must be consistent across pathways.',)
+           'this number must be consistent across pathways.')
     }
     
     if('gbif_species' %in% names(x)) {
