@@ -9,6 +9,7 @@ static_map(
   xlim,
   ylim,
   layer,
+  layer_names,
   legend_title,
   set_value_range,
   scale_type = "none",
@@ -17,6 +18,7 @@ static_map(
   surveillance_locs,
   pt_col = "red",
   aggregate_raster,
+  nrow,
   height,
   outfile
 )
@@ -31,6 +33,9 @@ raster file.}
 
 \item{layer}{Character. A layer name to be plotted. Only relevant if loading
 a \code{RasterStack} or \code{RasterBrick}.}
+
+\item{layer_names}{Optional panel titles names for multipanel maps. If not
+provided, panels will not be given titles.}
 
 \item{legend_title}{Character. Legend title.}
 
@@ -59,6 +64,9 @@ containing columns named "Latitude" and "Longitude".}
 \item{aggregate_raster}{\code{NULL} or a list containing the aggregation
 factor (i.e. number of raster cells to aggregate) and the aggregation
 function e.g. \code{list(10, sum)}.}
+
+\item{nrow}{For multipanel plots, an optional  numeric value defining the
+number of rows of panels.}
 
 \item{height}{height of plot in inches (will be rendered at 300 dpi). If not
 defined will use size of current graphic device. Width will be determined

@@ -9,6 +9,8 @@
 #' @param ylim Numeric vector. The latitudinal extent of the area to plot.
 #' @param layer Character. A layer name to be plotted. Only relevant if loading
 #'   a \code{RasterStack} or \code{RasterBrick}.
+#' @param layer_names Optional panel titles names for multipanel maps. If not
+#'   provided, panels will not be given titles.
 #' @param legend_title Character. Legend title.
 #' @param set_value_range A numeric vector containing an upper and lower bound
 #'   value (in units of raster). Values outside this range (including values
@@ -29,6 +31,8 @@
 #' @param aggregate_raster \code{NULL} or a list containing the aggregation
 #'   factor (i.e. number of raster cells to aggregate) and the aggregation
 #'   function e.g. \code{list(10, sum)}.
+#' @param nrow For multipanel plots, an optional  numeric value defining the
+#'   number of rows of panels.
 #' @param height height of plot in inches (will be rendered at 300 dpi). If not
 #'   defined will use size of current graphic device. Width will be determined
 #'   automatically, based on the aspect ratio given by the plotting extent.
@@ -43,19 +47,21 @@
 #'   the Java architecture (32-bit/64-bit) matches that of R. Additionally, 
 #'   some Java errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
-#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster stack setMinMax crop writeRaster
+#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster raster stack setMinMax crop writeRaster
 #' @importFrom sf st_as_sf st_crop st_crs
 #' @importFrom stats qlogis
-#' @importFrom tmap tm_dots tm_raster tm_rgb tm_shape tmap_mode tmap_options tmap_save tm_scale_bar tm_compass
+#' @importFrom tmap tm_dots tm_raster tm_rgb tm_shape tmap_mode tmap_options tmap_save tm_scale_bar tm_compass tm_facets
 #' @importFrom tmaptools bb read_osm
 #' @importFrom utils read.csv
 #' @importFrom magrittr "%>%"
 #' @importFrom gdalUtilities gdalwarp
 #' @export
 
-static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range, 
-  scale_type = "none",  transparency = 0.7, colramp_entire_range = TRUE, 
-  surveillance_locs, pt_col = "red", aggregate_raster, height, outfile) {
+static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title, 
+                       set_value_range, scale_type = "none",  
+                       transparency = 0.7, colramp_entire_range = TRUE, 
+                       surveillance_locs, pt_col = "red", aggregate_raster, 
+                       nrow, height, outfile) {
   
   if(missing(height)) {
     stop('height must be specified.')
@@ -67,6 +73,13 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
     "discrete"))
 
   if(is.character(ras)) ras <- raster::stack(ras)
+  
+  if(missing(layer_names)) {
+    layer_names <- rep('', dim(ras)[3])
+  } else if(length(layer_names) != dim(ras)[3]) {
+    stop('layer_names has invalid length')
+  }
+  
   ras <- raster::setMinMax(ras)
   
   e <- tmaptools::bb(xlim=xlim, ylim=ylim)
@@ -189,6 +202,8 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
                       legend.text.size=0.8)
   }
   
+  m <- m + tmap::tm_layout(panel.labels=layer_names)
+  if(!missing(nrow)) m <- m + tmap::tm_facets(nrow=nrow)
 
   # Add surveillance locations (if required)
   if(!missing(surveillance_locs)) {
