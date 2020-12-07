@@ -3,7 +3,8 @@
 #' Produce a static map of establishment likelihood, with OpenStreetMap base 
 #' layer.
 #' 
-#' @param ras A \code{RasterLayer} or file path to a raster file.
+#' @param ras A \code{Raster*} object or file path to a (potentially multiband)
+#'   raster file.
 #' @param xlim Numeric vector. The longitudinal extent of the area to plot.
 #' @param ylim Numeric vector. The latitudinal extent of the area to plot.
 #' @param layer Character. A layer name to be plotted. Only relevant if loading

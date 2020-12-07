@@ -22,7 +22,8 @@ static_map(
 )
 }
 \arguments{
-\item{ras}{A \code{RasterLayer} or file path to a raster file.}
+\item{ras}{A \code{Raster*} object or file path to a (potentially multiband)
+raster file.}
 
 \item{xlim}{Numeric vector. The longitudinal extent of the area to plot.}
 
