@@ -202,7 +202,8 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
                       legend.text.size=0.8)
   }
   
-  m <- m + tmap::tm_layout(panel.labels=layer_names)
+  m <- m + tmap::tm_layout(panel.labels=layer_names) +
+    tmap::tm_layout(legend.outside.position='bottom')
   if(!missing(nrow)) m <- m + tmap::tm_facets(nrow=nrow)
 
   # Add surveillance locations (if required)
