@@ -114,7 +114,8 @@ static_map <- function(ras, xlim, ylim, layer,  legend_title, set_value_range,
     }
   }
   
-  full_range <- c(raster::minValue(ras), raster::maxValue(ras))
+  full_range <- c(min(raster::minValue(ras), na.rm=TRUE),
+                  max(raster::maxValue(ras), na.rm=TRUE))
 
   # Reproject raster to web mercator
   # https://github.com/mtennekes/tmap/issues/410
