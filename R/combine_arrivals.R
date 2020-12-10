@@ -33,7 +33,8 @@ combine_arrivals <- function(x, outfile, summarise_uncertainty=FALSE,
   } 
 
   out <- lapply(seq_len(nbands), function(i) {
-    message('Summing establishment likelihood across pathways for leakage rate instance ', i)
+    message('Summing establishment likelihood across pathways for ',
+            'leakage rate instance ', i, ' of ', nbands, '.')
     lapply(x, function(f) {
       raster::raster(f, band=i)
     }) %>% raster::stack() %>% 
