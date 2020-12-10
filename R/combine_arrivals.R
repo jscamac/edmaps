@@ -30,7 +30,16 @@ combine_arrivals <- function(x, outfile, summarise_uncertainty=FALSE,
     stop('When multiple values are passed for prob_*, the same number of values ',
          'must be passed for each prob_* argument that is used.')
   } 
-  out <- Reduce(`+`, lapply(x, raster::stack))
+
+  nband <- dim(raster::stack(x[1]))[3]
+  out <- lapply(seq_len(nband), function(i) {
+    message('Summing establishment likelihood across pathways for leakage rate instance ', i)
+    lapply(x, function(f) {
+      raster::raster(f, band=i)
+    }) %>% raster::stack() %>% 
+      sum(na.rm=TRUE)
+  }) %>% raster::stack()
+  
   if(isTRUE(summarise_uncertainty)) {
     out <- raster::stack(
       list(median=raster::calc(out, median),
