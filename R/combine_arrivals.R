@@ -21,6 +21,7 @@
 #'   cell-wise median, minimum, and maximum of the layers, respectively.
 #' @importFrom raster stack writeRaster calc
 #' @importFrom methods is
+#' @importFrom magrittr "%>%"
 #' @export
 combine_arrivals <- function(x, outfile, summarise_uncertainty=FALSE, 
                              return_rast = FALSE) {
