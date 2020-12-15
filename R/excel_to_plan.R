@@ -200,16 +200,193 @@ excel_to_plan <- function(file) {
                     c('species', 'species_group')]
   if(nrow(groups > 0)) {
     plans$group_plans <- lapply(unique(groups$species_group), function(x) {
+      group <- gsub('\\s+', '_', x)
       species_in_group <- groups$species[groups$species_group==x]
       ff <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif', 
                     gsub(' ', '_', species_in_group), 1000)
-      f_out <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif', gsub(' ', '_', x), 1000)
+      f_out <- sprintf('outputs/%1$s/%1$s_group_edmap_%2$s.tif', 
+                       gsub(' ', '_', group), 1000)
+      res <- c(1000, 1000) # enforce 1km for now - memory safe
+      aggregated_res <- c(5000, 5000) # hardcoding for now (for grouped species' maps)
+      agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
         group_establishment_likelihood = 
           calculate_median(files=drake::file_in(!!ff), 
-                           outfile=drake::file_out(!!f_out))
+                           outfile=drake::file_out(!!f_out)),
+        
+        plot_group_national_establishment_likelihood = static_map(
+          ras = drake::file_in(
+            !!sprintf("outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(112.76, 155),
+          ylim = c(-44.03, -9.21),
+          legend_title = !!sprintf("log10(EL %skm)", round(aggregated_res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10",
+          transparency = 1, 
+          aggregate_raster = list(!!agg_factor, max), 
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_national_%s.pdf", 
+                    group, group, aggregated_res[1])
+          )
+        ),
+        
+        group_cairns_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(145.23, 146.14),
+          ylim = c(-17.34, -16.68),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_cairns_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_brisbane_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(151.76, 153.86),
+          ylim = c(-28.11, -26.45),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_brisbane_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_sydney_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(150.29, 151.5),
+          ylim = c(-34.25, -33.51),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_sydney_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_melbourne_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(144.5, 145.5),
+          ylim = c(-38.1, -37.5),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_melbourne_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_hobart_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(146.4, 148.13),
+          ylim = c(-43.34, -42.33),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_hobart_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_adelaide_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(138, 139.5),
+          ylim = c(-36, -34),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_adelaide_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_perth_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(115.28, 116.86),
+          ylim = c(-32.56, -31.41),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_perth_%s.pdf", group, group, res[1])
+          )
+        ),
+        
+        group_darwin_edmap = static_map(
+          ras = drake::file_in(!!sprintf(
+            "outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
+          ),
+          xlim = c(130.5, 131.65),
+          ylim = c(-12.88, -12.09),
+          legend_title = !!sprintf("log10(EL %skm)", round(res[1]/1000, 2)),
+          set_value_range = c(10^-8, Inf),
+          scale_type = "log10", 
+          transparency = 0.7,
+          colramp_entire_range = TRUE,
+          height = 7,
+          layer_names = c("Median", "Min", "Max"),
+          nrow = 1,
+          outfile = drake::file_out(
+            !!sprintf("outputs/%s/static_maps/%s_group_edmap_darwin_%s.pdf", group, group, res[1])
+          )
+        )
       )
-      group_plan$target <- gsub(' ', '_', paste(x, group_plan$target))
+      group_plan$target <- gsub(' ', '_', paste(group, group_plan$target))
       group_plan
     }) %>% dplyr::bind_rows()
   }
