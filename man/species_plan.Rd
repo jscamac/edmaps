@@ -169,9 +169,13 @@ provided.}
 uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is 
 provided.}
 
-\item{gbif_username}{TODO}
+\item{gbif_username}{GBIF username to use for querying GBIF's occurrence 
+download API endpoint. If missing, the less efficient "search" endpoint 
+is used. Register at http://gbif.org.}
 
-\item{gbif_password}{TODO}
+\item{gbif_password}{GBIF password to use for querying GBIF's occurrence 
+download API endpoint. If missing, the less efficient "search" endpoint 
+is used. Register at http://gbif.org.}
 
 \item{manual_check_flagged_records}{Logical. Should an interactive map be
 used for manually checking flagged occurrence records? If \code{TRUE}, the 

@@ -84,8 +84,12 @@
 #' @param gbif_max_uncertainty Numeric. The maximum permissable coordinate 
 #'   uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is 
 #'   provided.
-#' @param gbif_username TODO
-#' @param gbif_password TODO
+#' @param gbif_username GBIF username to use for querying GBIF's occurrence 
+#'   download API endpoint. If missing, the less efficient "search" endpoint 
+#'   is used. Register at http://gbif.org.
+#' @param gbif_password GBIF password to use for querying GBIF's occurrence 
+#'   download API endpoint. If missing, the less efficient "search" endpoint 
+#'   is used. Register at http://gbif.org.
 #' @param manual_check_flagged_records Logical. Should an interactive map be
 #'   used for manually checking flagged occurrence records? If \code{TRUE}, the 
 #'   user will have the opportunity to select dubious points (i.e. occurrences 
