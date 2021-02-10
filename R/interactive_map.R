@@ -76,11 +76,6 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   if(is.character(ras)) ras <- raster::stack(ras)
   ras <- raster::setMinMax(ras)
   
-  # if(!is.null(layer_name)) {
-  #   names(ras) <- layer_name 
-  # } else {
-  #   layer_name <- 'layer'
-  # }
   
   # If projection is missing, assume WGS84
   if(is.na(raster::projection(ras))) {
@@ -240,16 +235,9 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   l <- (m + tmap::tm_scale_bar()) %>% 
     tmap::tmap_leaflet()
   
-  # i <- grep('addRasterImage', sapply(l$x$calls, '[[', 'method'))
-  # j <- which(lengths(sapply(l$x$calls[[i]]$args, grep, pattern='^tmap')) > 0)
-  # l$x$calls[[i]]$args[[j]] <- layer_name
   out <- l %>%
     flip_legend %>% 
     leaflet::addMiniMap(position='bottomleft', toggleDisplay=TRUE) %>% 
-    # leafem::addImageQuery(
-    #   ras, project=TRUE,
-    #   layerId=layer_name,
-    #   digits=5, prefix='') %>%
     leafem::addMouseCoordinates()
   
   # outfile supplied
