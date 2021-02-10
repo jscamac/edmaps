@@ -191,7 +191,8 @@ excel_to_plan <- function(file) {
       x[setdiff(names(x), c('include_nvis', 'gbif_username', 'gbif_password', 
                             'species_group'))], 
       globals[intersect(names(globals), names(formals(species_plan)))])
-    
+    if(is.na(args$gbif_username)) args$gbif_username <- NULL
+    if(is.na(args$gbif_password)) args$gbif_password <- NULL
     do.call(species_plan, args)
   })
   
