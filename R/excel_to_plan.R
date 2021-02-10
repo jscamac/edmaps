@@ -32,6 +32,7 @@ excel_to_plan <- function(file) {
     dplyr::select(make_interactive_maps=`Make interactive maps?`,
                   gbif_username=`GBIF username`,
                   gbif_password=`GBIF password`,
+                  basemap_mode=`Basemap mode`,
                   clum_path=`CLUM raster path`,
                   nvis_path=`NVIS raster path`,
                   ndvi_path=`NDVI raster path`,
@@ -193,6 +194,7 @@ excel_to_plan <- function(file) {
       globals[intersect(names(globals), names(formals(species_plan)))])
     if(is.na(args$gbif_username)) args$gbif_username <- NULL
     if(is.na(args$gbif_password)) args$gbif_password <- NULL
+    if(is.na(args$basemap_mode)) args$basemap_mode <- 'OpenStreetMap'
     do.call(species_plan, args)
   })
   

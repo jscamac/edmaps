@@ -35,6 +35,7 @@ species_plan(
   gbif_max_uncertainty = 20000,
   gbif_username,
   gbif_password,
+  basemap_mode = c("OpenStreetMap", "boundaries"),
   manual_check_flagged_records = FALSE,
   total_tourists,
   prob_tourists,
@@ -176,6 +177,10 @@ is used. Register at http://gbif.org.}
 \item{gbif_password}{GBIF password to use for querying GBIF's occurrence 
 download API endpoint. If missing, the less efficient "search" endpoint 
 is used. Register at http://gbif.org.}
+
+\item{basemap_mode}{Type of basemap for static maps. Either 
+\code{'OpenStreetMap'} (default), or \code{'boundaries'} (polygons 
+delineating borders of states/territories).}
 
 \item{manual_check_flagged_records}{Logical. Should an interactive map be
 used for manually checking flagged occurrence records? If \code{TRUE}, the 

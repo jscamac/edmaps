@@ -13,6 +13,7 @@ static_map(
   legend_title,
   set_value_range,
   scale_type = "none",
+  basemap_mode = c("osm", "boundaries"),
   transparency = 0.7,
   colramp_entire_range = TRUE,
   surveillance_locs,
@@ -49,6 +50,10 @@ falling on the boundaries) will be masked.}
 on min and max), or \code{"logit"}. Note that if \code{"log10"} or 
 \code{"logit"} is used 0 or 1 values. must be masked (using 
 \code{set_value_range}) or rescaled outside of this function.}
+
+\item{basemap_mode}{Either `'boundaries'` or `'osm'` (i.e., OpenStreetMap),
+defining whether OpenStreetMap imagery should be used for static map
+basemaps, or simple administrative boundaries. Default is `'osm'`.}
 
 \item{transparency}{Numeric. Transparency of raster, between 0-1.}
 
