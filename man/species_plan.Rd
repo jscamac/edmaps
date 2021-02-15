@@ -35,7 +35,7 @@ species_plan(
   gbif_max_uncertainty = 20000,
   gbif_username,
   gbif_password,
-  basemap_mode = c("OpenStreetMap", "boundaries"),
+  basemap_mode = c("osm", "boundaries"),
   manual_check_flagged_records = FALSE,
   total_tourists,
   prob_tourists,
@@ -142,7 +142,8 @@ of containers by postcode.}
 \item{postcode_path}{File path to postal areas shapefile.}
 
 \item{occurrence_path}{Path to a .csv file containing occurrence data. Must
-include columns \code{Longitude}, \code{Latitude}, and \code{Species}.}
+include columns \code{Longitude}, \code{Latitude}, and \code{Species}.
+Coordinates are expected to be in decimal degrees (WGS84).}
 
 \item{infected_countries}{A character vector of countries within which the 
 \code{species} occurs. Ignored if \code{climate_suitability_path} is
@@ -178,9 +179,9 @@ is used. Register at http://gbif.org.}
 download API endpoint. If missing, the less efficient "search" endpoint 
 is used. Register at http://gbif.org.}
 
-\item{basemap_mode}{Type of basemap for static maps. Either 
-\code{'OpenStreetMap'} (default), or \code{'boundaries'} (polygons 
-delineating borders of states/territories).}
+\item{basemap_mode}{Type of basemap for static maps. Either \code{'osm'}
+(default), or \code{'boundaries'} (polygons delineating borders of
+states/territories).}
 
 \item{manual_check_flagged_records}{Logical. Should an interactive map be
 used for manually checking flagged occurrence records? If \code{TRUE}, the 

@@ -64,6 +64,7 @@
 #' @param postcode_path File path to postal areas shapefile.
 #' @param occurrence_path Path to a .csv file containing occurrence data. Must
 #'   include columns \code{Longitude}, \code{Latitude}, and \code{Species}.
+#'   Coordinates are expected to be in decimal degrees (WGS84).
 #' @param infected_countries A character vector of countries within which the 
 #'   \code{species} occurs. Ignored if \code{climate_suitability_path} is
 #'   provided.Only one of \code{infected_countries} or \code{cabi_path} should
