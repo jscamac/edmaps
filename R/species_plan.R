@@ -90,9 +90,9 @@
 #' @param gbif_password GBIF password to use for querying GBIF's occurrence 
 #'   download API endpoint. If missing, the less efficient "search" endpoint 
 #'   is used. Register at http://gbif.org.
-#' @param basemap_mode Type of basemap for static maps. Either 
-#'   \code{'OpenStreetMap'} (default), or \code{'boundaries'} (polygons 
-#'   delineating borders of states/territories).
+#' @param basemap_mode Type of basemap for static maps. Either \code{'osm'}
+#'   (default), or \code{'boundaries'} (polygons delineating borders of
+#'   states/territories).
 #' @param manual_check_flagged_records Logical. Should an interactive map be
 #'   used for manually checking flagged occurrence records? If \code{TRUE}, the 
 #'   user will have the opportunity to select dubious points (i.e. occurrences 
@@ -165,7 +165,7 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
   port_weight_beta, fertiliser_data_path, nrm_path, containers_data_path,
   postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE, 
   gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000, gbif_username,
-  gbif_password, basemap_mode=c('OpenStreetMap', 'boundaries'),
+  gbif_password, basemap_mode=c('osm', 'boundaries'),
   manual_check_flagged_records=FALSE, total_tourists, prob_tourists, 
   total_returning, prob_returning, total_torres, prob_torres, total_mail, 
   prob_mail, total_vessels, prob_vessels, total_fertiliser, prob_fertiliser, 
