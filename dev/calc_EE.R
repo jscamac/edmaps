@@ -1,11 +1,16 @@
 # Calculate the probability of one or more establishment events occurring
 #' 
-#' Calculate the probability of one or more establishment events occurring as
-#' as a function of estimated leakage numbers and probability a leakage event could establish
-#' @param n_events Numeric vector containing lower and upper 95% CI number of leakage events
-#' @param p_establish Numeric vector containing the lower and upper 95% probability a leakage event could establish
-#' @param nsims Integer. Number of samples to be taken from event and establishment distributions. Default = 100000
-#' @return A dataframe containing the possible number of incursions that may occur and the respective probabilities of occurring.
+#' Calculate the probability of one or more establishment events occurring as as
+#' a function of estimated leakage numbers and the probability a leakage event
+#' could result in establishment.
+#' @param n_events Numeric vector containing lower and upper bounds (95% CI) for
+#'   the number of leakage events.
+#' @param p_establish Numeric vector containing the lower and upper bounds (95%
+#'   CI) for the probability a leakage event could result in an establishment.
+#' @param nsims Integer. Number of samples to be taken from event and
+#'   establishment distributions. Default = 100000.
+#' @return A \code{data.frame} containing the possible number of incursions that
+#'   may occur, and their corresponding probabilities.
 #' @author James Camac (\email{james.camac@gmail.com})
 #' @export
 calc_EE <- function(n_events, p_establish, nsims = 100000) {
