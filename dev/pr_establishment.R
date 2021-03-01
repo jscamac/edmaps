@@ -29,10 +29,11 @@ pr_establishment <- function(rast, suitability, outfile, return_rast) {
     suitability <- raster::raster(suitability)
   }
   
-  if(raster::minValue(suitability) < 0 | raster::maxValue(suitability) > 1) {
+  if(raster::minValue(suitability) < 0 || raster::maxValue(suitability) > 1) {
     stop{"Suitability raster scores should be between zero (not suitable) and 1
       (ideal suitability)"}
   }
+  raster::compareRaster(rast, suitability, crs=FALSE)
   out <- rast * suitability
   
   if(!missing(outfile)) {
