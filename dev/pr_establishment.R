@@ -1,10 +1,12 @@
 #' Calculate probability of establishment
 #'
 #' Calculate probability of establishment for each raster cell as a function of
-#' probabilities of arrival and climate and/or biotic suitability
-#' @param rast Raster object or path to file containing pathway probability of 
-#' pest arrival
-#' @param suitability Raster object or path to file containing a suitability raster
+#' probabilities of arrival and climate and/or biotic suitability.
+#' @param rast Raster object or path to file containing pathway probability of
+#'   pest arrival.
+#' @param suitability Raster object or path to file containing a suitability
+#'   raster. Cell values must be between 0 (not suitable) and 1 (ideal
+#'   suitability).
 #' @param outfile Character. Output raster file path. If not provided, the 
 #' \code{RasterLayer} will be returned to R.
 #' @param return_rast Logical. Should the \code{RasterLayer} be returned to R?
@@ -17,7 +19,7 @@
 #' @export
 #' @export
 
-pr_estasblishment <- function(rast, suitability, outfile, return_raster) {
+pr_establishment <- function(rast, suitability, outfile, return_rast) {
   
   if(is.character(rast)) {
     rast <- raster::raster(rast)
