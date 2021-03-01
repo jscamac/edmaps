@@ -14,7 +14,7 @@
 #'   returned, otherwise \code{NULL} is returned invisibly.
 #' @importFrom raster raster stack writeRaster
 #' @export
-calc_pathway_pr <- function(EE, rast, outfile) {
+calc_pathway_pr <- function(EE, rast, outfile, return_rast) {
   
   if(is.character(rast)) {
     rast <- raster::raster(rast)
