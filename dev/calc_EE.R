@@ -51,4 +51,3 @@ calc_EE <- function(n_events, p_establish, nsims = 100000) {
              probability = c(est))
   
 }
-
