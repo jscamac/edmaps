@@ -1,8 +1,11 @@
 #' Calculate the probability of arrival across pathways
 #' 
-#' Calculate the probability of arrival across pathways
-#' @param x Character vector giving file path(s) to rasters to be included in 
-#'   the summation. All rasters must have the same extent and resolution.
+#' Calculate the probability of arrival across pathways.
+#' @param x Either a \code{RasterStack} or a character vector giving file
+#'   path(s) to rasters. Each raster should describe a pathway to be included in
+#'   the summation, and cell values give the probability of arrival for the
+#'   corresponding pathway. All rasters must have the same extent and
+#'   resolution.
 #' @param outfile Character. Output raster file path. If not provided, the 
 #'   \code{RasterLayer} will be returned to R.
 #' @param return_rast Logical. Should the \code{RasterLayer} be returned to R?
@@ -13,13 +16,11 @@
 #'   returned, otherwise \code{NULL} is returned invisibly.
 #' @importFrom raster stack writeRaster
 #' @export
-
-
 combine_pathways <- function(x, outfile, return_rast = FALSE) {
   
   pathways <- raster::stack(x)
   
-  out <- 1 - prod(1-pathways)
+  out <- 1 - prod(1 - pathways)
   
   if(!missing(outfile)) {
     # Create directory if it does not exist
