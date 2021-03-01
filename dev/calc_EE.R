@@ -14,6 +14,14 @@
 #' @author James Camac (\email{james.camac@gmail.com})
 #' @export
 calc_EE <- function(n_events, p_establish, nsims = 100000) {
+  
+  if(length(n_events) != 2) {
+    stop('n_events must be a vector of two values.')
+  }
+  if(length(p_establish) != 2) {
+    stop('p_establish must be a vector of two values.')
+  }
+  
   ## Calculate leakage number
   log_mean <- sum(log(n_events))/2
   log_sd <- (log_mean - log(min(n_events)))/1.96
