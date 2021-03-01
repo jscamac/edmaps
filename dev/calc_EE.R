@@ -12,6 +12,8 @@
 #' @return A \code{data.frame} containing the possible number of incursions that
 #'   may occur, and their corresponding probabilities.
 #' @author James Camac (\email{james.camac@gmail.com})
+#' @importFrom dplyr arrange
+#' @importFrom stats plogis qlogis qnorm rbinom rlnorm rnorm rpois
 #' @export
 calc_EE <- function(n_events, p_establish, nsims = 100000) {
   
@@ -23,30 +25,30 @@ calc_EE <- function(n_events, p_establish, nsims = 100000) {
   }
   
   ## Calculate leakage number
-  log_mean <- sum(log(n_events))/2
-  log_sd <- (log_mean - log(min(n_events)))/1.96
+  log_mean <- mean(log(n_events))
+  log_sd <- (log_mean - log(min(n_events)))/stats::qnorm(0.975)
   
   # Sample lambda from lognormal
-  lambda <- rlnorm(n = nsims, meanlog = log_mean, sdlog = log_sd)
+  lambda <- stats::rlnorm(n = nsims, meanlog = log_mean, sdlog = log_sd)
   
   # Sample leakage from poisson using lambda
-  n <- rpois(n = nsims,lambda = lambda)
+  n <- stats::rpois(n = nsims,lambda = lambda)
   
   ## Calculate establishment probability
-  logit_mean <- sum(qlogis(p_establish))/2
-  logit_sd <- (logit_mean - qlogis(min(p_establish)))/1.96
+  logit_mean <- mean(qlogis(p_establish))
+  logit_sd <- (logit_mean - stats::qlogis(min(p_establish)))/stats::qnorm(0.975)
   
-  # Sample lambda from lognormal
-  logit_p <- rnorm(n=nsims, mean = logit_mean, sd = logit_sd)
+  # Sample probability from logit normal
+  logit_p <- stats::rnorm(n=nsims, mean = logit_mean, sd = logit_sd)
   
   # Sample incursion events from binomial
   
-  est <- rbinom(n = nsims, size = n, prob = plogis(logit_p))
+  est <- stats::rbinom(n = nsims, size = n, prob = stats::plogis(logit_p))
   
-  est <-table(est) / length(est)
+  est <- table(est) / length(est)
   
   data.frame(N_incursions = as.integer(names(est)),
-             probability = as.numeric(est)) %>%
-    dplyr::arrange()
+             probability = c(est))
   
 }
+
