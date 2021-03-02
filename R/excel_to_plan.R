@@ -22,7 +22,7 @@
 #' @importFrom dplyr select rename mutate bind_rows
 #' @importFrom tidyr spread
 #' @importFrom drake file_in file_out drake_plan
-#' @importFrom raster stack writeRaster
+#' @importFrom raster stack unstack writeRaster
 #' @importFrom magrittr '%>%'
 #' @export
 excel_to_plan <- function(file) {
@@ -216,8 +216,10 @@ excel_to_plan <- function(file) {
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
         group_establishment_likelihood = {
-          raster::writeRaster(1 - prod(1 - raster::stack(drake::file_in(!!ff))),
-                              drake::file_out(!!f_out))
+          s <- raster::stack(drake::file_in(!!ff))
+          r <- Reduce(function(x, y) x*y, raster::unstack(1 - s))
+          if(!dir.exists(dirname(!!f_out))) dir.create(dirname(!!f_out))
+          raster::writeRaster(1 - r, drake::file_out(!!f_out))
         },
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
@@ -231,7 +233,6 @@ excel_to_plan <- function(file) {
           transparency = 1,
           aggregate_raster = list(!!agg_factor, max),
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_national_%s.pdf",
@@ -251,7 +252,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_cairns_%s.pdf", group, group, res[1])
@@ -270,7 +270,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_brisbane_%s.pdf", group, group, res[1])
@@ -289,7 +288,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_sydney_%s.pdf", group, group, res[1])
@@ -308,7 +306,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_melbourne_%s.pdf", group, group, res[1])
@@ -327,7 +324,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_hobart_%s.pdf", group, group, res[1])
@@ -346,7 +342,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_adelaide_%s.pdf", group, group, res[1])
@@ -365,7 +360,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_perth_%s.pdf", group, group, res[1])
@@ -384,7 +378,6 @@ excel_to_plan <- function(file) {
           transparency = 0.7,
           colramp_entire_range = TRUE,
           height = 7,
-          layer_names = c("Median", "Min", "Max"),
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_darwin_%s.pdf", group, group, res[1])
