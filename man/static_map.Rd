@@ -46,9 +46,9 @@ falling on the boundaries) will be masked.}
 
 \item{scale_type}{Character. Can be: \code{"none"} (raw data, no rescaling),
 \code{"log10"}, \code{"max normalize"} (proportional to maximum value),
-\code{"minmax normalize"} (rescale values to be between zero and 1 based 
-on min and max), or \code{"logit"}. Note that if \code{"log10"} or 
-\code{"logit"} is used 0 or 1 values. must be masked (using 
+\code{"minmax normalize"} (rescale values to be between zero and 1 based
+on min and max), or \code{"logit"}. Note that if \code{"log10"} or
+\code{"logit"} is used 0 or 1 values. must be masked (using
 \code{set_value_range}) or rescaled outside of this function.}
 
 \item{basemap_mode}{Either `'boundaries'` or `'osm'` (i.e., OpenStreetMap),
@@ -61,7 +61,7 @@ basemaps, or simple administrative boundaries. Default is `'osm'`.}
 on national risk range (\code{TRUE}) or by risk range present in region
 specified by \code{xlim} and \code{ylim}.}
 
-\item{surveillance_locs}{A spatial object or a path to a .csv file 
+\item{surveillance_locs}{A spatial object or a path to a .csv file
 containing columns named "Latitude" and "Longitude".}
 
 \item{pt_col}{Character. The plotting colour for surveillance points.}
@@ -80,19 +80,19 @@ automatically, based on the aspect ratio given by the plotting extent.}
 \item{outfile}{Character. File path to save map.}
 }
 \value{
-If \code{outfile} is provided, a map is saved to that file. 
+If \code{outfile} is provided, a map is saved to that file.
   Otherwise, a \code{tmap} object is returned to R.
 }
 \description{
-Produce a static map of establishment likelihood, with OpenStreetMap base 
+Produce a static map of establishment likelihood, with OpenStreetMap base
 layer.
 }
 \details{
-This function relies on the \code{OpenStreetMap} package to obtain 
-  base layer tiles. This in turn requires Java to be installed, and linking 
-  R with Java can sometimes prove challenging. On macOS, Java errors can 
+This function relies on the \code{OpenStreetMap} package to obtain
+  base layer tiles. This in turn requires Java to be installed, and linking
+  R with Java can sometimes prove challenging. On macOS, Java errors can
   often be resolved by entering \code{sudo R CMD javareconf} in a terminal (
-  which updates R's Java configuration variables). On Windows, ensure that 
-  the Java architecture (32-bit/64-bit) matches that of R. Additionally, 
+  which updates R's Java configuration variables). On Windows, ensure that
+  the Java architecture (32-bit/64-bit) matches that of R. Additionally,
   some Java errors arise when using RStudio but not when using R.
 }
