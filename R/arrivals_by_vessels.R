@@ -2,41 +2,48 @@
 #'
 #' Estimates pest arrivals by vessels.
 #'
-#' @param port_weight A \code{RasterLayer} or file path to a raster file 
+#' @param port_weight A \code{RasterLayer} or file path to a raster file
 #'   containing weights to be used to distribute arrivals.
-#' @param n_vessels Integer. The total number of vessels entering country.
-#' @param probability Numeric vector of one or more probabilities that a unit
-#'   carries a pest.
+#' @param leakage_rate Numeric vector of 2 values, giving the lower and upper
+#'   bounds of a 95% CI for leakage rate (the number of pest leakage events in
+#'   a random year).
+#' @param establishment_rate Numeric vector of 2 values, giving the lower and
+#'   upper bounds of a 95% CI for establishment rate (the rate of survival, to
+#'   establishment, for leakage events).
 #' @param outfile Character. Output raster file path. If \code{probability} has
 #'   length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
 #'   not provided, raster object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?
 #'   Ignored if \code{outfile} is not provided.
+#' @param overwrite Logical. If \code{TRUE} and \code{outfile} is not missing,
+#'   it will be overwritten if the file specified by \code{outfile} already
+#'   exists.
 #' @return If \code{outfile} is specified, the resulting raster (multiband if
 #'   \code{probability} has length > 1) is saved as a tiff at that path. If
 #'   \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-#'   resulting raster object is returned, otherwise \code{NULL} is returned 
+#'   resulting raster object is returned, otherwise \code{NULL} is returned
 #'   invisibly.
 #' @family functions estimating arrivals
 #' @importFrom raster raster writeRaster stack
 #' @export
 #'
-arrivals_by_vessels <- function(port_weight, n_vessels, probability, outfile, 
-  summarise_uncertainty=FALSE, return_rast=FALSE) {
+arrivals_by_vessels <- function(port_weight, leakage_rate, establishment_rate,
+  outfile, return_rast=FALSE, overwrite=FALSE) {
+
+  if(length(leakage_rate) != 2) {
+    stop('leakage_rate must be a vector of two values.')
+  }
+  if(length(establishment_rate) != 2) {
+    stop('establishment_rate must be a vector of two values.')
+  }
 
   if(is.character(port_weight)) {
     port_weight <- raster::raster(port_weight)
   }
 
   # Disperse passengers and calculate arrival rate
-  out <- disperse_arrivals(port_weight, n_vessels, probability[1])
-  if(length(probability > 1)) {
-    out <- raster::stack(
-      c(list(out), lapply(probability[-1]/probability[1], function(x) {
-        out*x
-      }))
-    )
-  }
+  EE <- calc_EE(leakage_rate, establishment_rate)
+  out <- calc_pathway_pr(EE, port_weight, return_rast=TRUE)
 
   if(!missing(outfile)) {
     # Create directory if it does not exist
@@ -44,7 +51,7 @@ arrivals_by_vessels <- function(port_weight, n_vessels, probability, outfile,
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite=TRUE)
+    raster::writeRaster(out, outfile, overwrite = overwrite)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out

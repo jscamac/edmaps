@@ -6,21 +6,24 @@
 \usage{
 arrivals_by_food(
   pop_density,
-  total_imports,
-  probability,
+  leakage_rate,
+  establishment_rate,
   outfile,
-  summarise_uncertainty = FALSE,
-  return_rast = FALSE
+  return_rast = FALSE,
+  overwrite = FALSE
 )
 }
 \arguments{
-\item{pop_density}{A \code{RasterLayer} or file path to a raster file 
+\item{pop_density}{A \code{RasterLayer} or file path to a raster file
 containing population density.}
 
-\item{total_imports}{Integer. Amount of imported fresh food entering country.}
+\item{leakage_rate}{Numeric vector of 2 values, giving the lower and upper
+bounds of a 95% CI for leakage rate (the number of pest leakage events in
+a random year).}
 
-\item{probability}{Numeric vector of one or more probabilities that a 
-consignment of imported fresh food carries a pest.}
+\item{establishment_rate}{Numeric vector of 2 values, giving the lower and
+upper bounds of a 95% CI for establishment rate (the rate of survival, to
+establishment, for leakage events).}
 
 \item{outfile}{Character. Output raster file path. If \code{probability} has
 length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
@@ -28,12 +31,16 @@ not provided, raster object will be returned to R.}
 
 \item{return_rast}{Logical. Should the raster object be returned to R?
 Ignored if \code{outfile} is not provided.}
+
+\item{overwrite}{Logical. If \code{TRUE} and \code{outfile} is not missing,
+it will be overwritten if the file specified by \code{outfile} already
+exists.}
 }
 \value{
 If \code{outfile} is specified, the resulting raster (multiband if
   \code{probability} has length > 1) is saved as a tiff at that path. If
   \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-  resulting raster object is returned, otherwise \code{NULL} is returned 
+  resulting raster object is returned, otherwise \code{NULL} is returned
   invisibly.
 }
 \description{

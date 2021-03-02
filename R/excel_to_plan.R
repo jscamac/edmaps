@@ -22,6 +22,7 @@
 #' @importFrom dplyr select rename mutate bind_rows
 #' @importFrom tidyr spread
 #' @importFrom drake file_in file_out drake_plan
+#' @importFrom raster stack writeRaster
 #' @importFrom magrittr '%>%'
 #' @export
 excel_to_plan <- function(file) {
@@ -42,17 +43,7 @@ excel_to_plan <- function(file) {
                   fertiliser_data_path=`Fertiliser data path`,
                   nrm_path=`NRM shapefile path`,
                   airport_beta=`Airport distance penalty (tourists)`,
-                  airport_tsi_beta=`Airport distance penalty (Torres)`,
-                  total_tourists=`Total tourists`,
-                  total_returning=`Total returning residents`,
-                  total_torres=`Total passengers from TSI`,
-                  total_mail=`Total mail`,
-                  total_vessels=`Total vessels`,
-                  total_fertiliser=`Total fertiliser`,
-                  total_machinery=`Total machinery`,
-                  total_nurserystock=`Total nurserystock`,
-                  total_food=`Total food`,
-                  total_goods=`Total goods`) %>% 
+                  airport_tsi_beta=`Airport distance penalty (Torres)`) %>%
     lapply(unlist)
 
   # Check that supplied file paths exist
@@ -78,18 +69,29 @@ excel_to_plan <- function(file) {
                   infected_countries=`Infected countries`,
                   climate_suitability_path=`Climate suitability path`,
                   exclude_bioclim_vars =`Exclude BIOCLIM vars`,
-                  prob_tourists=`Prob tourists`,
-                  prob_returning=`Prob returning resident`,
-                  prob_torres=`Prob Torres passenger`,
-                  prob_mail=`Prob mail`,
-                  prob_vessels=`Prob vessels`,
                   port_weight_beta=`Distance penalty (ports)`,
-                  prob_fertiliser=`Prob fertiliser`,
-                  prob_machinery=`Prob machinery`,
-                  prob_containers=`Prob containers`,
-                  prob_nurserystock=`Prob nurserystock`,
-                  prob_food=`Prob food`,
-                  prob_goods=`Prob goods`,
+                  leakage_tourists=`Tourist leakage`,
+                  establishment_tourists=`Tourist establishment`,
+                  leakage_returning=`Returning resident leakage`,
+                  establishment_returning=`Returning resident establishment`,
+                  leakage_torres=`Torres passenger leakage`,
+                  establishment_torres=`Torres passenger establishment`,
+                  leakage_mail=`Mail leakage`,
+                  establishment_mail=`Mail establishment`,
+                  leakage_vessels=`Vessels leakage`,
+                  establishment_vessels=`Vessels establishment`,
+                  leakage_fertiliser=`Fertiliser leakage`,
+                  establishment_fertiliser=`Fertiliser establishment`,
+                  leakage_machinery=`Machinery leakage`,
+                  establishment_machinery=`Machinery establishment`,
+                  leakage_containers=`Containers leakage`,
+                  establishment_containers=`Containers establishment`,
+                  leakage_nurserystock=`Nurserystock leakage`,
+                  establishment_nurserystock=`Nurserystock establishment`,
+                  leakage_food=`Food leakage`,
+                  establishment_food=`Food establishment`,
+                  leakage_goods=`Goods leakage`,
+                  establishment_goods=`Goods establishment`,
                   aggregated_res=`Aggregated res`) %>%
     dplyr::mutate(
       species=gsub('^\\s+|\\s+$', '', species),
@@ -160,15 +162,15 @@ excel_to_plan <- function(file) {
     x[sapply(x, is.list)] <- lapply(x[sapply(x, is.list)], unlist)
 
     # split probabilities and coerce to numeric vector
-    x[grep('^prob_', names(x))] <-
-      lapply(x[grep('^prob_', names(x))], function(y) {
-        as.numeric(strsplit(as.character(y), ',\\s*')[[1]])
+    x[grep('^leakage_|^establishment_', names(x))] <-
+      lapply(x[grep('^leakage_|^establishment_', names(x))], function(y) {
+        as.numeric(strsplit(as.character(y), '\\s*,\\s*')[[1]])
       })
-    prob_lens <- lengths(x[grep('^prob_', names(x))])
-    max_len <- max(prob_lens)
-    if(any(prob_lens < max_len)) {
-      stop('When multiple probabilities are passed for a given pathway, ',
-           'this number must be consistent across pathways.')
+    prob_lens <- lengths(x[grep('^leakage_|^establishment_', names(x))])
+    if(any(prob_lens != 2)) {
+      stop('Leakage and establishment rates must be given as a pair of ',
+           'bounding values, defining the bounds of a 95% CI.\nValues should ',
+           'be given as a comma-separated text string, e.g. "1,10".')
     }
 
     if('gbif_species' %in% names(x)) {
@@ -213,10 +215,10 @@ excel_to_plan <- function(file) {
       aggregated_res <- c(5000, 5000) # hardcoding for now (for grouped species' maps)
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
-        group_establishment_likelihood =
-          calculate_median(files=drake::file_in(!!ff),
-                           outfile=drake::file_out(!!f_out)),
-
+        group_establishment_likelihood = {
+          raster::writeRaster(1 - prod(1 - raster::stack(drake::file_in(!!ff))),
+                              drake::file_out(!!f_out))
+        },
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
             !!sprintf("outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])

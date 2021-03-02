@@ -17,32 +17,32 @@
 #' @importFrom raster as.data.frame mask raster writeRaster
 #' @importFrom stats na.omit
 #' @export
-calc_pathway_pr <- function(EE, rast, outfile, return_rast) {
-  
+calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
+
   if(is.character(rast)) {
     rast <- raster::raster(rast)
   }
-  
+
   d <- dplyr::mutate(setNames(raster::as.data.frame(rast), 'value'),
-                     cell=dplyr::row_number()) %>% 
-    stats::na.omit() %>% 
+                     cell=dplyr::row_number()) %>%
+    stats::na.omit() %>%
     dplyr::mutate(value = 1 - value, prob_absent=0)
   # ^ Transform to probability (given incursion) that pest does *not* arrive at
   # cell (i.e. arrives at some other cell)
-  
+
   # Loop over rows of EE, calculating the probability the cell does *not*
   # receive the pest, given the number of incursions and corresponding
   # probability of that number of incursions.
   for(i in seq_len(nrow(EE))) {
-    d$prob_absent <- d$prob_absent + EE$probability[i] * 
-      d$value^EE$N_incursions[i]  
+    d$prob_absent <- d$prob_absent + EE$probability[i] *
+      d$value^EE$N_incursions[i]
   }
-  
+
   # Initialise raster and populate with probability of presence
   out <- raster::mask(raster::raster(rast), rast)
   out[d$cell] <- 1 - d$prob_absent
-  
-  
+
+
   if(!missing(outfile)) {
     # Create directory if it does not exist
     if(!dir.exists(dirname(outfile))) {

@@ -37,27 +37,29 @@ species_plan(
   gbif_password,
   basemap_mode = c("osm", "boundaries"),
   manual_check_flagged_records = FALSE,
-  total_tourists,
-  prob_tourists,
-  total_returning,
-  prob_returning,
-  total_torres,
-  prob_torres,
-  total_mail,
-  prob_mail,
-  total_vessels,
-  prob_vessels,
-  total_fertiliser,
-  prob_fertiliser,
-  total_machinery,
-  prob_machinery,
-  prob_containers,
-  total_nurserystock,
-  prob_nurserystock,
-  total_food,
-  prob_food,
-  total_goods,
-  prob_goods
+  leakage_tourists,
+  establishment_tourists,
+  leakage_returning,
+  establishment_returning,
+  leakage_torres,
+  establishment_torres,
+  leakage_mail,
+  establishment_mail,
+  leakage_vessels,
+  establishment_vessels,
+  leakage_fertiliser,
+  establishment_fertiliser,
+  leakage_machinery,
+  establishment_machinery,
+  leakage_containers,
+  establishment_containers,
+  leakage_nurserystock,
+  establishment_nurserystock,
+  leakage_food,
+  establishment_food,
+  leakage_goods,
+  establishment_goods,
+  overwrite = TRUE
 )
 }
 \arguments{
@@ -85,15 +87,15 @@ or if \code{use_gbif} is TRUE.}
 \item{climate_suitability_path}{Optional file path to a raster describing
 climatic suitability across the landscape. If provided, the raster must be
 have the Australian Albers coordinate system (EPSG:3577), spatial
-resolution of 1000 m, and must have xmin = -1888000, xmax = 2122000, 
-ymin =-4847000, ymax = -1010000. If not provided and 
-\code{include_abiotic_weight} is TRUE, a range bag model will be fit to 
+resolution of 1000 m, and must have xmin = -1888000, xmax = 2122000,
+ymin =-4847000, ymax = -1010000. If not provided and
+\code{include_abiotic_weight} is TRUE, a range bag model will be fit to
 estimate climatic suitability.}
 
-\item{exclude_bioclim_vars}{Character vector of bioclim variables that 
-should not be used when fitting a range bag model (see 
-\code{\link{range_bag}}) of climatic suitability. Variables should be 
-specified as, e.g., \code{c("bio01", "bio12")}. Ignored if 
+\item{exclude_bioclim_vars}{Character vector of bioclim variables that
+should not be used when fitting a range bag model (see
+\code{\link{range_bag}}) of climatic suitability. Variables should be
+specified as, e.g., \code{c("bio01", "bio12")}. Ignored if
 \code{climate_suitability_path} is provided.}
 
 \item{include_ndvi}{Logical. Should biotic suitability be dependent on NDVI?}
@@ -101,7 +103,7 @@ specified as, e.g., \code{c("bio01", "bio12")}. Ignored if
 \item{aggregated_res}{A numeric vector of 2 elements, indicating the desired
 resolution of aggregated establishment likelihood rasters, in metres.}
 
-\item{make_interactive_maps}{Logical. Should interactive html maps be 
+\item{make_interactive_maps}{Logical. Should interactive html maps be
 generated?}
 
 \item{clum_path}{Path to the ACLUM raster.}
@@ -116,7 +118,7 @@ international tourists passengers around international airport. Default is
 
 \item{airport_tsi_beta}{Numeric. Parameter controlling the distribution of
 Torres Strait passengers around Cairns airport. Default is
-\code{log(0.5)/10} (i.e., 50\% of passengers within 10km of Cairns 
+\code{log(0.5)/10} (i.e., 50\% of passengers within 10km of Cairns
 airport).}
 
 \item{port_data_path}{File path to the marine ports .csv file.}
@@ -124,10 +126,10 @@ airport).}
 \item{port_weight_beta}{Numeric. Defines the decay rate of an exponential
 model. In the context of pests entering via the vessel pathway, this
 reflects the decrease in the relative likelihood of pest arrival at
-locations distant from marine ports. For example, 
-\code{prob_weight_beta=log(0.5)/10} would lead to distance-decay that 
-leads to 50\% (i.e. \code{0.5}) of establishment likelihood (prior to 
-considering other relevant pathways) within a distance of \code{10} map 
+locations distant from marine ports. For example,
+\code{prob_weight_beta=log(0.5)/10} would lead to distance-decay that
+leads to 50\% (i.e. \code{0.5}) of establishment likelihood (prior to
+considering other relevant pathways) within a distance of \code{10} map
 units (i.e., 10 kilometres when \code{res} is 1000).}
 
 \item{fertiliser_data_path}{File path to a csv file containing information
@@ -145,7 +147,7 @@ of containers by postcode.}
 include columns \code{Longitude}, \code{Latitude}, and \code{Species}.
 Coordinates are expected to be in decimal degrees (WGS84).}
 
-\item{infected_countries}{A character vector of countries within which the 
+\item{infected_countries}{A character vector of countries within which the
 \code{species} occurs. Ignored if \code{climate_suitability_path} is
 provided.Only one of \code{infected_countries} or \code{cabi_path} should
 be provided.}
@@ -153,30 +155,30 @@ be provided.}
 \item{cabi_path}{Path to a .csv file downloaded from CABI, indicating the
 countries within which the \code{species} occurs. Download links to these
 files can be found at the bottom of CABI species datasheet webpages, e.g.
-https://www.cabi.org/isc/datasheet/17685. Ignored if 
-\code{climate_suitability_path} is provided. Only one of 
+https://www.cabi.org/isc/datasheet/17685. Ignored if
+\code{climate_suitability_path} is provided. Only one of
 \code{infected_countries} or \code{cabi_path} should be provided.}
 
-\item{use_gbif}{Logical. Should species occurrence records be sourced from 
+\item{use_gbif}{Logical. Should species occurrence records be sourced from
 GBIF? Ignored if \code{climate_suitability_path} is provided.}
 
 \item{gbif_species}{Character vector. Taxon names to use when querying GBIF.
 Ignored if \code{climate_suitability_path} is provided.}
 
-\item{gbif_min_year}{Integer. The minimum year (\code{yyyy}) to be included 
-when downloading GBIF data. Ignored if \code{climate_suitability_path} is 
+\item{gbif_min_year}{Integer. The minimum year (\code{yyyy}) to be included
+when downloading GBIF data. Ignored if \code{climate_suitability_path} is
 provided.}
 
-\item{gbif_max_uncertainty}{Numeric. The maximum permissable coordinate 
-uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is 
+\item{gbif_max_uncertainty}{Numeric. The maximum permissable coordinate
+uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is
 provided.}
 
-\item{gbif_username}{GBIF username to use for querying GBIF's occurrence 
-download API endpoint. If missing, the less efficient "search" endpoint 
+\item{gbif_username}{GBIF username to use for querying GBIF's occurrence
+download API endpoint. If missing, the less efficient "search" endpoint
 is used. Register at http://gbif.org.}
 
-\item{gbif_password}{GBIF password to use for querying GBIF's occurrence 
-download API endpoint. If missing, the less efficient "search" endpoint 
+\item{gbif_password}{GBIF password to use for querying GBIF's occurrence
+download API endpoint. If missing, the less efficient "search" endpoint
 is used. Register at http://gbif.org.}
 
 \item{basemap_mode}{Type of basemap for static maps. Either \code{'osm'}
@@ -184,78 +186,77 @@ is used. Register at http://gbif.org.}
 states/territories).}
 
 \item{manual_check_flagged_records}{Logical. Should an interactive map be
-used for manually checking flagged occurrence records? If \code{TRUE}, the 
-user will have the opportunity to select dubious points (i.e. occurrences 
-in countries for which CABI has no record of the species' establishment), 
+used for manually checking flagged occurrence records? If \code{TRUE}, the
+user will have the opportunity to select dubious points (i.e. occurrences
+in countries for which CABI has no record of the species' establishment),
 to be retained. If \code{FALSE} (the default), all such dubious points will
-be excluded. Ignored if \code{climate_suitability_path} is provided. Note 
+be excluded. Ignored if \code{climate_suitability_path} is provided. Note
 that manual checking is not possible when using \code{\link{excel_to_plan}}
 since the required interactivity will interrupt plan processing.}
 
-\item{total_tourists}{Numeric. The total number of tourists entering
-Australia.}
-
-\item{prob_tourists}{Numeric. The per capita rate of pest entry that 
+\item{leakage_tourists}{Numeric. The per capita rate of pest entry that
 applies to tourists.}
 
-\item{total_returning}{Numeric. The total number of returnig residents 
-entering Australia.}
+\item{establishment_tourists}{Numeric.}
 
-\item{prob_returning}{Numeric. The per capita rate of pest entry that 
+\item{leakage_returning}{Numeric. The per capita rate of pest entry that
 applies to returning residents.}
 
-\item{total_torres}{Numeric. The total number of passenges entering 
-Australia via the Torres Strait Islands pathway.}
+\item{establishment_returning}{Numeric.}
 
-\item{prob_torres}{Numeric. The per capita rate of pest entry that 
+\item{leakage_torres}{Numeric. The per capita rate of pest entry that
 applies to passengers entering via the Torres Strait Islands
 pathway.}
 
-\item{total_mail}{Numeric. The total volume of mail entering Australia.}
+\item{establishment_torres}{Numeric.}
 
-\item{prob_mail}{The rate of pest entry per unit volume of mail.}
+\item{leakage_mail}{The rate of pest entry per unit volume of mail.}
 
-\item{total_vessels}{Numeric. The total volume of marine vessels entering
-Australia.}
+\item{establishment_mail}{Numeric.}
 
-\item{prob_vessels}{The rate of pest entry per vessel.}
+\item{leakage_vessels}{The rate of pest entry per vessel.}
 
-\item{total_fertiliser}{Numeric. The total volume of fertiliser entering
-Australia.}
+\item{establishment_vessels}{Numeric.}
 
-\item{prob_fertiliser}{The rate of pest entry per unit volume of fertiliser.}
+\item{leakage_fertiliser}{The rate of pest entry per unit volume of
+fertiliser.}
 
-\item{total_machinery}{Numeric. The total volume of machinery entering
-Australia.}
+\item{establishment_fertiliser}{Numeric.}
 
-\item{prob_machinery}{The rate of pest entry per unit volume of machinery.}
+\item{leakage_machinery}{The rate of pest entry per unit volume of machinery.}
 
-\item{prob_containers}{The rate of pest entry per container.}
+\item{establishment_machinery}{Numeric.}
 
-\item{total_nurserystock}{Numeric. The total volume of nursery stock 
-entering Australia.}
+\item{leakage_containers}{The rate of pest entry per container.}
 
-\item{prob_nurserystock}{The rate of pest entry per unit volume of nursery
+\item{establishment_containers}{Numeric.}
+
+\item{leakage_nurserystock}{The rate of pest entry per unit volume of nursery
 stock.}
 
-\item{total_food}{Numeric. The total volume of food entering Australia.}
+\item{establishment_nurserystock}{Numeric.}
 
-\item{prob_food}{The rate of pest entry per unit volume of food.}
+\item{leakage_food}{The rate of pest entry per unit volume of food.}
 
-\item{total_goods}{Numeric. The total volume of goods entering Australia.}
+\item{establishment_food}{Numeric.}
 
-\item{prob_goods}{The rate of pest entry per unit volume of goods.}
+\item{leakage_goods}{The rate of pest entry per unit volume of goods.}
+
+\item{establishment_goods}{Numeric.}
+
+\item{overwrite}{Logical. Should the code executed by the resulting plan be
+allowed to overwrite existing raster files? Default is \code{TRUE}.}
 }
 \description{
 Generate a drake plan that facilitates reproducible generation of species
 outputs.
 }
 \details{
-To simplify reproducibility, \code{edmaps} provides an 
+To simplify reproducibility, \code{edmaps} provides an
   \emph{Excel} interface for specifying species parameters relevant to
-  estimating establishment likelihood. An example spreadsheet is 
-  bundled with the package, available at the path given by 
-  \code{system.file('extdata/parameters.xlsx', package='edmaps')}. The 
+  estimating establishment likelihood. An example spreadsheet is
+  bundled with the package, available at the path given by
+  \code{system.file('extdata/parameters.xlsx', package='edmaps')}. The
   spreadsheet has two sheets, the first specifying "global" parameters
   that will apply to all species (e.g. file paths to rasters that will),
   be used regardless of species identity and the second specifying
