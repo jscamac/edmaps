@@ -36,6 +36,7 @@ species_plan(
   gbif_username,
   gbif_password,
   basemap_mode = c("osm", "boundaries"),
+  minimum_probability_for_maps = 1e-05,
   manual_check_flagged_records = FALSE,
   leakage_tourists,
   establishment_tourists,
@@ -184,6 +185,10 @@ is used. Register at http://gbif.org.}
 \item{basemap_mode}{Type of basemap for static maps. Either \code{'osm'}
 (default), or \code{'boundaries'} (polygons delineating borders of
 states/territories).}
+
+\item{minimum_probability_for_maps}{Numeric. A value between 0 and 1,
+defining the minimum establishment probability to be displayed on plotted
+maps. Values below this threshold will be excluded. Default is \code{1E-5}.}
 
 \item{manual_check_flagged_records}{Logical. Should an interactive map be
 used for manually checking flagged occurrence records? If \code{TRUE}, the
