@@ -8,6 +8,7 @@ species_plan(
   species,
   clum_classes,
   nvis_classes,
+  host_path,
   pathways,
   include_abiotic_weight = TRUE,
   climate_suitability_path,
@@ -69,11 +70,22 @@ files and folders.}
 
 \item{clum_classes}{An integer vector indicating which ACLUM classes are
 considered host plants for \code{species}. Either \code{clum_classes} or
-\code{nvis_classes} (or both) must be provided.}
+\code{nvis_classes} (or both) must be provided. If \code{user_host_path} is
+also provided, the union of the two datasets will be used to define host
+distribution.}
 
 \item{nvis_classes}{An integer vector indicating which NVIS classes are
 considered host plants for \code{species}. Either \code{clum_classes} or
 \code{nvis_classes} (or both) must be provided.}
+
+\item{host_path}{Character. Optional file path to a raster dataset that
+describes the distribution of host material for the species. The file must
+be readable by GDAL. All cell values other than zero or NA will be
+considered to be host material. Dataset will be projected and resampled as
+necessary to match the spatial extent and resolution of analysis. If
+\code{clum_classes} is also provided, the union of the two datasets will be
+used to define host distribution. A valid coordinate reference system must
+be associated with the spatial dataset.}
 
 \item{pathways}{A character vector of invasion pathways that should be
 included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},

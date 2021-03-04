@@ -23,6 +23,7 @@
 #' @importFrom tidyr spread
 #' @importFrom drake file_in file_out drake_plan
 #' @importFrom raster stack unstack writeRaster
+#' @importFrom countrycode countrycode
 #' @importFrom magrittr '%>%'
 #' @export
 excel_to_plan <- function(file) {
@@ -62,6 +63,7 @@ excel_to_plan <- function(file) {
                   include_abiotic_weight=`Include abiotic weight?`,
                   include_ndvi=`Include NDVI?`,
                   include_nvis=`Include NVIS?`,
+                  host_path=`Host distribution`,
                   clum_classes=`CLUM classes`,
                   nvis_classes=`NVIS classes`,
                   gbif_species=`GBIF species name(s)`,

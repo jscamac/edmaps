@@ -1,7 +1,7 @@
 Package: edmaps
 Type: Package
 Title: Estimate Likelihood of Pest Establishment
-Version: 1.9.0.9010
+Version: 1.9.0.9011
 Authors@R: as.person(c(
     "James Camac <james.camac@gmail.com> [aut, cre]", 
     "John Baumgartner <johnbaums@gmail.com> [aut]"
@@ -18,7 +18,6 @@ Depends: R (>= 4.0)
 SystemRequirements: Java (>= 1.5), JRI, GNU make
 Imports:
   countrycode,
-  CoordinateCleaner,
   dplyr,
   drake,
   fasterize,
@@ -51,6 +50,7 @@ Imports:
   tmaptools,
   viridis
 Suggests: 
+  CoordinateCleaner,
   knitr,
   rmarkdown,
   testthat,

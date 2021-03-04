@@ -7,10 +7,20 @@
 #'   files and folders.
 #' @param clum_classes An integer vector indicating which ACLUM classes are
 #'   considered host plants for \code{species}. Either \code{clum_classes} or
-#'   \code{nvis_classes} (or both) must be provided.
+#'   \code{nvis_classes} (or both) must be provided. If \code{user_host_path} is
+#'   also provided, the union of the two datasets will be used to define host
+#'   distribution.
 #' @param nvis_classes An integer vector indicating which NVIS classes are
 #'   considered host plants for \code{species}. Either \code{clum_classes} or
 #'   \code{nvis_classes} (or both) must be provided.
+#' @param host_path Character. Optional file path to a raster dataset that
+#'   describes the distribution of host material for the species. The file must
+#'   be readable by GDAL. All cell values other than zero or NA will be
+#'   considered to be host material. Dataset will be projected and resampled as
+#'   necessary to match the spatial extent and resolution of analysis. If
+#'   \code{clum_classes} is also provided, the union of the two datasets will be
+#'   used to define host distribution. A valid coordinate reference system must
+#'   be associated with the spatial dataset.
 #' @param include_abiotic_weight Logical. Should suitability be dependent on
 #'   climate? Considered TRUE if \code{climate_suitability_path} is provided,
 #'   or if \code{use_gbif} is TRUE.
@@ -148,18 +158,12 @@
 #'   guide the user with respect to expected/allowable data.
 #' @seealso \code{\link{excel_to_plan}}
 #' @importFrom glue glue
-#' @importFrom CoordinateCleaner clean_coordinates
 #' @importFrom raster extent raster res compareCRS
 #' @importFrom sp CRS
-#' @importFrom sf st_bbox
-#' @importFrom readr read_csv
-#' @importFrom dplyr select bind_rows
-#' @importFrom drake file_in file_out code_to_plan
-#' @importFrom gdalUtilities gdal_translate
-#' @importFrom magrittr '%>%'
+#' @importFrom drake code_to_plan
 #' @export
-species_plan <- function(species, clum_classes, nvis_classes, pathways,
-  include_abiotic_weight=TRUE, climate_suitability_path,
+species_plan <- function(species, clum_classes, nvis_classes, host_path,
+  pathways, include_abiotic_weight=TRUE, climate_suitability_path,
   exclude_bioclim_vars=NULL, include_ndvi=TRUE, aggregated_res=c(5000, 5000),
   make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
   airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
@@ -215,9 +219,9 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     stop('Only one of cabi_path or infected_countries should be provided.')
   }
 
-  if(missing(clum_classes) && missing(nvis_classes))
-    stop('Provide clum_classes and/or nvis_classes to define ',
-         'distribution of host plants.')
+  if(missing(clum_classes) && missing(nvis_classes) && missing(host_path))
+    stop('Provide clum_classes and/or nvis_classes and/or user_host_path to ',
+         'define host distribution.')
 
   if(!missing(climate_suitability_path)) {
     r <- raster::raster(climate_suitability_path)
@@ -285,10 +289,94 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
     \n\n'), file=f, append=TRUE)
   }
 
-  if(!missing(clum_classes) && !missing(nvis_classes)) {
+  if(!missing(host_path)) {
+    cat(glue::glue('
+      user_host_rast <- gdalUtilities::gdalwarp(
+        srcfile = drake::file_in("<<host_path>>"),
+        dstfile = drake::file_out(
+          "outputs/<<species>>/auxiliary/<<species>>_userHost_raster_<<res[1]>>.tif"
+        ),
+        t_srs = "EPSG:3577",
+        tr = <<deparse(res)>>,
+        r = "near",
+        te = <<deparse(extent[c(1, 3, 2, 4)])>>,
+        overwrite = <<overwrite>>
+      )
+
+      binarise_user_host_rast <- {
+        r <- raster::raster(
+          drake::file_in(
+            "outputs/<<species>>/auxiliary/<<species>>_userHost_raster_<<res[1]>>.tif"
+          )
+        ) > 0
+        raster::writeRaster(
+          r,
+          drake::file_out(
+            "outputs/<<species>>/auxiliary/<<species>>_userHostBinary_raster_<<res[1]>>.tif"
+          ), overwrite = TRUE, datatype = "INT2S"
+        )
+      }
+    \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+  }
+
+  if(!missing(host_path) && !missing(clum_classes)) {
+    cat(glue::glue('
+    combined_host <- {
+      r <- sum(raster::stack(
+        drake::file_in("outputs/<<species>>/auxiliary/<<species>>_userHostBinary_raster_<<res[1]>>.tif"),
+        drake::file_in("outputs/<<species>>/auxiliary/<<species>>_clum_raster_<<res[1]>>.tif")
+      ) > 0, na.rm = TRUE) > 0
+      # ^ binary output: which cells have positive values for one or both layers
+      #   (ignore NAs).
+      raster::writeRaster(
+        r,
+        drake::file_out("outputs/<<species>>/auxiliary/<<species>>_clumAndUserHost_raster_<<res[1]>>.tif"),
+        datatype="INT2S", overwrite = <<overwrite>>
+      )
+    }
+   \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+  }
+
+  # clum and nvis and user-defined host:
+  if(!missing(clum_classes) && !missing(nvis_classes) && !missing(host_path)) {
+    cat(glue::glue('
+      host_rast <- suitability(list(
+        drake::file_in("outputs/{species}/auxiliary/{species}_clumAndUserHost_raster_{res[1]}.tif"),
+        drake::file_in("outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif")
+        ), outfile=drake::file_out(
+          "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
+        )
+      )
+    \n\n'), file=f, append=TRUE)
+  # clum and nvis but no user-defined host:
+  } else if(!missing(clum_classes) && !missing(nvis_classes) && missing(host_path)) {
     cat(glue::glue('
       host_rast <- suitability(list(
         drake::file_in("outputs/{species}/auxiliary/{species}_clum_raster_{res[1]}.tif"),
+        drake::file_in("outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif")
+        ), outfile=drake::file_out(
+          "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
+        )
+      )
+    \n\n'), file=f, append=TRUE)
+  # clum and user-defined host but no nvis
+  } else if(!missing(clum_classes) && missing(nvis_classes) && !missing(host_path)) {
+    cat(glue::glue('
+     host_rast <-
+        file.copy(
+          drake::file_in(
+            "outputs/{species}/auxiliary/{species}_clumAndUserHost_raster_{res[1]}.tif"
+          ),
+          drake::file_out(
+            "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
+          )
+        )
+    \n\n'), file=f, append=TRUE)
+  # user-defined host and nvis but no clum
+  } else if(missing(clum_classes) && !missing(nvis_classes) && !missing(host_path)) {
+    cat(glue::glue('
+     host_rast <- suitability(list(
+        drake::file_in("outputs/{species}/auxiliary/{species}_userHostBinary_raster_{res[1]}.tif"),
         drake::file_in("outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif")
         ), outfile=drake::file_out(
           "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
@@ -313,6 +401,18 @@ species_plan <- function(species, clum_classes, nvis_classes, pathways,
         file.copy(
           drake::file_in(
             "outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif"
+          ),
+          drake::file_out(
+            "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
+          )
+        )
+    \n\n'), file=f, append=TRUE)
+  } else if(!missing(host_path)) {
+    cat(glue::glue('
+      host_rast <-
+        file.copy(
+          drake::file_in(
+            "outputs/{species}/auxiliary/{species}_userHostBinary_raster_{res[1]}.tif"
           ),
           drake::file_out(
             "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
