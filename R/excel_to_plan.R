@@ -173,7 +173,12 @@ excel_to_plan <- function(file) {
            'bounding values, defining the bounds of a 95% CI.\nValues should ',
            'be given as a comma-separated text string, e.g. "1,10".')
     }
-
+    invalid_establishment <-
+      sapply(x[grep('^establishment_', names(x))], min) < 0 |
+      sapply(x[grep('^establishment_', names(x))], max) > 1
+    if(any(invalid_establishment)) {
+      stop('Establishment rates must be between 0 and 1.')
+    }
     if('gbif_species' %in% names(x)) {
       if(!'use_gbif' %in% names(x) || x$use_gbif) {
         x$gbif_species <- gsub('^\\s+|\\s+$', '', x$gbif_species)
