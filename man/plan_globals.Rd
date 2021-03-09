@@ -13,7 +13,8 @@ plan_globals(
   containers_data_path,
   postcode_path,
   airport_beta,
-  airport_tsi_beta
+  airport_tsi_beta,
+  basemap_mode = c("osm", "boundaries")
 )
 }
 \arguments{
@@ -23,35 +24,39 @@ plan_globals(
 
 \item{ndvi_path}{Character. File path to the \href{http://www.bom.gov.au/jsp/awap/ndvi/index.jsp?colour=colour&time=history/nat/2018110120190430&step=7&map=ndviave&period=6month&area=nat}{Normalised Difference Vegetation Index (NDVI)} raster dataset.}
 
-\item{fertiliser_data_path}{Character. File path to a csv containing data 
+\item{fertiliser_data_path}{Character. File path to a csv containing data
 describing fertiliser use, available \href{https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/4627.02016-17}{here}.}
 
 \item{nrm_path}{Character. File path to shapefile of \href{https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.003July 2016}{Natural Resource Management Regions}.}
 
-\item{containers_data_path}{Character. File path to xlsx file containing 
+\item{containers_data_path}{Character. File path to xlsx file containing
 data about shipping container movements, available \href{https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/5368.0.55.0182009-10}{here}.}
 
-\item{postcode_path}{Character. File path to postal areas (i.e. post codes) 
+\item{postcode_path}{Character. File path to postal areas (i.e. post codes)
 shapefile, available \href{https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.003July 2011}{here}.}
 
-\item{airport_beta}{Numeric. Parameter controlling the distribution of 
-tourists (international air passengers) around Australian international 
-airports. Distance to nearest airport is multiplied by this value and 
-exponentiated to give the relative density of tourists at a location. To 
-generate a distribution that ensures proportion \emph{p} of tourists 
-within distance \emph{d} of nearest airport, specify 
-\code{airport_beta=log(p)/d} (e.g. to have 50% of tourists within 200 km 
+\item{airport_beta}{Numeric. Parameter controlling the distribution of
+tourists (international air passengers) around Australian international
+airports. Distance to nearest airport is multiplied by this value and
+exponentiated to give the relative density of tourists at a location. To
+generate a distribution that ensures proportion \emph{p} of tourists
+within distance \emph{d} of nearest airport, specify
+\code{airport_beta=log(p)/d} (e.g. to have 50% of tourists within 200 km
 of an airport, use \code{log(0.5)/200}).}
 
-\item{airport_tsi_beta}{Numeric. Interpretation is as for 
-\code{airport_beta}, but applies to air passengers arriving at Cairns 
+\item{airport_tsi_beta}{Numeric. Interpretation is as for
+\code{airport_beta}, but applies to air passengers arriving at Cairns
 International Airport (CNS) from the Torres Strait Islands.}
+
+\item{basemap_mode}{Type of basemap for static maps. Either \code{'osm'}
+(default), or \code{'boundaries'} (polygons delineating borders of
+states/territories).}
 }
 \value{
 A \code{drake} plan containing targets that generate objects used
   across species.
 }
 \description{
-Create a drake plan that describes targets relating to global parameters 
+Create a drake plan that describes targets relating to global parameters
 to be used by individual species plans.
 }

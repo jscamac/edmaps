@@ -1228,5 +1228,6 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     containers_data_path=containers_data_path,
     postcode_path=postcode_path,
     airport_beta=airport_beta,
-    airport_tsi_beta=airport_tsi_beta), plan)
+    airport_tsi_beta=airport_tsi_beta,
+    basemap_mode=basemap_mode), plan)
 }
