@@ -563,10 +563,12 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         template_raster = drake::file_in(
           "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
         ),
-        probability = {paste(deparse(leakage_containers), collapse="")},
+        leakage_rate = {deparse(leakage_containers)},
+        establishment_rate = {deparse(establishment_containers)},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_containers_arrivals_{res[1]}.tif"
-        )
+        ),
+        overwrite = {overwrite}
       )
     \n\n'), file=f, append=TRUE)
   }

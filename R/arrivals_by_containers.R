@@ -11,17 +11,24 @@
 #' @param template_raster \code{RasterLayer} or file path to a raster file.
 #'   This is used to define the extent and resolution of output. Must be in
 #'   CRS EPSG:3577.
-#' @param probability Numeric vector of one or more probabilities that a unit
-#'   carries a pest.
+#' @param leakage_rate Numeric vector of 2 values, giving the lower and upper
+#'   bounds of a 95% CI for leakage rate (the number of pest leakage events in
+#'   a random year).
+#' @param establishment_rate Numeric vector of 2 values, giving the lower and
+#'   upper bounds of a 95% CI for establishment rate (the rate of survival, to
+#'   establishment, for leakage events).
 #' @param outfile Character. Output raster file path. If \code{probability} has
 #'   length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
 #'   not provided, raster object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?
 #'   Ignored if \code{outfile} is not provided.
+#' @param overwrite Logical. If \code{TRUE} and \code{outfile} is not missing,
+#'   it will be overwritten if the file specified by \code{outfile} already
+#'   exists.
 #' @return If \code{outfile} is specified, the resulting raster (multiband if
 #'   \code{probability} has length > 1) is saved as a tiff at that path. If
 #'   \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-#'   resulting raster object is returned, otherwise \code{NULL} is returned 
+#'   resulting raster object is returned, otherwise \code{NULL} is returned
 #'   invisibly.
 #' @family functions estimating arrivals
 #' @importFrom sf read_sf
@@ -31,15 +38,15 @@
 #' @importFrom fasterize fasterize
 #' @export
 #'
-arrivals_by_containers <- function(container_weights, port_data, 
-  template_raster, probability, outfile, summarise_uncertainty=FALSE, 
-  return_rast=FALSE) {
+arrivals_by_containers <- function(container_weights, port_data,
+  template_raster, leakage_rate, establishment_rate, outfile,
+  return_rast=FALSE, overwrite=FALSE) {
 
   # Load container weight data if path provided
   if(is.character(container_weights)) {
     container_weights <- sf::read_sf(container_weights)
   }
-  
+
   # Load port_data
   port_data <- utils::read.csv(port_data)
   # Load template_raster
@@ -48,25 +55,22 @@ arrivals_by_containers <- function(container_weights, port_data,
   } else if(!is(template_raster, 'RasterLayer')) {
     stop('template_raster must be a RasterLayer or a file path to a raster file.')
   }
-  
+
   # Subset port data to ports present in container weights
   port_data <- port_data %>%
     dplyr::filter(Name %in% names(container_weights)) %>%
     dplyr::mutate(Name = as.character(Name))
-  
-  # Rasterize and estimate number of pest arrivals per grid cell
-  out <- sum(raster::stack(sapply(port_data$Name, function(x) {
+
+  # Rasterize
+  weight <- sum(raster::stack(sapply(port_data$Name, function(x) {
     calc_proportion(fasterize::fasterize(
       sf = container_weights, raster = template_raster, field = x)) *
       port_data[port_data$Name==x, 'Count']
-  }))) * probability[1]
-  if(length(probability > 1)) {
-    out <- raster::stack(
-      c(list(out), lapply(probability[-1]/probability[1], function(x) {
-        out*x
-      }))
-    )
-  }
+  })))
+
+  # Disperse passengers and calculate arrival rate
+  EE <- calc_EE(leakage_rate, establishment_rate)
+  out <- calc_pathway_pr(EE, weight, return_rast=TRUE)
 
   if(!missing(outfile)) {
     # Create directory if it does not exist
@@ -75,7 +79,7 @@ arrivals_by_containers <- function(container_weights, port_data,
     }
 
     # write out raster
-    raster::writeRaster(out, outfile, overwrite=TRUE)
+    raster::writeRaster(out, outfile, overwrite = overwrite)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out
