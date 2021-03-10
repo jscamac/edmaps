@@ -227,8 +227,7 @@ excel_to_plan <- function(file) {
           s <- raster::stack(drake::file_in(!!ff))
           r <- Reduce(function(x, y) prod(x, y, na.rm=TRUE), raster::unstack(1 - s))
           if(!dir.exists(dirname(!!f_out))) dir.create(dirname(!!f_out))
-          raster::writeRaster(1 - r, drake::file_out(!!f_out),
-                              overwrite=overwrite)
+          raster::writeRaster(1 - r, drake::file_out(!!f_out), overwrite=TRUE)
         },
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
