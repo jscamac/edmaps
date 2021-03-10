@@ -31,7 +31,7 @@
 #'   resulting raster object is returned, otherwise \code{NULL} is returned
 #'   invisibly.
 #' @family functions estimating arrivals
-#' @importFrom sf read_sf
+#' @importFrom sf read_sf st_drop_geometry
 #' @importFrom raster raster stack writeRaster
 #' @importFrom utils read.csv
 #' @importFrom dplyr filter mutate
@@ -61,12 +61,19 @@ arrivals_by_containers <- function(container_weights, port_data,
     dplyr::filter(Name %in% names(container_weights)) %>%
     dplyr::mutate(Name = as.character(Name))
 
-  # Rasterize
-  weight <- sum(raster::stack(sapply(port_data$Name, function(x) {
-    calc_proportion(fasterize::fasterize(
-      sf = container_weights, raster = template_raster, field = x)) *
-      port_data[port_data$Name==x, 'Count']
-  })))
+  # Multiply proportional postcode distribution volumes by port container
+  # arrival volumes, and sum resulting postcode arrivals across source ports
+  container_weights$total <-
+    rowSums(sweep(sf::st_drop_geometry(container_weights[, port_data$Name]), 2,
+        port_data$Count, `*`))
+
+  # Convert total postcode arrivals to a proportion of their sum
+  container_weights$total <-
+    container_weights$total/sum(container_weights$total, na.rm=TRUE)
+
+  # Rasterize postcode arrivals
+  weight <- fasterize::fasterize(sf=container_weights, raster=template_raster,
+                                 field='total')
 
   # Disperse passengers and calculate arrival rate
   EE <- calc_EE(leakage_rate, establishment_rate)
