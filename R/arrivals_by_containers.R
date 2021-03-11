@@ -47,6 +47,8 @@ arrivals_by_containers <- function(container_weights, port_data,
     container_weights <- sf::read_sf(container_weights)
   }
 
+  container_weights$POA_CODE <- as.numeric(container_weights$POA_CODE)
+
   # Load port_data
   port_data <- utils::read.csv(port_data)
   # Load template_raster
@@ -71,9 +73,26 @@ arrivals_by_containers <- function(container_weights, port_data,
   container_weights$total <-
     container_weights$total/sum(container_weights$total, na.rm=TRUE)
 
+  # COMMENT THIS
+  postcode_rast <- container_weights %>%
+    fasterize::fasterize(raster = template_raster, field = "POA_CODE")
+
+  postcode_n <- as.data.frame(postcode_rast) %>%
+    na.omit %>%
+    dplyr::group_by(layer) %>%
+    dplyr::summarise(n_cells=dplyr::n())
+
+  container_weights <- container_weights %>%
+    dplyr::left_join(postcode_n, by=c(POA_CODE='layer')) %>%
+    dplyr::mutate(total_per_cell=total/n_cells)
+
   # Rasterize postcode arrivals
   weight <- fasterize::fasterize(sf=container_weights, raster=template_raster,
-                                 field='total')
+                                 field='total_per_cell')
+
+  # Rescale due to missing postcodes not being rasterised (not overlaying cell
+  # centres).
+  weight <- calc_proportion(weight)
 
   # Disperse passengers and calculate arrival rate
   EE <- calc_EE(leakage_rate, establishment_rate)
