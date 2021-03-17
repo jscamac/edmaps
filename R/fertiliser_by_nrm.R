@@ -1,11 +1,11 @@
 #' Create fertiliser by nrm sf object
 #'
 #' Create fertiliser by nrm sf object.
-#' 
+#'
 #' @param abs_data Character. File path to ABS .csv file.
 #' @param nrm_shapefile Character. File path to NRM shapefile.
-#' @param outfile Character. Name of shapefile (or other vector data format 
-#'   supported by OGR) where output will be saved. If not provided, \code{sf} 
+#' @param outfile Character. Name of shapefile (or other vector data format
+#'   supported by OGR) where output will be saved. If not provided, \code{sf}
 #'   object will be returned to R.
 #' @param return_sf Logical. Should the \code{sf} object be returned to R?
 #'   Ignored if \code{outfile} is not provided.
@@ -15,7 +15,7 @@
 #' @importFrom sf read_sf st_transform st_write
 #' @export
 
-fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile, 
+fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
   return_sf=FALSE) {
   fert <- readr::read_csv(abs_data,
                          col_names = c("NRM_ID",
@@ -31,7 +31,7 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
                                           Region = "c",
                                           Item = "c",
                                           Estimate ="c"),
-                         skip =5) %>%
+                         skip = 4) %>%
     dplyr::mutate(Estimate = as.numeric(gsub(",", "", Estimate))) %>%
     dplyr::filter(Item %in% c(
       "Fertiliser - Nitrate slow release fertiliser - Weight applied (t)",
@@ -52,7 +52,7 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
     dplyr::summarise(Fert_t = sum(Estimate, na.rm=TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::select(NRM_ID, Fert_t)
-  
+
   # ABS lumped some NRMs so need to account for that
   nrm <- sf::read_sf(nrm_shapefile) %>%
     dplyr::mutate(NRM_ID=ifelse(
@@ -61,8 +61,8 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
 
   out <- dplyr::left_join(nrm, fert, by = "NRM_ID") %>%
     dplyr::filter(!is.na(Fert_t)) %>%
-    sf::st_transform(crs = '+init=epsg:3577') 
-  
+    sf::st_transform(crs = '+init=epsg:3577')
+
   if(!missing(outfile)) {
     # Create directory if it does not exist
     if(!dir.exists(dirname(outfile))) {
