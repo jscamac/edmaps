@@ -207,9 +207,9 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   species <- gsub('\\s+', '_', gsub('^\\s+|\\s+$', '', species))
 
   pathways <- match.arg(
-    pathways, c('containers', 'fertiliser', 'food', 'goods', 'machinery',
-                'mail', 'nurserystock', 'residents', 'torres', 'tourists',
-                'vessels'),
+    tolower(pathways),
+    c('containers', 'fertiliser', 'food', 'goods', 'machinery',
+      'mail', 'nurserystock', 'residents', 'torres', 'tourists', 'vessels'),
     several.ok=TRUE
   )
 
