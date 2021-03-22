@@ -11,8 +11,8 @@ fertiliser_by_nrm(abs_data, nrm_shapefile, outfile, return_sf = FALSE)
 
 \item{nrm_shapefile}{Character. File path to NRM shapefile.}
 
-\item{outfile}{Character. Name of shapefile (or other vector data format 
-supported by OGR) where output will be saved. If not provided, \code{sf} 
+\item{outfile}{Character. Name of shapefile (or other vector data format
+supported by OGR) where output will be saved. If not provided, \code{sf}
 object will be returned to R.}
 
 \item{return_sf}{Logical. Should the \code{sf} object be returned to R?

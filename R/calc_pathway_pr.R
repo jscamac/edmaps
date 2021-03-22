@@ -14,7 +14,7 @@
 #'   \code{outfile} is not specified, the resulting \code{RasterLayer} is
 #'   returned, otherwise \code{NULL} is returned invisibly.
 #' @importFrom dplyr mutate row_number
-#' @importFrom raster as.data.frame mask raster writeRaster
+#' @importFrom raster as.data.frame raster writeRaster init
 #' @importFrom stats na.omit
 #' @export
 calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
@@ -39,8 +39,8 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
   }
 
   # Initialise raster and populate with probability of presence
-  out <- raster::mask(raster::raster(rast), rast)
-  out[d$cell] <- 1 - d$prob_absent
+  out <- raster::init(rast, function(x) 0)
+  out[d$cell] <- ifelse(is.na(d$prob_absent), 0, 1 - d$prob_absent)
 
 
   if(!missing(outfile)) {
