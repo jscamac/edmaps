@@ -68,6 +68,7 @@ Other functions estimating arrivals:
 \code{\link{arrivals_by_residents}()},
 \code{\link{arrivals_by_torres}()},
 \code{\link{arrivals_by_tourists}()},
-\code{\link{arrivals_by_vessels}()}
+\code{\link{arrivals_by_vessels}()},
+\code{\link{arrivals_by_wind}()}
 }
 \concept{functions estimating arrivals}
