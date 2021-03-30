@@ -181,8 +181,8 @@ of containers by postcode.}
 \item{postcode_path}{File path to postal areas shapefile.}
 
 \item{occurrence_path}{Path to a .csv file containing occurrence data. Must
-include columns \code{Longitude}, \code{Latitude}, and \code{Species}.
-Coordinates are expected to be in decimal degrees (WGS84).}
+include columns \code{Longitude} and \code{Latitude}. Coordinates are
+expected to be in decimal degrees (WGS84).}
 
 \item{infected_countries}{A character vector of countries within which the
 \code{species} occurs. Ignored if \code{climate_suitability_path} is

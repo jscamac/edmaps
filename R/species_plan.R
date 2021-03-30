@@ -86,8 +86,8 @@
 #'   of containers by postcode.
 #' @param postcode_path File path to postal areas shapefile.
 #' @param occurrence_path Path to a .csv file containing occurrence data. Must
-#'   include columns \code{Longitude}, \code{Latitude}, and \code{Species}.
-#'   Coordinates are expected to be in decimal degrees (WGS84).
+#'   include columns \code{Longitude} and \code{Latitude}. Coordinates are
+#'   expected to be in decimal degrees (WGS84).
 #' @param infected_countries A character vector of countries within which the
 #'   \code{species} occurs. Ignored if \code{climate_suitability_path} is
 #'   provided.Only one of \code{infected_countries} or \code{cabi_path} should
@@ -724,11 +724,10 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         clean_gbif <- dplyr::select(
         # ^ target is renamed before returning from species_plan
           CoordinateCleaner::clean_coordinates(
-            x = dplyr::mutate({species}_gbif_records, species="{species}"),
+            x = {species}_gbif_records,
             lon = "decimalLongitude",
             lat = "decimalLatitude",
             countries = "countryCode",
-            species = "species",
             country_ref = country_reference,
             country_refcol = "iso_a3",
             tests = c("capitals",
@@ -755,7 +754,6 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
             x = readr::read_csv(drake::file_in("{occurrence_path}")),
             lon = "Longitude",
             lat = "Latitude",
-            species = "Species",
             tests = c("capitals",
                       "centroids",
                       "equal",
