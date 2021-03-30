@@ -19,8 +19,8 @@
 #'   corresponds to a separate species. Tooltips and data validation
 #'   guide the user with respect to expected/allowable data.
 #' @importFrom readxl read_excel
-#' @importFrom dplyr select rename mutate bind_rows
-#' @importFrom tidyr spread
+#' @importFrom dplyr select rename mutate bind_rows filter
+#' @importFrom tidyr spread unnest
 #' @importFrom drake file_in file_out drake_plan
 #' @importFrom raster stack unstack writeRaster
 #' @importFrom countrycode countrycode
@@ -44,6 +44,7 @@ excel_to_plan <- function(file) {
                   port_data_path=`Marine ports data path`,
                   fertiliser_data_path=`Fertiliser data path`,
                   nrm_path=`NRM shapefile path`,
+                  wind_path=`Wind data path`,
                   airport_beta=`Airport distance penalty (tourists)`,
                   airport_tsi_beta=`Airport distance penalty (Torres)`) %>%
     lapply(unlist)
@@ -61,17 +62,22 @@ excel_to_plan <- function(file) {
                   species_group=`Species group`,
                   pathways=Pathways,
                   include_abiotic_weight=`Include abiotic weight?`,
+                  clum_classes=`CLUM classes`,
                   include_ndvi=`Include NDVI?`,
                   include_nvis=`Include NVIS?`,
-                  host_path=`Host distribution`,
-                  clum_classes=`CLUM classes`,
                   nvis_classes=`NVIS classes`,
-                  gbif_species=`GBIF species name(s)`,
+                  host_path=`Host distribution raster file`,
+                  include_native_hosts=`Include native hosts?`,
+                  native_hosts_occurrence_path=`Native hosts occurrence csv file`,
+                  native_hosts_method=`Native hosts method`,
+                  native_hosts_alpha=`Native hosts alpha parameter`,
+                  climate_suitability_path=`Climate suitability raster file`,
+                  gbif_species=`GBIF focal species name(s)`,
                   gbif_min_year=`GBIF min year`,
-                  occurrence_path=`Occurrence path`,
+                  occurrence_path=`Occurrence csv file`,
                   infected_countries=`Infected countries`,
-                  climate_suitability_path=`Climate suitability path`,
                   exclude_bioclim_vars =`Exclude BIOCLIM vars`,
+                  wind_effect_width=`Wind effect width`,
                   port_weight_beta=`Distance penalty (ports)`,
                   leakage_tourists=`Tourist leakage`,
                   establishment_tourists=`Tourist establishment`,
@@ -95,6 +101,12 @@ excel_to_plan <- function(file) {
                   establishment_food=`Food establishment`,
                   leakage_goods=`Goods leakage`,
                   establishment_goods=`Goods establishment`,
+                  leakage_northwind=`North wind leakage`,
+                  establishment_northwind=`North wind establishment`,
+                  leakage_pacificwind=`Pacific wind leakage`,
+                  establishment_pacificwind=`Pacific wind establishment`,
+                  leakage_nzwind=`NZ wind leakage`,
+                  establishment_nzwind=`NZ wind establishment`,
                   aggregated_res=`Aggregated res`) %>%
     dplyr::mutate(
       species=gsub('^\\s+|\\s+$', '', species),
@@ -397,5 +409,42 @@ excel_to_plan <- function(file) {
     }) %>% dplyr::bind_rows()
   }
 
+  # Create wind pathway rasters if required
+  wind_pathways <- species %>%
+    dplyr::select(pathways, wind_effect_width) %>%
+    tidyr::unnest(pathways) %>%
+    dplyr::filter(grepl('wind', pathways, ignore.case=TRUE)) %>%
+    dplyr::mutate(pathways=tolower(pathways),
+                  pathways=sapply(pathways, function(x) {
+                    switch(x,
+                           northwind="North_Winds",
+                           pacificwind="Pacific_Winds",
+                           nzwind="NZ_Winds")
+                  })) %>%
+    unique
+
+  if(nrow(wind_pathways) > 0) {
+    plans$wind_plans <- lapply(seq_len(nrow(wind_pathways)), function(i) {
+      drake::drake_plan(
+        rasterize_wind(drake::file_in(!!globals$wind_path),
+                       !!wind_pathways$pathways[i],
+                       template='risk_layers/auxiliary/aus_mask_clum_1000.tif',
+                       width=!!wind_pathways$wind_effect_width[i],
+                       outfile=drake::file_out(
+                         !!sprintf('risk_layers/pathway/processed/%s_%s.tif',
+                                   wind_pathways$pathways[i],
+                                   format(wind_pathways$wind_effect_width[i],
+                                          scientific=FALSE, trim=TRUE))
+                       ))
+      )
+    }) %>%
+      dplyr::bind_rows() %>%
+      dplyr::mutate(target=sprintf(
+        'rasterize_wind_%s_%s', wind_pathways$pathways,
+        format(wind_pathways$wind_effect_width, scientific=FALSE, trim=TRUE)
+      ))
+  }
+
+  # Combine all plans
   return(unique(dplyr::bind_rows(plans)))
 }

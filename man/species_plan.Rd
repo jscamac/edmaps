@@ -10,6 +10,10 @@ species_plan(
   nvis_classes,
   host_path,
   pathways,
+  include_native_hosts,
+  gbif_host_species,
+  native_hosts_method,
+  native_hosts_alpha,
   include_abiotic_weight = TRUE,
   climate_suitability_path,
   exclude_bioclim_vars = NULL,
@@ -39,6 +43,7 @@ species_plan(
   basemap_mode = c("osm", "boundaries"),
   minimum_probability_for_maps = 1e-05,
   manual_check_flagged_records = FALSE,
+  wind_effect_width,
   leakage_tourists,
   establishment_tourists,
   leakage_returning,
@@ -61,6 +66,12 @@ species_plan(
   establishment_food,
   leakage_goods,
   establishment_goods,
+  leakage_northwind,
+  establishment_northwind,
+  leakage_pacificwind,
+  establishment_pacificwind,
+  leakage_nzwind,
+  establishment_nzwind,
   overwrite = TRUE
 )
 }
@@ -91,7 +102,20 @@ be associated with the spatial dataset.}
 included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
 \code{'food'}, \code{'goods'}, \code{'machinery'}, \code{'mail'},
 \code{'nurserystock'}, \code{'residents'}, \code{'torres'},
-\code{'tourists'}, \code{'vessels'}.}
+\code{'tourists'}, \code{'vessels'}, \code{'northwind'},
+\code{'pacificwind'}, \code{'nzwind'}.}
+
+\item{include_native_hosts}{Should the distribution of native host species be
+estimated and added to the definition of host availability?}
+
+\item{native_hosts_method}{Either \code{"points"} or \code{"alphahull"},
+defining the method for estimating native host species' distribution.
+Ignored when \code{include_native_hosts} is \code{FALSE}.}
+
+\item{native_hosts_alpha}{Alpha parameter for calculation of alpha hull
+defining native hosts' spatial distribution. Ignored when
+\code{include_native_hosts} is \code{FALSE} or when
+\code{native_hosts_method} is \code{"points"}.}
 
 \item{include_abiotic_weight}{Logical. Should suitability be dependent on
 climate? Considered TRUE if \code{climate_suitability_path} is provided,
@@ -211,58 +235,25 @@ be excluded. Ignored if \code{climate_suitability_path} is provided. Note
 that manual checking is not possible when using \code{\link{excel_to_plan}}
 since the required interactivity will interrupt plan processing.}
 
-\item{leakage_tourists}{Numeric. The per capita rate of pest entry that
-applies to tourists.}
+\item{wind_effect_width}{Numeric. For wind pathways, the distance (in metres)
+inland from the coastline, over which wind-based arrival applies. E.g. if
+pests are expected to be carried by wind up to 50 km inland from the coast,
+use \code{50000}. Ignored if \code{pathways} does not include one or more
+of \code{northwind}, \code{pacificwind}, or code{nzwind}.}
 
-\item{establishment_tourists}{Numeric.}
+\item{leakage_tourists, leakage_returning, leakage_torres, leakage_mail, leakage_vessels, leakage_fertiliser, leakage_machinery, leakage_containers, leakage_nurserystock, leakage_food, leakage_goods, leakage_northwind, leakage_pacificwind, leakage_nzwind}{Numeric vector with length = 2, giving the range (bounds of 95% CI) of the
+number of leakage events per year for the pathway.}
 
-\item{leakage_returning}{Numeric. The per capita rate of pest entry that
-applies to returning residents.}
-
-\item{establishment_returning}{Numeric.}
-
-\item{leakage_torres}{Numeric. The per capita rate of pest entry that
-applies to passengers entering via the Torres Strait Islands
+\item{establishment_tourists, establishment_returning, establishment_torres, establishment_mail, establishment_vessels, establishment_fertiliser, establishment_machinery, establishment_containers, establishment_nurserystock, establishment_food, establishment_goods, establishment_northwind, establishment_pacificwind, establishment_nzwind}{Numeric vector with length = 2, giving the bounds of the 95% CI of the rate
+of survival & establishment to end of pathway, for leakage events on the
 pathway.}
-
-\item{establishment_torres}{Numeric.}
-
-\item{leakage_mail}{The rate of pest entry per unit volume of mail.}
-
-\item{establishment_mail}{Numeric.}
-
-\item{leakage_vessels}{The rate of pest entry per vessel.}
-
-\item{establishment_vessels}{Numeric.}
-
-\item{leakage_fertiliser}{The rate of pest entry per unit volume of
-fertiliser.}
-
-\item{establishment_fertiliser}{Numeric.}
-
-\item{leakage_machinery}{The rate of pest entry per unit volume of machinery.}
-
-\item{establishment_machinery}{Numeric.}
-
-\item{leakage_containers}{The rate of pest entry per container.}
-
-\item{establishment_containers}{Numeric.}
-
-\item{leakage_nurserystock}{The rate of pest entry per unit volume of nursery
-stock.}
-
-\item{establishment_nurserystock}{Numeric.}
-
-\item{leakage_food}{The rate of pest entry per unit volume of food.}
-
-\item{establishment_food}{Numeric.}
-
-\item{leakage_goods}{The rate of pest entry per unit volume of goods.}
-
-\item{establishment_goods}{Numeric.}
 
 \item{overwrite}{Logical. Should the code executed by the resulting plan be
 allowed to overwrite existing raster files? Default is \code{TRUE}.}
+
+\item{native_hosts_occurrence_path}{Path to a .csv file containing occurrence
+data for hosts of the focal pest. Must include columns \code{Longitude} and
+\code{Latitude}. Coordinates are expected to be in decimal degrees (WGS84).}
 }
 \description{
 Generate a drake plan that facilitates reproducible generation of species

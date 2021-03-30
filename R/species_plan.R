@@ -21,6 +21,18 @@
 #'   \code{clum_classes} is also provided, the union of the two datasets will be
 #'   used to define host distribution. A valid coordinate reference system must
 #'   be associated with the spatial dataset.
+#' @param include_native_hosts Should the distribution of native host species be
+#'   estimated and added to the definition of host availability?
+#' @param native_hosts_occurrence_path Path to a .csv file containing occurrence
+#'   data for hosts of the focal pest. Must include columns \code{Longitude} and
+#'   \code{Latitude}. Coordinates are expected to be in decimal degrees (WGS84).
+#' @param native_hosts_method Either \code{"points"} or \code{"alphahull"},
+#'   defining the method for estimating native host species' distribution.
+#'   Ignored when \code{include_native_hosts} is \code{FALSE}.
+#' @param native_hosts_alpha Alpha parameter for calculation of alpha hull
+#'   defining native hosts' spatial distribution. Ignored when
+#'   \code{include_native_hosts} is \code{FALSE} or when
+#'   \code{native_hosts_method} is \code{"points"}.
 #' @param include_abiotic_weight Logical. Should suitability be dependent on
 #'   climate? Considered TRUE if \code{climate_suitability_path} is provided,
 #'   or if \code{use_gbif} is TRUE.
@@ -41,7 +53,8 @@
 #'   included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
 #'   \code{'food'}, \code{'goods'}, \code{'machinery'}, \code{'mail'},
 #'   \code{'nurserystock'}, \code{'residents'}, \code{'torres'},
-#'   \code{'tourists'}, \code{'vessels'}.
+#'   \code{'tourists'}, \code{'vessels'}, \code{'northwind'},
+#'   \code{'pacificwind'}, \code{'nzwind'}.
 #' @param aggregated_res A numeric vector of 2 elements, indicating the desired
 #'   resolution of aggregated establishment likelihood rasters, in metres.
 #' @param make_interactive_maps Logical. Should interactive html maps be
@@ -115,34 +128,18 @@
 #'   be excluded. Ignored if \code{climate_suitability_path} is provided. Note
 #'   that manual checking is not possible when using \code{\link{excel_to_plan}}
 #'   since the required interactivity will interrupt plan processing.
-#' @param leakage_tourists Numeric. The per capita rate of pest entry that
-#'   applies to tourists.
-#' @param establishment_tourists Numeric.
-#' @param leakage_returning Numeric. The per capita rate of pest entry that
-#'   applies to returning residents.
-#' @param establishment_returning Numeric.
-#' @param leakage_torres Numeric. The per capita rate of pest entry that
-#'   applies to passengers entering via the Torres Strait Islands
+#' @param wind_effect_width Numeric. For wind pathways, the distance (in metres)
+#'   inland from the coastline, over which wind-based arrival applies. E.g. if
+#'   pests are expected to be carried by wind up to 50 km inland from the coast,
+#'   use \code{50000}. Ignored if \code{pathways} does not include one or more
+#'   of \code{northwind}, \code{pacificwind}, or code{nzwind}.
+#' @param leakage_tourists,leakage_returning,leakage_torres,leakage_mail,leakage_vessels,leakage_fertiliser,leakage_machinery,leakage_containers,leakage_nurserystock,leakage_food,leakage_goods,leakage_northwind,leakage_pacificwind,leakage_nzwind
+#'   Numeric vector with length = 2, giving the range (bounds of 95% CI) of the
+#'   number of leakage events per year for the pathway.
+#' @param establishment_tourists,establishment_returning,establishment_torres,establishment_mail,establishment_vessels,establishment_fertiliser,establishment_machinery,establishment_containers,establishment_nurserystock,establishment_food,establishment_goods,establishment_northwind,establishment_pacificwind,establishment_nzwind
+#'   Numeric vector with length = 2, giving the bounds of the 95% CI of the rate
+#'   of survival & establishment to end of pathway, for leakage events on the
 #'   pathway.
-#' @param establishment_torres Numeric.
-#' @param leakage_mail The rate of pest entry per unit volume of mail.
-#' @param establishment_mail Numeric.
-#' @param leakage_vessels The rate of pest entry per vessel.
-#' @param establishment_vessels Numeric.
-#' @param leakage_fertiliser The rate of pest entry per unit volume of
-#'   fertiliser.
-#' @param establishment_fertiliser Numeric.
-#' @param leakage_machinery The rate of pest entry per unit volume of machinery.
-#' @param establishment_machinery Numeric.
-#' @param leakage_containers The rate of pest entry per container.
-#' @param establishment_containers Numeric.
-#' @param leakage_nurserystock The rate of pest entry per unit volume of nursery
-#'   stock.
-#' @param establishment_nurserystock Numeric.
-#' @param leakage_food The rate of pest entry per unit volume of food.
-#' @param establishment_food Numeric.
-#' @param leakage_goods The rate of pest entry per unit volume of goods.
-#' @param establishment_goods Numeric.
 #' @param overwrite Logical. Should the code executed by the resulting plan be
 #'   allowed to overwrite existing raster files? Default is \code{TRUE}.
 #' @details To simplify reproducibility, \code{edmaps} provides an
@@ -163,7 +160,8 @@
 #' @importFrom drake code_to_plan
 #' @export
 species_plan <- function(species, clum_classes, nvis_classes, host_path,
-  pathways, include_abiotic_weight=TRUE, climate_suitability_path,
+  pathways, include_native_hosts, gbif_host_species, native_hosts_method,
+  native_hosts_alpha, include_abiotic_weight=TRUE, climate_suitability_path,
   exclude_bioclim_vars=NULL, include_ndvi=TRUE, aggregated_res=c(5000, 5000),
   make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
   airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
@@ -171,14 +169,16 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE,
   gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000, gbif_username,
   gbif_password, basemap_mode=c('osm', 'boundaries'),
-  minimum_probability_for_maps=1e-5,
-  manual_check_flagged_records=FALSE, leakage_tourists, establishment_tourists,
+  minimum_probability_for_maps=1e-5, manual_check_flagged_records=FALSE,
+  wind_effect_width, leakage_tourists, establishment_tourists,
   leakage_returning, establishment_returning, leakage_torres,
   establishment_torres, leakage_mail, establishment_mail, leakage_vessels,
   establishment_vessels, leakage_fertiliser, establishment_fertiliser,
   leakage_machinery, establishment_machinery, leakage_containers,
   establishment_containers, leakage_nurserystock, establishment_nurserystock,
   leakage_food, establishment_food, leakage_goods, establishment_goods,
+  leakage_northwind, establishment_northwind, leakage_pacificwind,
+  establishment_pacificwind, leakage_nzwind, establishment_nzwind,
   overwrite=TRUE) {
 
   # prepare extent and resolution
@@ -209,7 +209,8 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   pathways <- match.arg(
     tolower(pathways),
     c('containers', 'fertiliser', 'food', 'goods', 'machinery',
-      'mail', 'nurserystock', 'residents', 'torres', 'tourists', 'vessels'),
+      'mail', 'nurserystock', 'residents', 'torres', 'tourists', 'vessels',
+      'northwind', 'pacificwind', 'nzwind'),
     several.ok=TRUE
   )
 
@@ -219,9 +220,11 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     stop('Only one of cabi_path or infected_countries should be provided.')
   }
 
-  if(missing(clum_classes) && missing(nvis_classes) && missing(host_path))
-    stop('Provide clum_classes and/or nvis_classes and/or user_host_path to ',
-         'define host distribution.')
+  if(missing(clum_classes) && missing(nvis_classes) && missing(host_path) &&
+     !isTRUE(include_native_hosts)) {
+    stop('Provide one or more of: clum_classes, nvis_classes, user_host_path, ',
+         'include_native_hosts=TRUE, to define host distribution.')
+  }
 
   if(!missing(climate_suitability_path)) {
     r <- raster::raster(climate_suitability_path)
@@ -317,6 +320,18 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         )
       }
     \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+  }
+
+  if(isTRUE(include_native_hosts)) {
+    cat(glue::glue('
+    rasterize_range <- rasterize_range(
+      xy=drake::file_in("{native_hosts_occurrence_path}"),
+      method="{native_hosts_method}", alpha={native_hosts_alpha},
+      template_raster=
+        drake::file_in("risk_layers/auxiliary/aus_mask_clum_{res[1]}.tif"),
+      outfile=drake::file_out("outputs/{species}/auxiliary/{species}_nativehosts_{res[1]}.tif")
+    )
+    \n\n'), file=f, append=TRUE)
   }
 
   if(!missing(host_path) && !missing(clum_classes)) {
@@ -595,6 +610,51 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         establishment_rate = {deparse(establishment_food)},
         outfile = drake::file_out(
           "outputs/{species}/auxiliary/{species}_food_arrivals_{res[1]}.tif"
+        ),
+        overwrite = {overwrite}
+      )
+    \n\n'), file=f, append=TRUE)
+  }
+
+  if('northwind' %in% pathways) {
+    cat(glue::glue('
+      northwind_arrivals <- arrivals_by_wind(
+        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/wind/North_Wind_%s.tif\",
+          format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
+        leakage_rate = {deparse(leakage_northwind)},
+        establishment_rate = {deparse(establishment_northwind)},
+        outfile = drake::file_out(
+          "outputs/{species}/auxiliary/{species}_northwind_arrivals_{res[1]}.tif"
+        ),
+        overwrite = {overwrite}
+      )
+    \n\n'), file=f, append=TRUE)
+  }
+
+  if('pacificwind' %in% pathways) {
+    cat(glue::glue('
+      pacificwind_arrivals <- arrivals_by_wind(
+        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/wind/Pacific_Wind_%s.tif\",
+          format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
+        leakage_rate = {deparse(leakage_pacificwind)},
+        establishment_rate = {deparse(establishment_pacificwind)},
+        outfile = drake::file_out(
+          "outputs/{species}/auxiliary/{species}_pacificwind_arrivals_{res[1]}.tif"
+        ),
+        overwrite = {overwrite}
+      )
+    \n\n'), file=f, append=TRUE)
+  }
+
+  if('nzwind' %in% pathways) {
+    cat(glue::glue('
+      nzwind_arrivals <- arrivals_by_wind(
+        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/wind/NZ_Wind_%s.tif\",
+          format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
+        leakage_rate = {deparse(leakage_nzwind)},
+        establishment_rate = {deparse(establishment_nzwind)},
+        outfile = drake::file_out(
+          "outputs/{species}/auxiliary/{species}_nzwind_arrivals_{res[1]}.tif"
         ),
         overwrite = {overwrite}
       )
