@@ -2,9 +2,7 @@
 % Please edit documentation in R/calc_EE.R
 \name{calc_EE}
 \alias{calc_EE}
-\title{Calculate the probability of one or more establishment events occurring as as
-a function of estimated leakage numbers and the probability a leakage event
-could result in establishment.}
+\title{Calculate establishment probability}
 \usage{
 calc_EE(n_events, p_establish, nsims = 1e+05)
 }
