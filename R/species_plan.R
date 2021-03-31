@@ -354,7 +354,11 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   }
 
   nvis_text <- if(!missing(nvis_classes)) {
-    sprintf('r <- suitability(list(r, raster::raster(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))))', species, res[1])
+    if(length(host_files) > 0) {
+      sprintf('r <- suitability(list(r, raster::raster(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))))', species, res[1])
+    } else {
+      sprintf('r <- raster::raster(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))', species, res[1])
+    }
   } else ''
 
   cat(sprintf('combined_host <- {
