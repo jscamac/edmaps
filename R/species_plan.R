@@ -324,7 +324,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
   if(isTRUE(include_native_hosts)) {
     cat(glue::glue('
-    rasterize_range <- rasterize_range(
+    rasterize_nativehosts <- rasterize_range(
       xy=drake::file_in("{native_hosts_occurrence_path}"),
       method="{native_hosts_method}", alpha={native_hosts_alpha},
       template_raster=
@@ -334,108 +334,40 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     \n\n'), file=f, append=TRUE)
   }
 
-  if(!missing(host_path) && !missing(clum_classes)) {
-    cat(glue::glue('
-    combined_host <- {
-      r <- sum(raster::stack(
-        drake::file_in("outputs/<<species>>/auxiliary/<<species>>_userHostBinary_raster_<<res[1]>>.tif"),
-        drake::file_in("outputs/<<species>>/auxiliary/<<species>>_clum_raster_<<res[1]>>.tif")
-      ) > 0, na.rm = TRUE) > 0
-      # ^ binary output: which cells have positive values for one or both layers
-      #   (ignore NAs).
-      raster::writeRaster(
-        r,
-        drake::file_out("outputs/<<species>>/auxiliary/<<species>>_clumAndUserHost_raster_<<res[1]>>.tif"),
-        datatype="INT2S", overwrite = <<overwrite>>
-      )
-    }
-   \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
+  # Combine host layers
+  host_files <- sprintf(c(
+    "drake::file_in('outputs/%1$s/auxiliary/%1$s_clum_raster_%2$s.tif')",
+    "drake::file_in('outputs/%1$s/auxiliary/%1$s_userHostBinary_raster_%2$s.tif')",
+    "drake::file_in('outputs/%1$s/auxiliary/%1$s_nativehosts_%2$s.tif')"),
+    species, res[1])[
+      c(!missing(clum_classes), !missing(host_path), isTRUE(include_native_hosts))
+    ]
+
+  host_text <- if(length(host_files) == 0) {
+    ''
+  } else if(length(host_files) == 1) {
+    sprintf('r <- raster::raster(%s)', host_files)
+  } else {
+    sprintf('r <- sum(raster::stack(
+    %s
+  ) > 0, na.rm=TRUE)', paste(host_files, collapse=',\n    '))
   }
 
-  # clum and nvis and user-defined host:
-  if(!missing(clum_classes) && !missing(nvis_classes) && !missing(host_path)) {
-    cat(glue::glue('
-      host_rast <- suitability(list(
-        drake::file_in("outputs/{species}/auxiliary/{species}_clumAndUserHost_raster_{res[1]}.tif"),
-        drake::file_in("outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif")
-        ), outfile=drake::file_out(
-          "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-        )
-      )
-    \n\n'), file=f, append=TRUE)
-  # clum and nvis but no user-defined host:
-  } else if(!missing(clum_classes) && !missing(nvis_classes) && missing(host_path)) {
-    cat(glue::glue('
-      host_rast <- suitability(list(
-        drake::file_in("outputs/{species}/auxiliary/{species}_clum_raster_{res[1]}.tif"),
-        drake::file_in("outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif")
-        ), outfile=drake::file_out(
-          "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-        )
-      )
-    \n\n'), file=f, append=TRUE)
-  # clum and user-defined host but no nvis
-  } else if(!missing(clum_classes) && missing(nvis_classes) && !missing(host_path)) {
-    cat(glue::glue('
-     host_rast <-
-        file.copy(
-          drake::file_in(
-            "outputs/{species}/auxiliary/{species}_clumAndUserHost_raster_{res[1]}.tif"
-          ),
-          drake::file_out(
-            "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-          )
-        )
-    \n\n'), file=f, append=TRUE)
-  # user-defined host and nvis but no clum
-  } else if(missing(clum_classes) && !missing(nvis_classes) && !missing(host_path)) {
-    cat(glue::glue('
-     host_rast <- suitability(list(
-        drake::file_in("outputs/{species}/auxiliary/{species}_userHostBinary_raster_{res[1]}.tif"),
-        drake::file_in("outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif")
-        ), outfile=drake::file_out(
-          "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-        )
-      )
-    \n\n'), file=f, append=TRUE)
-  } else if(!missing(clum_classes)) {
-    cat(glue::glue('
-      host_rast <-
-        file.copy(
-          drake::file_in(
-            "outputs/{species}/auxiliary/{species}_clum_raster_{res[1]}.tif"
-          ),
-          drake::file_out(
-            "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-          )
-        )
-    \n\n'), file=f, append=TRUE)
-  } else if(!missing(nvis_classes)) {
-    cat(glue::glue('
-      host_rast <-
-        file.copy(
-          drake::file_in(
-            "outputs/{species}/auxiliary/{species}_nvis_raster_{res[1]}.tif"
-          ),
-          drake::file_out(
-            "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-          )
-        )
-    \n\n'), file=f, append=TRUE)
-  } else if(!missing(host_path)) {
-    cat(glue::glue('
-      host_rast <-
-        file.copy(
-          drake::file_in(
-            "outputs/{species}/auxiliary/{species}_userHostBinary_raster_{res[1]}.tif"
-          ),
-          drake::file_out(
-            "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
-          )
-        )
-    \n\n'), file=f, append=TRUE)
-  }
+  nvis_text <- if(!missing(nvis_classes)) {
+    sprintf('r <- suitability(list(r, raster::raster(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))))', species, res[1])
+  } else ''
 
+  cat(sprintf('combined_host <- {
+  %1$s
+  %2$s
+  raster::writeRaster(r,
+    drake::file_out("outputs/%3$s/auxiliary/%3$s_host_raster_%4$s.tif"),
+    datatype="INT2S", overwrite = %5$s
+        )
+}\n\n',
+  host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
+
+  # Pathway arrivals
   if('tourists' %in% pathways) {
     cat(glue::glue('
       tourist_arrivals <- arrivals_by_tourists(
