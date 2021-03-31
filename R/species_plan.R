@@ -619,7 +619,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   if('northwind' %in% pathways) {
     cat(glue::glue('
       northwind_arrivals <- arrivals_by_wind(
-        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/wind/North_Wind_%s.tif\",
+        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/North_Wind_%s.tif\",
           format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
         leakage_rate = {deparse(leakage_northwind)},
         establishment_rate = {deparse(establishment_northwind)},
@@ -634,7 +634,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   if('pacificwind' %in% pathways) {
     cat(glue::glue('
       pacificwind_arrivals <- arrivals_by_wind(
-        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/wind/Pacific_Wind_%s.tif\",
+        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/Pacific_Wind_%s.tif\",
           format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
         leakage_rate = {deparse(leakage_pacificwind)},
         establishment_rate = {deparse(establishment_pacificwind)},
@@ -649,7 +649,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   if('nzwind' %in% pathways) {
     cat(glue::glue('
       nzwind_arrivals <- arrivals_by_wind(
-        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/wind/NZ_Wind_%s.tif\",
+        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/NZ_Wind_%s.tif\",
           format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
         leakage_rate = {deparse(leakage_nzwind)},
         establishment_rate = {deparse(establishment_nzwind)},
