@@ -21,18 +21,6 @@
 #'   \code{clum_classes} is also provided, the union of the two datasets will be
 #'   used to define host distribution. A valid coordinate reference system must
 #'   be associated with the spatial dataset.
-#' @param include_native_hosts Should the distribution of native host species be
-#'   estimated and added to the definition of host availability?
-#' @param native_hosts_occurrence_path Path to a .csv file containing occurrence
-#'   data for hosts of the focal pest. Must include columns \code{Longitude} and
-#'   \code{Latitude}. Coordinates are expected to be in decimal degrees (WGS84).
-#' @param native_hosts_method Either \code{"points"} or \code{"alphahull"},
-#'   defining the method for estimating native host species' distribution.
-#'   Ignored when \code{include_native_hosts} is \code{FALSE}.
-#' @param native_hosts_alpha Alpha parameter for calculation of alpha hull
-#'   defining native hosts' spatial distribution. Ignored when
-#'   \code{include_native_hosts} is \code{FALSE} or when
-#'   \code{native_hosts_method} is \code{"points"}.
 #' @param include_abiotic_weight Logical. Should suitability be dependent on
 #'   climate? Considered TRUE if \code{climate_suitability_path} is provided,
 #'   or if \code{use_gbif} is TRUE.
@@ -160,8 +148,7 @@
 #' @importFrom drake code_to_plan
 #' @export
 species_plan <- function(species, clum_classes, nvis_classes, host_path,
-  pathways, include_native_hosts, gbif_host_species, native_hosts_method,
-  native_hosts_alpha, include_abiotic_weight=TRUE, climate_suitability_path,
+  pathways, include_abiotic_weight=TRUE, climate_suitability_path,
   exclude_bioclim_vars=NULL, include_ndvi=TRUE, aggregated_res=c(5000, 5000),
   make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
   airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
@@ -220,10 +207,9 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     stop('Only one of cabi_path or infected_countries should be provided.')
   }
 
-  if(missing(clum_classes) && missing(nvis_classes) && missing(host_path) &&
-     !isTRUE(include_native_hosts)) {
+  if(missing(clum_classes) && missing(nvis_classes) && missing(host_path)) {
     stop('Provide one or more of: clum_classes, nvis_classes, user_host_path, ',
-         'include_native_hosts=TRUE, to define host distribution.')
+         'to define host distribution.')
   }
 
   if(!missing(climate_suitability_path)) {
@@ -322,26 +308,11 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
   }
 
-  if(isTRUE(include_native_hosts)) {
-    cat(glue::glue('
-    rasterize_nativehosts <- rasterize_range(
-      xy=drake::file_in("{native_hosts_occurrence_path}"),
-      method="{native_hosts_method}", alpha={native_hosts_alpha},
-      template_raster=
-        drake::file_in("risk_layers/auxiliary/aus_mask_clum_{res[1]}.tif"),
-      outfile=drake::file_out("outputs/{species}/auxiliary/{species}_nativehosts_{res[1]}.tif")
-    )
-    \n\n'), file=f, append=TRUE)
-  }
-
   # Combine host layers
   host_files <- sprintf(c(
     "drake::file_in('outputs/%1$s/auxiliary/%1$s_clum_raster_%2$s.tif')",
-    "drake::file_in('outputs/%1$s/auxiliary/%1$s_userHostBinary_raster_%2$s.tif')",
-    "drake::file_in('outputs/%1$s/auxiliary/%1$s_nativehosts_%2$s.tif')"),
-    species, res[1])[
-      c(!missing(clum_classes), !missing(host_path), isTRUE(include_native_hosts))
-    ]
+    "drake::file_in('outputs/%1$s/auxiliary/%1$s_userHostBinary_raster_%2$s.tif')"),
+    species, res[1])[c(!missing(clum_classes), !missing(host_path))]
 
   host_text <- if(length(host_files) == 0) {
     ''

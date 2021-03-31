@@ -10,10 +10,6 @@ species_plan(
   nvis_classes,
   host_path,
   pathways,
-  include_native_hosts,
-  gbif_host_species,
-  native_hosts_method,
-  native_hosts_alpha,
   include_abiotic_weight = TRUE,
   climate_suitability_path,
   exclude_bioclim_vars = NULL,
@@ -104,18 +100,6 @@ included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
 \code{'nurserystock'}, \code{'residents'}, \code{'torres'},
 \code{'tourists'}, \code{'vessels'}, \code{'northwind'},
 \code{'pacificwind'}, \code{'nzwind'}.}
-
-\item{include_native_hosts}{Should the distribution of native host species be
-estimated and added to the definition of host availability?}
-
-\item{native_hosts_method}{Either \code{"points"} or \code{"alphahull"},
-defining the method for estimating native host species' distribution.
-Ignored when \code{include_native_hosts} is \code{FALSE}.}
-
-\item{native_hosts_alpha}{Alpha parameter for calculation of alpha hull
-defining native hosts' spatial distribution. Ignored when
-\code{include_native_hosts} is \code{FALSE} or when
-\code{native_hosts_method} is \code{"points"}.}
 
 \item{include_abiotic_weight}{Logical. Should suitability be dependent on
 climate? Considered TRUE if \code{climate_suitability_path} is provided,
@@ -250,10 +234,6 @@ pathway.}
 
 \item{overwrite}{Logical. Should the code executed by the resulting plan be
 allowed to overwrite existing raster files? Default is \code{TRUE}.}
-
-\item{native_hosts_occurrence_path}{Path to a .csv file containing occurrence
-data for hosts of the focal pest. Must include columns \code{Longitude} and
-\code{Latitude}. Coordinates are expected to be in decimal degrees (WGS84).}
 }
 \description{
 Generate a drake plan that facilitates reproducible generation of species
