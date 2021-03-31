@@ -3,3 +3,4 @@ Meta
 *.DS_store
 .Rproj.user
 .Rhistory
+rosm.cache/*
