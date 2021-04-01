@@ -631,7 +631,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         clean_gbif <- dplyr::select(
         # ^ target is renamed before returning from species_plan
           CoordinateCleaner::clean_coordinates(
-            x = dplyr::mutate({species}_gbif_records, Species=1),
+            x = dplyr::mutate({species}_gbif_records, species=1),
             # ^ constant value for species (column is required for the function
             #   to run)
             lon = "decimalLongitude",
@@ -661,7 +661,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         clean_expert_records <- dplyr::select(
           CoordinateCleaner::clean_coordinates(
             x = dplyr::mutate(readr::read_csv(drake::file_in("{occurrence_path}")),
-                Species=1),
+                species=1),
             # ^ constant value for species (column is required for the function
             #   to run)
             lon = "Longitude",
