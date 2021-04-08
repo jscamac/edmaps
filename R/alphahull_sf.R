@@ -8,7 +8,7 @@
 #' @references Adapted from ConR:::.alpha.hull.poly and ConR:::.alpha.hull.poly.
 #' @importFrom alphahull ahull anglesArc
 #' @importFrom methods slot
-#' @importFrom rgeos gBuffer
+#' @importFrom raster buffer
 #' @importFrom sf st_as_sf
 #' @importFrom sp CRS Line Lines Polygons proj4string SpatialLines SpatialLinesDataFrame SpatialPolygons
 #' @keywords internal
@@ -29,7 +29,7 @@ alphahull_sf <- function(xy, alpha) {
     ) %>%
     sp::SpatialLinesDataFrame(data.frame(id=1), match.ID=FALSE)
 
-  ah_poly <- rgeos::gBuffer(ah_spldf, width = 0.00001)
+  ah_poly <- raster::buffer(ah_spldf, width = 0.00001)
   # ^ required to convert lines to polys
 
   pols <- methods::slot(ah_poly, "polygons")
