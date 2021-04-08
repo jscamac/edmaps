@@ -18,7 +18,13 @@
 #' @param outfile Optional file path to write out resulting host raster.
 #' @param xy_crs Coordinate reference system of \code{xy}, passed as numeric
 #'   EPSG code, or any other format accepted by \code{\link{sf::st_set_crs}}. If
-#'   missing, \code{xy} will be assumed to have the same CRS as \code{template}.
+#'   missing and \code{xy} is an \code{sp} or \code{sf} object, the CRS is
+#'   defined by the object. If the latter is undefined, or if \code{xy_crs} is
+#'   missing and \code{xy} is a matrix or path to a csv file, \code{xy} will
+#'   inherit the CRS of \code{template}, and if that is undefined, EPSG:4326
+#'   (WGS84) will be assumed. If \code{xy_crs} is provided and \code{xy} is an
+#'   \code{sf} or \code{sp} object with a defined CRS, \code{xy_crs} will be
+#'   ignored.
 #' @return A \code{RasterLayer} with the resulting range burnt into it.
 #'   Additionally, if \code{outfile} is not missing, the raster is written to
 #'   that file.
@@ -27,7 +33,7 @@
 #' @importFrom raster cellFromXY init raster writeRaster
 #' @importFrom readr read_csv
 #' @importFrom sf st_coordinates st_crs st_multipoint st_set_crs st_sfc st_transform
-#' @importFrom sp coordinates
+#' @importFrom sp coordinates proj4string
 #' @export
 rasterize_range <- function(xy, method, alpha, template, outfile, xy_crs) {
   if(is.character(template)) {
@@ -35,37 +41,69 @@ rasterize_range <- function(xy, method, alpha, template, outfile, xy_crs) {
   } else if(!is(template, 'RasterLayer')) {
     stop('template must be a RasterLayer or a file path to a raster file.')
   }
-
-  if(missing(xy_crs)) {
-    xy_crs <- sf::st_crs(template)
-    warning('xy assumed to have the same CRS as template: ', xy_crs$input)
-  }
-
+  r_crs <- sf::st_crs(template)
   if(is.character(xy)) {
     xy <- as.matrix(dplyr::select(readr::read_csv(xy), Longitude, Latitude))
-  } else if(is(xy, 'SpatialPoints')) {
-    xy <- sp::coordinates(xy)[, 1:2]
-  } else if(is(xy, 'sf')) {
-    xy <- sf::st_coordinates(xy)[, 1:2]
+    if(missing(xy_crs)) {
+      if(is.na(r_crs)) {
+        xy_crs <- 4326
+        warning('CRS of xy assumed to be EPSG:4326 (WGS84)')
+      } else {
+        xy_crs <- r_crs
+        warning('CRS of xy assumed to be ', r_crs)
+      }
+    }
   } else if(is.matrix(xy)) {
     xy <- xy[, 1:2]
+    if(missing(xy_crs)) {
+      if(is.na(r_crs)) {
+        xy_crs <- 4326
+        warning('CRS of xy assumed to be EPSG:4326 (WGS84)')
+      } else {
+        xy_crs <- r_crs
+        warning('CRS of xy assumed to be ', r_crs)
+      }
+    }
+  } else if(is(xy, 'SpatialPoints')) {
+    if(is.na(sp::proj4string(xy)) && missing(xy_crs)) {
+      if(is.na(r_crs)) {
+        xy_crs <- 4326
+        warning('CRS of xy assumed to be EPSG:4326 (WGS84)')
+      } else {
+        xy_crs <- r_crs
+        warning('CRS of xy assumed to be ', r_crs)
+      }
+    } else if(!is.na(sp::proj4string(xy))) {
+      xy_crs <- sp::proj4string(xy)
+    }
+    xy <- sp::coordinates(xy)[, 1:2]
+  } else if(is(xy, 'sf')) {
+    if(is.na(sf::st_crs(xy)) && missing(xy_crs)) {
+      if(is.na(r_crs)) {
+        xy_crs <- 4326
+        warning('CRS of xy assumed to be EPSG:4326 (WGS84)')
+      } else {
+        xy_crs <- r_crs
+        warning('CRS of xy assumed to be ', r_crs)
+      }
+    } else if(!is.na(sf::st_crs(xy))) {
+      xy_crs <- sf::st_crs(xy)
+    }
+    xy <- sf::st_coordinates(xy)[, 1:2]
   } else {
     stop('xy must be one of: sf points object; SpatialPoints* object; matrix',
          ' containing Longitude and Latitude; or a file path to a csv',
          ' containing columns Longitude and Latitude.')
   }
   colnames(xy) <- c('Longitude', 'Latitude')
-
   xy <- sf::st_multipoint(unique(xy)) %>%
     sf::st_sfc() %>%
     sf::st_set_crs(xy_crs) %>%
     sf::st_transform(sf::st_crs(template)) %>%
     sf::st_coordinates() %>%
     .[, 1:2]
-
   host <- raster::init(template, function(x) NA)
   method <- match.arg(method, c('points', 'alphahull'))
-
   if(method=='points') {
     host[raster::cellFromXY(host, xy)] <- 1
   } else if(method=='alphahull') {
