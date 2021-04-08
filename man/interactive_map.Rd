@@ -29,24 +29,24 @@ colour names) or the name of a palette function supported by \code{tmap}
 (see \code{\link[tmaptools]{palette_explorer}} and
 \code{\link[tmap]{tm_raster}}).}
 
-\item{transparency}{Numeric. Value between 0 and 1 defining the opacity of 
+\item{transparency}{Numeric. Value between 0 and 1 defining the opacity of
 the plotted raster data (1 = fully opaque; 0 = fully transparent).}
 
 \item{legend}{Logical. Should a legend be plotted?}
 
 \item{set_value_range}{A numeric vector giving upper and lower limits for
-raster values. Values outside this range (including the limits) will be 
+raster values. Values outside this range (including the limits) will be
 set to NA.}
 
-\item{discrete}{Logical. Are the values of \code{ras} discrete 
+\item{discrete}{Logical. Are the values of \code{ras} discrete
 (categorical)?}
 
 \item{scale_type}{Character. Can be one of: \code{"none"} (raw data, no
-rescaling), \code{"log10"}, \code{"max normalize"} (proportional to 
-maximum value), \code{"minmax normalize"} (rescale values to be between 0 
-and 1 based on min and max) or \code{"logit"}. Note that if 
+rescaling), \code{"log10"}, \code{"max normalize"} (proportional to
+maximum value), \code{"minmax normalize"} (rescale values to be between 0
+and 1 based on min and max) or \code{"logit"}. Note that if
 \code{"log10"} or \code{"logit"} is used, 0 or 1 values must be masked (
-using \code{set_value_range}) or rescaled before passing to this 
+using \code{set_value_range}) or rescaled before passing to this
 function. \code{scale_type} is ignored if \code{discrete} is \code{TRUE}.}
 
 \item{outfile}{Character. If \code{NULL}, map will be returned to R and not
@@ -54,13 +54,13 @@ saved. Otherwise, map will be exported as a html file. Full path address
 must be used. If pandoc is available, a standalone html file is created
 (see details).}
 
-\item{surveillance_locs}{A spatial object or a path to a .csv file 
+\item{surveillance_locs}{A spatial object or a path to a .csv file
 containing columns named "Latitude" and "Longitude".}
 
 \item{pt_col}{Character. The plotting colour for surveillance points.}
 
-\item{cleanup}{Logical. If a standalone html file is created, should 
-accessory files be removed after the standalone file is generated? This 
+\item{cleanup}{Logical. If a standalone html file is created, should
+accessory files be removed after the standalone file is generated? This
 will be a folder created within \code{tempdir()}.}
 }
 \value{
@@ -70,8 +70,8 @@ A html map.
 Produce an interactive html map.
 }
 \details{
-To create a standalone html file, the 
-  \href{https://pandoc.org/installing.html}{pandoc} software must be 
-  installed and available to R. If pandoc is unavailable, the html file 
+To create a standalone html file, the
+  \href{https://pandoc.org/installing.html}{pandoc} software must be
+  installed and available to R. If pandoc is unavailable, the html file
   will be accompanied by a folder of accessory files.
 }

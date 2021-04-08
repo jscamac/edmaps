@@ -38,16 +38,16 @@
 #'   \href{https://pandoc.org/installing.html}{pandoc} software must be
 #'   installed and available to R. If pandoc is unavailable, the html file
 #'   will be accompanied by a folder of accessory files.
-#' @importFrom raster stack unstack setMinMax minValue maxValue getValues setValues ncell extent projection writeRaster projectRaster
+#' @importFrom raster extent getValues maxValue minValue ncell projection projectRaster raster setMinMax setValues writeRaster
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom methods slot "slot<-"
+#' @importFrom methods is slot "slot<-"
 #' @importFrom utils read.csv
 #' @importFrom dplyr filter
-#' @importFrom sf st_as_sf st_crs st_crop
+#' @importFrom sf st_as_sf st_crs st_crop st_transform
 #' @importFrom stats qlogis
-#' @importFrom tmap tmap_options tm_shape tm_raster tm_scale_bar tm_dots tmap_leaflet tmap_mode tm_facets
+#' @importFrom tmap tm_dots tm_facets tm_raster tm_scale_bar tm_shape tmap_leaflet tmap_mode tmap_options
 #' @importFrom tmaptools tmap.pal.info
-#' @importFrom leafem addImageQuery addMouseCoordinates
+#' @importFrom leafem addMouseCoordinates
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom leaflet addMiniMap
 #' @importFrom stars read_stars
@@ -72,7 +72,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   }
 
   # Must be a path to a raster file, or a RasterLayer
-  if(is.character(ras)) ras <- raster::stack(ras)
+  if(is.character(ras)) ras <- raster::raster(ras)
   ras <- raster::setMinMax(ras)
 
 
@@ -89,57 +89,54 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
 
   # Restrict Raster value range?
   if(!is.null(set_value_range)) {
-    ras <- raster::stack(lapply(raster::unstack(ras), function(x) {
-      x[x <= min(set_value_range) | x >= max(set_value_range)] <- NA
-      x
-    }))
+      ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
 
+  minval <- raster::minValue(ras)
+  if(is.na(minval)) {
+    warning(sprintf('Cannot create map %s (no cells with data).', outfile))
+    return(NULL)
+  }
+
+  maxval <- raster::maxValue(ras)
+
   # if the raster contains non-zero values...
-  if(!is.na(raster::minValue(ras))) {
-    if(!isTRUE(discrete)) {
-      # Convert to log10 scale
-      if(scale_type == "log10") {
-        if(any(raster::getValues(ras) <= 0, na.rm=TRUE)) {
-          stop('Cannot log transform raster containing zero or negative values.')
-        } else {
-          ras <- raster::setValues(ras, log10(raster::getValues(ras)))
-        }
+  if(!isTRUE(discrete)) {
+    # Convert to log10 scale
+    if(scale_type == "log10") {
+      if(minval <= 0) {
+        stop('Cannot log transform raster containing zero or negative values.')
+      } else {
+        ras <- raster::setValues(ras, log10(raster::getValues(ras)))
       }
+    }
 
-      # Max normalize
-      if(scale_type == "max normalize") {
-        ras <- max_normalize(ras)
-      }
-      # Min Max normalize
-      if(scale_type == "minmax normalize") {
-        ras <- min_max_normalize(ras)
-      }
+    # Max normalize
+    if(scale_type == "max normalize") {
+      ras <- max_normalize(ras)
+    }
+    # Min Max normalize
+    if(scale_type == "minmax normalize") {
+      ras <- min_max_normalize(ras)
+    }
 
-      # Convert to logit scale
-      if(scale_type == "logit") {
-        if(any(
-          raster::getValues(ras) <= 0 | raster::getValues(ras) >= 1, na.rm=TRUE)
-        ) {
-          stop('Cannot logit transform raster containing values less than or',
-               ' equal to 0 or values greater than or equal to 1.')
-        } else {
-          ras <- raster::setValues(
-            ras, stats::qlogis(raster::getValues(ras))
-          )
-        }
+    # Convert to logit scale
+    if(scale_type == "logit") {
+      if(minval <= 0 | maxval >= 1) {
+        stop('Cannot logit transform raster containing values less than or',
+             ' equal to 0 or values greater than or equal to 1.')
+      } else {
+        ras <- raster::setValues(ras, stats::qlogis(raster::getValues(ras)))
       }
+    }
 
-      # Convert to percent scale
-      if(scale_type == "percent") {
-        if(any(
-          raster::getValues(ras) <0 | raster::getValues(ras) >1, na.rm=TRUE)
-        ) {
-          stop('Cannot convert to percentage raster because there are values',
-               ' less than 0 or values greater 1.')
-        } else {
-          ras <-raster::setValues(ras, raster::getValues(ras)*100)
-        }
+    # Convert to percent scale
+    if(scale_type == "percent") {
+      if(minval < 0 | maxval > 1) {
+        stop('Cannot convert to percentage raster because there are values',
+             ' less than 0 or values greater 1.')
+      } else {
+        ras <- raster::setValues(ras, raster::getValues(ras)*100)
       }
     }
   }
@@ -203,12 +200,13 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'),
                             t_srs = "+init=epsg:3857", r = "bilinear")
     ras <- stars::read_stars(f2)
-    nbands <- ifelse(length(dim(ras))==2, 1, dim(ras)[3])
     m <- tmap::tm_shape(ras, name = layer_name) +
       tmap::tm_raster(palette = palette,
                       style = "cont", midpoint = NA, alpha = transparency,
-                      legend.show=c(TRUE, rep(FALSE, nbands - 1)),
-                      title = layer_name) +
+                      legend.show=TRUE, title = layer_name,
+                      colorNA='#ffffff01') +
+                      # ^ colorNA set to almost transparent, to avoid error if
+                      #   raster is entirely NA.
       tmap::tm_facets(as.layers=TRUE)
   }
 

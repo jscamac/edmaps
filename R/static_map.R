@@ -51,7 +51,7 @@
 #'   some Java errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster setMinMax stack writeRaster
+#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster raster setMinMax writeRaster
 #' @importFrom sf st_as_sf st_crop st_crs st_read st_transform
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_compass tm_dots tm_facets tm_layout tm_polygons tm_raster tm_rgb tm_scale_bar tm_shape tmap_mode tmap_options tmap_save
@@ -59,7 +59,6 @@
 #' @importFrom utils read.csv
 #' @importFrom magrittr "%>%"
 #' @export
-
 static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
                        set_value_range, scale_type = "none",
                        basemap_mode=c('osm', 'boundaries'),
@@ -78,7 +77,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     "none", "log10", "max normalize", "minmax normalize", "logit",
     "discrete"))
 
-  if(is.character(ras)) ras <- raster::stack(ras)
+  if(is.character(ras)) ras <- raster::raster(ras)
 
   if(missing(layer_names)) {
     layer_names <- rep('', dim(ras)[3])
@@ -112,33 +111,38 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
 
-  # if the raster contains non-zero values...
-  if(!is.na(raster::minValue(ras))) {
-    # Convert to log10 scale
-    if(scale_type == "log10") {
-      if(any(raster::minValue(ras)) <= 0) {
-        stop('Cannot log transform raster containing zero or negative values.')
-      } else {
-        ras <- log10(ras)
-      }
-    }
+  minval <- raster::minValue(ras)
+  if(is.na(minval)) {
+    warning(sprintf('Cannot create map %s (no cells with data).', outfile))
+    return(NULL)
+  }
 
-    # Max normalize
-    if(scale_type == "max normalize") {
-      ras <- max_normalize(ras)
-    }
-    # Min Max normalize
-    if(scale_type == "minmax normalize") {
-      ras <- min_max_normalize(ras)
-    }
+  maxval <- raster::maxValue(ras)
 
-    # Convert to logit scale
-    if(scale_type == "logit") {
-      if(raster::minValue(ras) <= 0 | raster::maxValue(ras) >= 1) {
-        stop('Cannot logit transform raster containing values <= 0 or >= 1.')
-      } else {
-        ras <-  stats::qlogis(ras)
-      }
+  # Convert to log10 scale
+  if(scale_type == "log10") {
+    if(minval <= 0) {
+      stop('Cannot log transform raster containing zero or negative values.')
+    } else {
+      ras <- log10(ras)
+    }
+  }
+
+  # Max normalize
+  if(scale_type == "max normalize") {
+    ras <- max_normalize(ras)
+  }
+  # Min Max normalize
+  if(scale_type == "minmax normalize") {
+    ras <- min_max_normalize(ras)
+  }
+
+  # Convert to logit scale
+  if(scale_type == "logit") {
+    if(minval <= 0 || maxval >= 1) {
+      stop('Cannot logit transform raster containing values <= 0 or >= 1.')
+    } else {
+      ras <-  stats::qlogis(ras)
     }
   }
 
@@ -162,7 +166,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
       r = "bilinear", te=e, te_srs='EPSG:4283')
       # ^ This will interpolate the aggregated data if
       #   aggregate_raster is not NULL
-    ras <- raster::setMinMax(raster::stack(f2))
+    ras <- raster::setMinMax(raster::raster(f2))
   }
 
   if(isTRUE(colramp_entire_range)) {
