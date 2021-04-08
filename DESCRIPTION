@@ -1,7 +1,7 @@
 Package: edmaps
 Type: Package
 Title: Estimate Likelihood of Pest Establishment
-Version: 1.9.0.9045
+Version: 1.9.0.9046
 Authors@R: as.person(c(
     "James Camac <james.camac@gmail.com> [aut, cre]", 
     "John Baumgartner <johnbaums@gmail.com> [aut]"
@@ -28,15 +28,13 @@ Imports:
   glue,
   htmlwidgets,
   httr,
-  leaflet,
-  leaflet.opacity,
   leafem,
+  leaflet,
   magrittr,
   mapedit,
   methods,
   purrr,
   raster,
-  rasterVis,
   readr,
   readxl,
   rgbif,
@@ -47,8 +45,7 @@ Imports:
   stars,
   tidyr,
   tmap,
-  tmaptools,
-  viridis
+  tmaptools
 Suggests: 
   CoordinateCleaner,
   knitr,

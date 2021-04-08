@@ -50,7 +50,6 @@
 #' @importFrom leafem addImageQuery addMouseCoordinates
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom leaflet addMiniMap
-#' @importFrom leaflet.opacity addOpacitySlider
 #' @importFrom stars read_stars
 #' @export
 interactive_map <- function(ras, layer_name = NULL, palette = 'inferno', 
