@@ -112,31 +112,33 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
 
-  # Scale raster values?
-  # Convert to log10 scale
-  if(scale_type == "log10") {
-    if(any(raster::minValue(ras)) <= 0) {
-      stop('Cannot log transform raster containing zero or negative values.')
-    } else {
-      ras <- log10(ras)
+  # if the raster contains non-zero values...
+  if(!is.na(raster::minValue(ras))) {
+    # Convert to log10 scale
+    if(scale_type == "log10") {
+      if(any(raster::minValue(ras)) <= 0) {
+        stop('Cannot log transform raster containing zero or negative values.')
+      } else {
+        ras <- log10(ras)
+      }
     }
-  }
 
-  # Max normalize
-  if(scale_type == "max normalize") {
-    ras <- max_normalize(ras)
-  }
-  # Min Max normalize
-  if(scale_type == "minmax normalize") {
-    ras <- min_max_normalize(ras)
-  }
+    # Max normalize
+    if(scale_type == "max normalize") {
+      ras <- max_normalize(ras)
+    }
+    # Min Max normalize
+    if(scale_type == "minmax normalize") {
+      ras <- min_max_normalize(ras)
+    }
 
-  # Convert to logit scale
-  if(scale_type == "logit") {
-    if(raster::minValue(ras) <= 0 | raster::maxValue(ras) >= 1) {
-      stop('Cannot logit transform raster containing values <= 0 or >= 1.')
-    } else {
-      ras <-  stats::qlogis(ras)
+    # Convert to logit scale
+    if(scale_type == "logit") {
+      if(raster::minValue(ras) <= 0 | raster::maxValue(ras) >= 1) {
+        stop('Cannot logit transform raster containing values <= 0 or >= 1.')
+      } else {
+        ras <-  stats::qlogis(ras)
+      }
     }
   }
 
