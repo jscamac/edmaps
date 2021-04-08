@@ -1,7 +1,7 @@
 Package: edmaps
 Type: Package
 Title: Estimate Likelihood of Pest Establishment
-Version: 1.9.0.9047
+Version: 1.9.0.9048
 Authors@R: as.person(c(
     "James Camac <james.camac@gmail.com> [aut, cre]", 
     "John Baumgartner <johnbaums@gmail.com> [aut]"
@@ -17,6 +17,7 @@ Description: This package combines spatial environmental data (e.g. distance
 Depends: R (>= 4.0)
 SystemRequirements: Java (>= 1.5), JRI, GNU make
 Imports:
+  alphahull,
   countrycode,
   dplyr,
   drake,
@@ -43,6 +44,7 @@ Imports:
   sf,
   sp,
   stars,
+  stplanr,
   tidyr,
   tmap,
   tmaptools
