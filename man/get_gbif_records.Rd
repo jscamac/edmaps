@@ -33,28 +33,28 @@ endpoint) or `'download'` (uses the GBIF `/occurrence/download`API
 endpoint). The former makes paginated queries to the API, while the latter
 performs an asynchronous query (but waits for the resulting dataset to be
 ready for download). The `'search'` method is limited to 100,000 records;
-for large datasets, consider using `'download'`. When using 
-`method='download'`, the arguments `username`, `pwd`, and `email` must be 
+for large datasets, consider using `'download'`. When using
+`method='download'`, the arguments `username`, `pwd`, and `email` must be
 provided.}
 
 \item{username}{GBIF username, required when method is `'download'`.}
 
 \item{pwd}{GBIF password, required when method is `'download'`.}
 
-\item{email}{Email address, required when `method = 'download'`. This _may_ 
+\item{email}{Email address, required when `method = 'download'`. This _may_
 be used to notify user when download is ready.}
 
-\item{retries}{If `method='download'` and file download fails, how many 
+\item{retries}{If `method='download'` and file download fails, how many
 additional attempts should be made to download the file?}
 
-\item{cleanup}{Logical. Should temporary files associated with 
+\item{cleanup}{Logical. Should temporary files associated with
 `method='download'` be deleted? Default is `TRUE`.}
 }
 \value{
 A `data.frame` of species occurrence records.
 }
 \description{
-Downloads GBIF records of species, removing auxiliary columns and records 
+Downloads GBIF records of species, removing auxiliary columns and records
 recorded prior to a specified year, or that have coordinate uncertainty
 above a specified amount.
 }
