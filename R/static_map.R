@@ -144,16 +144,17 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
       }
     }
 
-    full_range <- c(min(raster::minValue(ras), na.rm=TRUE),
-                    max(raster::maxValue(ras), na.rm=TRUE))
-
-    if(isTRUE(colramp_entire_range)) {
-      limit_cols <- full_range
-    } else {
-      limit_cols <- c(raster::minValue(ras), raster::maxValue(ras))
-    }
-
   }
+
+  full_range <- c(min(raster::minValue(ras), na.rm=TRUE),
+                  max(raster::maxValue(ras), na.rm=TRUE))
+
+  if(isTRUE(colramp_entire_range)) {
+    limit_cols <- full_range
+  } else {
+    limit_cols <- c(raster::minValue(ras), raster::maxValue(ras))
+  }
+
 
   # Reproject raster to web mercator
   # https://github.com/mtennekes/tmap/issues/410
