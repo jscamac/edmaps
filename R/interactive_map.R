@@ -192,9 +192,6 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   })
 
   if(is.na(minval)) {
-    ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
-
-  } else if(isTRUE(discrete)) {
     # If raster is entirely NA, tmap throws an error if palette is specified.
     # Can't just `return` early, since file_out needs to be fulfilled.
     # Workaround is to set a colour, but set transparency to a small number.
@@ -202,6 +199,11 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     m <- tmap::tm_shape(ras, name=layer_name) +
       tmap::tm_raster(col='white', style='cat', title=layer_name,
                       alpha=0.01)
+  } else if(isTRUE(discrete)) {
+    ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
+    m <- tmap::tm_shape(ras, name=layer_name) +
+      tmap::tm_raster(palette=palette, style='cat', title=layer_name,
+                      alpha=transparency)
   } else {
     raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'),
