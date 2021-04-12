@@ -92,7 +92,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
   if(basemap_mode=='osm') {
     basemap <- tmaptools::read_osm(e, zoom=NULL)
     basemap_res <- c(abs(attr(basemap, 'dimensions')$x$delta),
-                      abs(attr(basemap, 'dimensions')$y$delta))
+                     abs(attr(basemap, 'dimensions')$y$delta))
   } else {
     basemap <- sf::st_read(system.file('extdata/ne_australia_states.gpkg',
                                        package='edmaps')) %>%
@@ -112,42 +112,48 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
   }
 
   minval <- raster::minValue(ras)
-  if(is.na(minval)) {
-    warning(sprintf('Cannot create map %s (no cells with data).', outfile))
-    return(NULL)
-  }
 
-  maxval <- raster::maxValue(ras)
+  if(!is.na(minval)) {
 
-  # Convert to log10 scale
-  if(scale_type == "log10") {
-    if(minval <= 0) {
-      stop('Cannot log transform raster containing zero or negative values.')
-    } else {
-      ras <- log10(ras)
+    maxval <- raster::maxValue(ras)
+
+    # Convert to log10 scale
+    if(scale_type == "log10") {
+      if(minval <= 0) {
+        stop('Cannot log transform raster containing zero or negative values.')
+      } else {
+        ras <- log10(ras)
+      }
     }
-  }
 
-  # Max normalize
-  if(scale_type == "max normalize") {
-    ras <- max_normalize(ras)
-  }
-  # Min Max normalize
-  if(scale_type == "minmax normalize") {
-    ras <- min_max_normalize(ras)
-  }
-
-  # Convert to logit scale
-  if(scale_type == "logit") {
-    if(minval <= 0 || maxval >= 1) {
-      stop('Cannot logit transform raster containing values <= 0 or >= 1.')
-    } else {
-      ras <-  stats::qlogis(ras)
+    # Max normalize
+    if(scale_type == "max normalize") {
+      ras <- max_normalize(ras)
     }
-  }
+    # Min Max normalize
+    if(scale_type == "minmax normalize") {
+      ras <- min_max_normalize(ras)
+    }
 
-  full_range <- c(min(raster::minValue(ras), na.rm=TRUE),
-                  max(raster::maxValue(ras), na.rm=TRUE))
+    # Convert to logit scale
+    if(scale_type == "logit") {
+      if(minval <= 0 || maxval >= 1) {
+        stop('Cannot logit transform raster containing values <= 0 or >= 1.')
+      } else {
+        ras <-  stats::qlogis(ras)
+      }
+    }
+
+    full_range <- c(min(raster::minValue(ras), na.rm=TRUE),
+                    max(raster::maxValue(ras), na.rm=TRUE))
+
+    if(isTRUE(colramp_entire_range)) {
+      limit_cols <- full_range
+    } else {
+      limit_cols <- c(raster::minValue(ras), raster::maxValue(ras))
+    }
+
+  }
 
   # Reproject raster to web mercator
   # https://github.com/mtennekes/tmap/issues/410
@@ -164,15 +170,9 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
       t_srs = "EPSG:3857",
       tr = if(basemap_mode=='osm') basemap_res else c(5000, 5000),
       r = "bilinear", te=e, te_srs='EPSG:4283')
-      # ^ This will interpolate the aggregated data if
-      #   aggregate_raster is not NULL
+    # ^ This will interpolate the aggregated data if
+    #   aggregate_raster is not NULL
     ras <- raster::setMinMax(raster::raster(f2))
-  }
-
-  if(isTRUE(colramp_entire_range)) {
-    limit_cols <- full_range
-  } else {
-    limit_cols <- c(raster::minValue(ras), raster::maxValue(ras))
   }
 
   # Set tmap options
@@ -253,8 +253,8 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     locs <- suppressWarnings(suppressMessages(
       sf::st_as_sf(surveillance_locs, coords = c("Longitude", "Latitude"),
                    crs = 4326) %>%
-      sf::st_transform(crs = sf::st_crs(ras)) %>%
-      sf::st_crop(y = raster::extent(ras))
+        sf::st_transform(crs = sf::st_crs(ras)) %>%
+        sf::st_crop(y = raster::extent(ras))
     ))
     m <- m +
       tmap::tm_shape(locs) +

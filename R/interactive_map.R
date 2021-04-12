@@ -53,9 +53,9 @@
 #' @importFrom stars read_stars
 #' @export
 interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
-  transparency = 0.8, legend = TRUE, set_value_range = NULL,  discrete = FALSE,
-  scale_type = "none", outfile = NULL, surveillance_locs = NULL,
-  pt_col = "red", cleanup = FALSE) {
+                            transparency = 0.8, legend = TRUE, set_value_range = NULL,  discrete = FALSE,
+                            scale_type = "none", outfile = NULL, surveillance_locs = NULL,
+                            pt_col = "red", cleanup = FALSE) {
 
   # Ensure valid scaling type
   scale_type <- match.arg(
@@ -89,56 +89,56 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
 
   # Restrict Raster value range?
   if(!is.null(set_value_range)) {
-      ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
+    ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
 
   minval <- raster::minValue(ras)
-  if(is.na(minval)) {
-    warning(sprintf('Cannot create map %s (no cells with data).', outfile))
-    return(NULL)
-  }
 
-  maxval <- raster::maxValue(ras)
+  if(!is.na(minval)) {
 
-  # if the raster contains non-zero values...
-  if(!isTRUE(discrete)) {
-    # Convert to log10 scale
-    if(scale_type == "log10") {
-      if(minval <= 0) {
-        stop('Cannot log transform raster containing zero or negative values.')
-      } else {
-        ras <- raster::setValues(ras, log10(raster::getValues(ras)))
+    maxval <- raster::maxValue(ras)
+
+    # if the raster contains non-zero values...
+    if(!isTRUE(discrete)) {
+      # Convert to log10 scale
+      if(scale_type == "log10") {
+        if(minval <= 0) {
+          stop('Cannot log transform raster containing zero or negative values.')
+        } else {
+          ras <- raster::setValues(ras, log10(raster::getValues(ras)))
+        }
+      }
+
+      # Max normalize
+      if(scale_type == "max normalize") {
+        ras <- max_normalize(ras)
+      }
+      # Min Max normalize
+      if(scale_type == "minmax normalize") {
+        ras <- min_max_normalize(ras)
+      }
+
+      # Convert to logit scale
+      if(scale_type == "logit") {
+        if(minval <= 0 | maxval >= 1) {
+          stop('Cannot logit transform raster containing values less than or',
+               ' equal to 0 or values greater than or equal to 1.')
+        } else {
+          ras <- raster::setValues(ras, stats::qlogis(raster::getValues(ras)))
+        }
+      }
+
+      # Convert to percent scale
+      if(scale_type == "percent") {
+        if(minval < 0 | maxval > 1) {
+          stop('Cannot convert to percentage raster because there are values',
+               ' less than 0 or values greater 1.')
+        } else {
+          ras <- raster::setValues(ras, raster::getValues(ras)*100)
+        }
       }
     }
 
-    # Max normalize
-    if(scale_type == "max normalize") {
-      ras <- max_normalize(ras)
-    }
-    # Min Max normalize
-    if(scale_type == "minmax normalize") {
-      ras <- min_max_normalize(ras)
-    }
-
-    # Convert to logit scale
-    if(scale_type == "logit") {
-      if(minval <= 0 | maxval >= 1) {
-        stop('Cannot logit transform raster containing values less than or',
-             ' equal to 0 or values greater than or equal to 1.')
-      } else {
-        ras <- raster::setValues(ras, stats::qlogis(raster::getValues(ras)))
-      }
-    }
-
-    # Convert to percent scale
-    if(scale_type == "percent") {
-      if(minval < 0 | maxval > 1) {
-        stop('Cannot convert to percentage raster because there are values',
-             ' less than 0 or values greater 1.')
-      } else {
-        ras <- raster::setValues(ras, raster::getValues(ras)*100)
-      }
-    }
   }
 
   # Flip legend
@@ -190,11 +190,18 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     tmap::tmap_options(opts)
     suppressMessages(tmap::tmap_mode(tmode))
   })
-  if(isTRUE(discrete)) {
+
+  if(is.na(minval)) {
+    ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
+
+  } else if(isTRUE(discrete)) {
+    # If raster is entirely NA, tmap throws an error if palette is specified.
+    # Can't just `return` early, since file_out needs to be fulfilled.
+    # Workaround is to set a colour, but set transparency to a small number.
     ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
     m <- tmap::tm_shape(ras, name=layer_name) +
-      tmap::tm_raster(palette=palette, style='cat', title=layer_name,
-                      alpha=transparency)
+      tmap::tm_raster(col='white', style='cat', title=layer_name,
+                      alpha=0.01)
   } else {
     raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'),
@@ -205,8 +212,8 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
                       style = "cont", midpoint = NA, alpha = transparency,
                       legend.show=TRUE, title = layer_name,
                       colorNA='#ffffff01') +
-                      # ^ colorNA set to almost transparent, to avoid error if
-                      #   raster is entirely NA.
+      # ^ colorNA set to almost transparent, to avoid error if
+      #   raster is entirely NA.
       tmap::tm_facets(as.layers=TRUE)
   }
 
@@ -257,8 +264,8 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
       }
     } else {
       htmlwidgets::saveWidget(out, selfcontained=FALSE,
-                    file=file.path(normalizePath(dirname(outfile)),
-                                   basename(outfile)))
+                              file=file.path(normalizePath(dirname(outfile)),
+                                             basename(outfile)))
     }
   } else {
     # Else return object in R
