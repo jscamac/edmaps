@@ -244,10 +244,16 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   l <- (m + tmap::tm_scale_bar()) %>%
     tmap::tmap_leaflet()
 
-  out <- l %>%
-    flip_legend %>%
-    leaflet::addMiniMap(position='bottomleft', toggleDisplay=TRUE) %>%
-    leafem::addMouseCoordinates()
+  if(!is.na(minval)) {
+    out <- l %>%
+      flip_legend %>%
+      leaflet::addMiniMap(position='bottomleft', toggleDisplay=TRUE) %>%
+      leafem::addMouseCoordinates()
+  } else {
+    out <- l %>%
+      leaflet::addMiniMap(position='bottomleft', toggleDisplay=TRUE) %>%
+      leafem::addMouseCoordinates()
+  }
 
   # outfile supplied
   if(!is.null(outfile)) {
