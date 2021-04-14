@@ -223,12 +223,12 @@ excel_to_plan <- function(file) {
     plans$group_plans <- lapply(unique(groups$species_group), function(x) {
       group <- gsub('\\s+', '_', x)
       species_in_group <- groups$species[groups$species_group==x]
-      ff <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif',
-                    gsub(' ', '_', species_in_group), 1000)
-      f_out <- sprintf('outputs/%1$s/%1$s_group_edmap_%2$s.tif',
-                       gsub(' ', '_', group), 1000)
       res <- c(1000, 1000) # enforce 1km for now - memory safe
       aggregated_res <- c(5000, 5000) # hardcoding for now (for grouped species' maps)
+      ff <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif',
+                    gsub(' ', '_', species_in_group), res[1])
+      f_out <- sprintf('outputs/%1$s/%1$s_group_edmap_%2$s.tif',
+                       gsub(' ', '_', group), res[1])
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
         group_establishment_likelihood = {
