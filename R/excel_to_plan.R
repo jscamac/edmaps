@@ -140,7 +140,7 @@ excel_to_plan <- function(file) {
   }
 
   cabi_paths_idx <- which(grepl('\\.csv$', species$infected_countries) &
-         species$include_abiotic_weight)
+                            species$include_abiotic_weight)
   exist <- file.exists(species$infected_countries[cabi_paths_idx])
 
   if(any(!exist)) {
@@ -154,7 +154,7 @@ excel_to_plan <- function(file) {
   # Test if any countries are invalid
   if(any(!is.na(species$infected_countries))) {
     countries <- unique(unlist(strsplit(setdiff(species$infected_countries, NA),
-                                 '\\s*,\\s*')))
+                                        '\\s*,\\s*')))
     testmatch <- countrycode::countrycode(
       countries, 'country.name', 'iso3n', warn=FALSE)
 
@@ -237,6 +237,13 @@ excel_to_plan <- function(file) {
           if(!dir.exists(dirname(!!f_out))) dir.create(dirname(!!f_out))
           raster::writeRaster(1 - r, drake::file_out(!!f_out), overwrite=TRUE)
         },
+        group_establishment_likelihood_agg <- aggregate_raster(
+          rast = drake::file_in("outputs/{species}/{species}_edmap_{res[1]}.tif"),
+          outfile = drake::file_out(
+            "outputs/{species}/{species}_edmap_{aggregated_res[1]}.tif"
+          ),
+          aggregate_factor = {agg_factor},
+          fun = function(x) 1 - prod(1-x)),
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
             !!sprintf("outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
@@ -247,12 +254,12 @@ excel_to_plan <- function(file) {
           set_value_range = c(!!globals$minimum_probability_for_maps, Inf),
           scale_type = "log10",
           transparency = 1,
-          aggregate_raster = list(!!agg_factor, max),
+          aggregate_raster = list(!!agg_factor, function(x) 1 - prod(1-x)),
           height = 7,
           nrow = 1,
           outfile = drake::file_out(
             !!sprintf("outputs/%s/static_maps/%s_group_edmap_national_%s.pdf",
-                    group, group, aggregated_res[1])
+                      group, group, aggregated_res[1])
           )
         ),
 
