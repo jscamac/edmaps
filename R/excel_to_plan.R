@@ -229,6 +229,8 @@ excel_to_plan <- function(file) {
                     gsub(' ', '_', species_in_group), res[1])
       f_out <- sprintf('outputs/%1$s/%1$s_group_edmap_%2$s.tif',
                        gsub(' ', '_', group), res[1])
+      f_out2 <- sprintf('outputs/%1$s/%1$s_group_edmap_%2$s.tif',
+                        gsub(' ', '_', group), aggregated_res[1])
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
         group_establishment_likelihood = {
@@ -238,12 +240,9 @@ excel_to_plan <- function(file) {
           raster::writeRaster(1 - r, drake::file_out(!!f_out), overwrite=TRUE)
         },
         group_establishment_likelihood_agg = aggregate_raster(
-          rast = drake::file_in("outputs/{species}/{species}_edmap_{res[1]}.tif"),
-          outfile = drake::file_out(
-            "outputs/{species}/{species}_edmap_{aggregated_res[1]}.tif"
-          ),
-          aggregate_factor = {agg_factor},
-          fun = function(x, ...) 1 - prod(1-x)
+          rast = drake::file_in(!!f_out),
+          outfile = drake::file_out(!!f_out2),
+          aggregate_factor = !!agg_factor, fun = function(x, ...) 1 - prod(1 - x)
         ),
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
@@ -251,7 +250,7 @@ excel_to_plan <- function(file) {
           ),
           xlim = c(112.76, 155),
           ylim = c(-44.03, -9.21),
-          legend_title = !!sprintf("log10(EL %skm)", round(aggregated_res[1]/1000, 2)),
+          legend_title = !!sprintf("log10(EL %skm)", !!round(aggregated_res[1]/1000, 2)),
           set_value_range = c(!!globals$minimum_probability_for_maps, Inf),
           scale_type = "log10",
           transparency = 1,
