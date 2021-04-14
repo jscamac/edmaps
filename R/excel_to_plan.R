@@ -237,13 +237,14 @@ excel_to_plan <- function(file) {
           if(!dir.exists(dirname(!!f_out))) dir.create(dirname(!!f_out))
           raster::writeRaster(1 - r, drake::file_out(!!f_out), overwrite=TRUE)
         },
-        group_establishment_likelihood_agg <- aggregate_raster(
+        group_establishment_likelihood_agg = aggregate_raster(
           rast = drake::file_in("outputs/{species}/{species}_edmap_{res[1]}.tif"),
           outfile = drake::file_out(
             "outputs/{species}/{species}_edmap_{aggregated_res[1]}.tif"
           ),
           aggregate_factor = {agg_factor},
-          fun = function(x) 1 - prod(1-x)),
+          fun = function(x) 1 - prod(1-x)
+        ),
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
             !!sprintf("outputs/%s/%s_group_edmap_%s.tif", group, group, res[1])
