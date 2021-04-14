@@ -243,7 +243,7 @@ excel_to_plan <- function(file) {
             "outputs/{species}/{species}_edmap_{aggregated_res[1]}.tif"
           ),
           aggregate_factor = {agg_factor},
-          fun = function(x) 1 - prod(1-x)
+          fun = function(x, ...) 1 - prod(1-x)
         ),
         plot_group_national_establishment_likelihood = static_map(
           ras = drake::file_in(
@@ -255,7 +255,7 @@ excel_to_plan <- function(file) {
           set_value_range = c(!!globals$minimum_probability_for_maps, Inf),
           scale_type = "log10",
           transparency = 1,
-          aggregate_raster = list(!!agg_factor, function(x) 1 - prod(1-x)),
+          aggregate_raster = list(!!agg_factor, function(x, ...) 1 - prod(1-x)),
           height = 7,
           nrow = 1,
           outfile = drake::file_out(
