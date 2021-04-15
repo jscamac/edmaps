@@ -946,7 +946,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
         "outputs/{species}/{species}_edmap_{aggregated_res[1]}.tif"
       ),
       aggregate_factor = {agg_factor},
-      fun = function(x, ...) 1 - prod(1-x))
+      fun = function(x, ...) 1 - prod(1-x, na.rm=TRUE))
   \n\n'), file=f, append=TRUE)
 
 
@@ -1013,7 +1013,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
       set_value_range = c({minimum_probability_for_maps}, Inf),
       scale_type = "log10",
       transparency = 1,
-      aggregate_raster = list({agg_factor}, fun = function(x, ...) 1 - prod(1-x)),
+      aggregate_raster = list({agg_factor}, fun = function(x, ...) 1 - prod(1-x, na.rm=TRUE)),
       height = 7,
       nrow = 1,
       outfile = drake::file_out(

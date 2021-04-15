@@ -242,7 +242,7 @@ excel_to_plan <- function(file) {
         establishment_likelihood_agg = aggregate_raster(
           rast = drake::file_in(!!f_out),
           outfile = drake::file_out(!!f_out2),
-          aggregate_factor = !!agg_factor, fun = function(x, ...) 1 - prod(1 - x)
+          aggregate_factor = !!agg_factor, fun = function(x, ...) 1 - prod(1 - x, na.rm=TRUE)
         ),
         plot_national_establishment_likelihood = static_map(
           ras = drake::file_in(
@@ -254,7 +254,7 @@ excel_to_plan <- function(file) {
           set_value_range = c(!!globals$minimum_probability_for_maps, Inf),
           scale_type = "log10",
           transparency = 1,
-          aggregate_raster = list(!!agg_factor, function(x, ...) 1 - prod(1-x)),
+          aggregate_raster = list(!!agg_factor, function(x, ...) 1 - prod(1-x, na.rm=TRUE)),
           height = 7,
           nrow = 1,
           outfile = drake::file_out(
