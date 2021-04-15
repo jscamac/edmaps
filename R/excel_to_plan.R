@@ -233,7 +233,7 @@ excel_to_plan <- function(file) {
                         gsub(' ', '_', group), aggregated_res[1])
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
-        group_establishment_likelihood = {
+        establishment_likelihood = {
           s <- raster::stack(drake::file_in(!!ff))
           r <- Reduce(function(x, y) prod(x, y, na.rm=TRUE), raster::unstack(1 - s))
           if(!dir.exists(dirname(!!f_out))) dir.create(dirname(!!f_out))
