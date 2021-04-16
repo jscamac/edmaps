@@ -259,7 +259,17 @@ excel_to_plan <- function(file) {
                       group, group, aggregated_res[1])
           )
         ),
-
+        edmap=interactive_map(
+          ras = drake::file_in(!!f_edmap),
+          layer_name = !!sprintf("log10(Establishment likelihood %skm)",
+                                 round(res[1]/1000, 2)),
+          set_value_range = c(!!globals$minimum_probability_for_maps, Inf),
+          scale_type = "log10",
+          outfile = drake::file_out(
+            !!sprintf("outputs/%1$s/interactive_maps/%1$s_edmap_%2$s.html",
+                      group, group, res[1])
+          )
+        ),
         cairns_edmap = static_map(
           ras = drake::file_in(!!sprintf(
             "outputs/%s/%s_edmap_%s.tif", group, group, res[1])
