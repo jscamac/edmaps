@@ -10,7 +10,8 @@ rasterize_range(xy, method, alpha, template, outfile, xy_crs)
 \item{xy}{Coordinates to define host/species' range. This must be one of: a
 matrix with two columns giving longitude and latitude (in that order); a
 file path to a csv file that contains columns "Longitude" and "Latitude";
-a \code{SpatialPoints} object; or a \code{sf} multipoints object.}
+a \code{SpatialPoints} object; or a \code{sf} multipoints object. Points
+will be reduced to the subset that falls within the \code{template} extent.}
 
 \item{method}{Either \code{points} to burn \code{xy} points into raster, or
 \code{alphahull} to calculate the alpha hull of \code{xy}, and burn those
