@@ -227,27 +227,24 @@ excel_to_plan <- function(file) {
       aggregated_res <- c(5000, 5000) # hardcoding for now (for grouped species' maps)
       ff <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif',
                     gsub(' ', '_', species_in_group), res[1])
-      f_out <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif',
-                       gsub(' ', '_', group), res[1])
-      f_out2 <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif',
-                        gsub(' ', '_', group), aggregated_res[1])
+      f_edmap <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif', group, res[1])
+      f_edmap_agg <- sprintf('outputs/%1$s/%1$s_edmap_%2$s.tif', group,
+                             aggregated_res[1])
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
         establishment_likelihood = {
           s <- raster::stack(drake::file_in(!!ff))
           r <- Reduce(function(x, y) prod(x, y, na.rm=TRUE), raster::unstack(1 - s))
-          if(!dir.exists(dirname(!!f_out))) dir.create(dirname(!!f_out))
-          raster::writeRaster(1 - r, drake::file_out(!!f_out), overwrite=TRUE)
+          if(!dir.exists(dirname(!!f_edmap))) dir.create(dirname(!!f_edmap))
+          raster::writeRaster(1 - r, drake::file_out(!!f_edmap), overwrite=TRUE)
         },
         establishment_likelihood_agg = aggregate_raster(
-          rast = drake::file_in(!!f_out),
-          outfile = drake::file_out(!!f_out2),
+          rast = drake::file_in(!!f_edmap),
+          outfile = drake::file_out(!!f_edmap_agg),
           aggregate_factor = !!agg_factor, fun = function(x, ...) 1 - prod(1 - x, na.rm=TRUE)
         ),
         plot_national_establishment_likelihood = static_map(
-          ras = drake::file_in(
-            !!sprintf("outputs/%s/%s_edmap_%s.tif", group, group, res[1])
-          ),
+          ras = drake::file_in(!!f_edmap),
           xlim = c(112.76, 155),
           ylim = c(-44.03, -9.21),
           legend_title = !!sprintf("log10(EL %skm)", !!round(aggregated_res[1]/1000, 2)),
