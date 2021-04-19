@@ -4,7 +4,16 @@
 \alias{rasterize_range}
 \title{Rasterize species range}
 \usage{
-rasterize_range(xy, method, alpha, template, outfile, xy_crs)
+rasterize_range(
+  xy,
+  method,
+  alpha,
+  point_buffer = 0,
+  template,
+  outfile,
+  xy_crs,
+  plot = TRUE
+)
 }
 \arguments{
 \item{xy}{Coordinates to define host/species' range. This must be one of: a
@@ -19,6 +28,11 @@ polygons into raster.}
 
 \item{alpha}{Alpha parameter for alpha hull calculation. Ignored if
 \code{method} is \code{'points'}.}
+
+\item{point_buffer}{When \code{method = "points"}, the width of a buffer to
+generate around \code{xy} points before burning into the raster. Expected
+to be in the CRS of \code{template}. Ignored if \code{method} is
+\code{'alphahull'}.}
 
 \item{template}{\code{RasterLayer} or file path to raster file. The host
 raster resulting from this function will use the extent and resolution of

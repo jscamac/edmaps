@@ -4,15 +4,18 @@
 \alias{alphahull_sf}
 \title{Convert an alpha hull into an sf object}
 \usage{
-alphahull_sf(xy, alpha)
+alphahull_sf(xy, alpha, buffer_width)
 }
 \arguments{
 \item{xy}{A two-column matrix of x, y coordinates.}
 
 \item{alpha}{Alpha parameter for calculating the hull.}
+
+\item{buffer_width}{The width (in xy CRS) to buffer intermediate polylines
+such that they combine into closed polygons.}
 }
 \value{
-An \code{ahull} object.
+An \code{sf} object.
 }
 \description{
 Convert an alphahull ahull object into an sf object.

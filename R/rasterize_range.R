@@ -13,6 +13,10 @@
 #'   polygons into raster.
 #' @param alpha Alpha parameter for alpha hull calculation. Ignored if
 #'   \code{method} is \code{'points'}.
+#' @param point_buffer When \code{method = "points"}, the width of a buffer to
+#'   generate around \code{xy} points before burning into the raster. Expected
+#'   to be in the CRS of \code{template}. Ignored if \code{method} is
+#'   \code{'alphahull'}.
 #' @param template \code{RasterLayer} or file path to raster file. The host
 #'   raster resulting from this function will use the extent and resolution of
 #'   this template.
@@ -31,12 +35,13 @@
 #'   that file.
 #' @importFrom dplyr select
 #' @importFrom fasterize fasterize
-#' @importFrom raster cellFromXY init raster writeRaster
+#' @importFrom raster cellFromXY init raster writeRaster res plot
 #' @importFrom readr read_csv
-#' @importFrom sf st_coordinates st_crs st_multipoint st_set_crs st_sfc st_transform
+#' @importFrom sf st_coordinates st_crs st_multipoint st_set_crs st_sfc st_transform st_buffer st_as_sf
 #' @importFrom sp coordinates proj4string
 #' @export
-rasterize_range <- function(xy, method, alpha, template, outfile, xy_crs) {
+rasterize_range <- function(xy, method, alpha, point_buffer=0, template, outfile,
+                            xy_crs, plot=TRUE) {
   if(is.character(template)) {
     template <- raster::raster(template)
   } else if(!is(template, 'RasterLayer')) {
@@ -101,19 +106,27 @@ rasterize_range <- function(xy, method, alpha, template, outfile, xy_crs) {
     sf::st_sfc() %>%
     sf::st_set_crs(xy_crs) %>%
     sf::st_transform(sf::st_crs(template)) %>%
-    sf::st_intersection(sf::st_as_sfc(sf::st_bbox(template))) %>%
-    sf::st_coordinates() %>%
-    .[, 1:2]
+    sf::st_intersection(sf::st_as_sfc(sf::st_bbox(template)))
   host <- raster::init(template, function(x) NA)
   method <- match.arg(method, c('points', 'alphahull'))
   if(method=='points') {
-    host[raster::cellFromXY(host, xy)] <- 1
+    if(point_buffer > 0) {
+      xy_buffer <- sf::st_buffer(sf::st_as_sf(xy), point_buffer)
+      host <- fasterize::fasterize(xy_buffer, host)
+    } else {
+      host[raster::cellFromXY(host, sf::st_coordinates(xy)[, 1:2])] <- 1
+    }
   } else if(method=='alphahull') {
-    host_poly <- alphahull_sf(xy, alpha)
+    host_poly <- alphahull_sf(sf::st_coordinates(xy)[, 1:2], alpha,
+                              buffer_width=raster::res(template)[1]/100)
     host <- fasterize::fasterize(host_poly, host)
   }
   if(!missing(outfile)) {
     raster::writeRaster(host, outfile)
+  }
+  if(isTRUE(plot)) {
+    raster::plot(host, legend=FALSE, col='grey60')
+    plot(xy, add=TRUE, pch=20, col=2)
   }
   host
 }

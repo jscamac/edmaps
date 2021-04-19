@@ -4,7 +4,9 @@
 #'
 #' @param xy A two-column matrix of x, y coordinates.
 #' @param alpha Alpha parameter for calculating the hull.
-#' @return An \code{ahull} object.
+#' @param buffer_width The width (in xy CRS) to buffer intermediate polylines
+#'   such that they combine into closed polygons.
+#' @return An \code{sf} object.
 #' @references Adapted from ConR:::.alpha.hull.poly and ConR:::.alpha.hull.poly.
 #' @importFrom alphahull ahull anglesArc
 #' @importFrom methods slot
@@ -12,7 +14,7 @@
 #' @importFrom sf st_as_sf
 #' @importFrom sp CRS Line Lines Polygons proj4string SpatialLines SpatialLinesDataFrame SpatialPolygons
 #' @keywords internal
-alphahull_sf <- function(xy, alpha) {
+alphahull_sf <- function(xy, alpha, buffer_width) {
   ah <- alphahull::ahull(xy, alpha = alpha)
   arcs <- as.data.frame(ah$arcs)
 
@@ -29,7 +31,7 @@ alphahull_sf <- function(xy, alpha) {
     ) %>%
     sp::SpatialLinesDataFrame(data.frame(id=1), match.ID=FALSE)
 
-  ah_poly <- raster::buffer(ah_spldf, width = 0.00001)
+  ah_poly <- raster::buffer(ah_spldf, width = buffer_width)
   # ^ required to convert lines to polys
 
   pols <- methods::slot(ah_poly, "polygons")
