@@ -18,7 +18,7 @@
 #' @param outfile Character. The target file path for the wind raster.
 #' @importFrom dplyr filter group_by left_join mutate select summarise
 #' @importFrom sf st_as_sf st_boundary st_buffer st_cast st_collection_extract st_coordinates st_geometry_type st_intersection st_join st_make_valid st_nearest_feature st_set_crs st_sf st_union st_voronoi st_drop_geometry
-#' @importFrom stars read_stars st_rasterize write_stars
+#' @importFrom stars read_stars st_rasterize write_stars st_as_stars
 #' @importFrom stplanr rnet_get_nodes
 #' @importFrom magrittr '%>%'
 #' @export
@@ -62,8 +62,10 @@ rasterize_wind <- function(data, wind_column, template, width, outfile) {
   ) %>% sf::st_union()
 
   # Create 1000 x 1000m template raster and convert to polygons
-  if(is.character(template) || is(template, 'RasterLayer')) {
+  if(is.character(template)) {
     template <- stars::read_stars(template)[1]
+  } else if(is(template, 'RasterLayer')) {
+    template <- stars::st_as_stars(template)[1]
   } else if(!is(template, 'stars')) {
     stop('template must be a stars object, a RasterLayer, or a file path to a',
          ' raster file.')
