@@ -49,6 +49,8 @@ inherit the CRS of \code{template}, and if that is undefined, EPSG:4326
 (WGS84) will be assumed. If \code{xy_crs} is provided and \code{xy} is an
 \code{sf} or \code{sp} object with a defined CRS, \code{xy_crs} will be
 ignored.}
+
+\item{plot}{Logical. Plot the resulting raster? Default = \code{TRUE}.}
 }
 \value{
 A \code{RasterLayer} with the resulting range burnt into it.

@@ -30,6 +30,7 @@
 #'   (WGS84) will be assumed. If \code{xy_crs} is provided and \code{xy} is an
 #'   \code{sf} or \code{sp} object with a defined CRS, \code{xy_crs} will be
 #'   ignored.
+#' @param plot Logical. Plot the resulting raster? Default = \code{TRUE}.
 #' @return A \code{RasterLayer} with the resulting range burnt into it.
 #'   Additionally, if \code{outfile} is not missing, the raster is written to
 #'   that file.
@@ -37,8 +38,10 @@
 #' @importFrom fasterize fasterize
 #' @importFrom raster cellFromXY init raster writeRaster res plot
 #' @importFrom readr read_csv
-#' @importFrom sf st_coordinates st_crs st_multipoint st_set_crs st_sfc st_transform st_buffer st_as_sf
+#' @importFrom sf st_coordinates st_crs st_multipoint st_set_crs st_sfc st_transform st_buffer st_as_sf st_bbox
 #' @importFrom sp coordinates proj4string
+#' @importFrom tmaptools read_osm
+#' @importFrom tmap tm_shape tm_raster tm_rgb tm_dots tm_facets tm_legend
 #' @export
 rasterize_range <- function(xy, method, alpha, point_buffer=0, template, outfile,
                             xy_crs, plot=TRUE) {
@@ -125,8 +128,16 @@ rasterize_range <- function(xy, method, alpha, point_buffer=0, template, outfile
     raster::writeRaster(host, outfile)
   }
   if(isTRUE(plot)) {
-    raster::plot(host, legend=FALSE, col='grey60')
-    plot(xy, add=TRUE, pch=20, col=2)
+    e <- sf::st_bbox(host)
+    basemap <- tmaptools::read_osm(e, zoom=NULL)
+    m <- tmap::tm_shape(basemap) +
+      tmap::tm_rgb() +
+      tmap::tm_shape(host) +
+      tmap::tm_raster(palette ="red", alpha = 0.5) +
+      tmap::tm_shape(xy) +
+      tmap::tm_dots(size = 0.01) +
+      tmap::tm_legend(show=FALSE)
+    print(m)
   }
   host
 }
