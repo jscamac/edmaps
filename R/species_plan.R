@@ -280,21 +280,22 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
   if(!missing(host_path)) {
     cat(glue::glue('
-      if(!dir.exists("outputs/<<species>>/auxiliary")) {
-        dir.create("outputs/<<species>>/auxiliary")
+      user_host_rast <- {
+        if(!dir.exists("outputs/<<species>>/auxiliary")) {
+          dir.create("outputs/<<species>>/auxiliary")
+        }
+        gdalUtilities::gdalwarp(
+          srcfile = drake::file_in("<<host_path>>"),
+          dstfile = drake::file_out(
+            "outputs/<<species>>/auxiliary/<<species>>_userHost_raster_<<res[1]>>.tif"
+          ),
+          t_srs = "EPSG:3577",
+          tr = <<deparse(res)>>,
+          r = "near",
+          te = <<deparse(extent[c(1, 3, 2, 4)])>>,
+          overwrite = <<overwrite>>
+        )
       }
-
-      user_host_rast <- gdalUtilities::gdalwarp(
-        srcfile = drake::file_in("<<host_path>>"),
-        dstfile = drake::file_out(
-          "outputs/<<species>>/auxiliary/<<species>>_userHost_raster_<<res[1]>>.tif"
-        ),
-        t_srs = "EPSG:3577",
-        tr = <<deparse(res)>>,
-        r = "near",
-        te = <<deparse(extent[c(1, 3, 2, 4)])>>,
-        overwrite = <<overwrite>>
-      )
 
       binarise_user_host_rast <- {
         r <- raster::raster(
