@@ -1,7 +1,7 @@
 Package: edmaps
 Type: Package
 Title: Estimate Likelihood of Pest Establishment
-Version: 1.9.1.9011
+Version: 1.9.1.9012
 Authors@R: as.person(c(
     "James Camac <james.camac@gmail.com> [aut, cre]", 
     "John Baumgartner <johnbaums@gmail.com> [aut]"
