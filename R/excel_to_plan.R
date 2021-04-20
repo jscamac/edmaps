@@ -427,9 +427,9 @@ excel_to_plan <- function(file) {
     dplyr::mutate(pathways=tolower(pathways),
                   pathways=sapply(pathways, function(x) {
                     switch(x,
-                           northwind="North_Winds",
-                           pacificwind="Pacific_Winds",
-                           nzwind="NZ_Winds")
+                           northwind="North_Wind",
+                           pacificwind="Pacific_Wind",
+                           nzwind="NZ_Wind")
                   })) %>%
     unique
 
