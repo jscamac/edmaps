@@ -282,7 +282,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     cat(glue::glue('
       user_host_rast <- {
         if(!dir.exists("outputs/<<species>>/auxiliary")) {
-          dir.create("outputs/<<species>>/auxiliary")
+          dir.create("outputs/<<species>>/auxiliary", recursive=TRUE)
         }
         gdalUtilities::gdalwarp(
           srcfile = drake::file_in("<<host_path>>"),
