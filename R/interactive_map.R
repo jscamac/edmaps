@@ -195,7 +195,8 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     # If raster is entirely NA, tmap throws an error if palette is specified.
     # Can't just `return` early, since file_out needs to be fulfilled.
     # Workaround is to set a colour, but set transparency to a small number.
-    ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
+    ras <- raster::projectRaster(raster::raster(ras), crs = "+init=epsg:3857",
+                                 method = "ngb")
     m <- tmap::tm_shape(ras, name=layer_name) +
       tmap::tm_raster(col='white', style='cat', title=layer_name,
                       alpha=0.01)
@@ -213,7 +214,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
       tmap::tm_raster(palette = palette,
                       style = "cont", midpoint = NA, alpha = transparency,
                       legend.show=TRUE, title = layer_name,
-                      colorNA='#ffffff01') +
+                      colorNA='transparent', showNA=FALSE) +
       # ^ colorNA set to almost transparent, to avoid error if
       #   raster is entirely NA.
       tmap::tm_facets(as.layers=TRUE)
