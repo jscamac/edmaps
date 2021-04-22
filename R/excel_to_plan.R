@@ -438,7 +438,7 @@ excel_to_plan <- function(file) {
       drake::drake_plan(
         rasterize_wind(drake::file_in(!!globals$wind_path),
                        !!wind_pathways$pathways[i],
-                       template='risk_layers/auxiliary/aus_mask_clum_1000.tif',
+                       template=drake::file_in('risk_layers/auxiliary/aus_mask_clum_1000.tif'),
                        width=!!wind_pathways$wind_effect_width[i],
                        outfile=drake::file_out(
                          !!sprintf('risk_layers/pathway/processed/%s_%s.tif',
