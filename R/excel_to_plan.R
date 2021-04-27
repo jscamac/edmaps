@@ -105,6 +105,7 @@ excel_to_plan <- function(file) {
                   establishment_nzwind=`NZ wind establishment`,
                   aggregated_res=`Aggregated res`) %>%
     dplyr::mutate(
+      species=gsub('^[0-9.]+|[^a-zA-Z0-9_. ]', '', species),
       species=gsub('^\\s+|\\s+$', '', species),
       species=gsub('\\s+', ' ', species),
       clum_classes=expand_range(strsplit(
