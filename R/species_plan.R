@@ -191,7 +191,8 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   # remove leading/trailing white space from species name, and replace all
   # internal white space with underscores. Required, since species name
   # is used to name targets
-  species <- gsub('\\s+', '_', gsub('^\\s+|\\s+$', '', species))
+  species <- gsub('^[0-9.]+|[^a-zA-Z0-9_. ]', '',
+                  gsub('\\s+', '_', gsub('^\\s+|\\s+$', '', species)))
 
   pathways <- match.arg(
     tolower(pathways),
@@ -1194,7 +1195,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
   plan <- drake::code_to_plan(f)
   plan$target <- ifelse(plan$target=='country_reference', 'country_reference',
-                        paste0(gsub('\\(|\\)', '', species), '_', plan$target))
+                        paste0(species, '_', plan$target))
   rbind(plan_globals(
     clum_path=clum_path,
     nvis_path=nvis_path,
