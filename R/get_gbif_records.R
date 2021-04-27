@@ -136,7 +136,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         csv <- utils::unzip(f, exdir=tempfile())
 
         dat <- readr::read_delim(
-          csv, '\t',
+          file=csv, delim='\t', quote='',
           col_types=readr::cols_only(
             gbifID=readr::col_character(),
             scientificName=readr::col_character(),
