@@ -605,12 +605,17 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
     if(isTRUE(use_gbif)) {
       cat(glue::glue('
+        o <- sf::sf_use_s2(FALSE)
         country_reference <-
           sf::as_Spatial(
-            sf::st_buffer(
-              rnaturalearth::ne_countries(scale=50, returnclass="sf"), 0
-            ) # fix self-intersection
+            suppressWarnings(
+              sf::st_buffer(
+                rnaturalearth::ne_countries(scale=50, returnclass="sf"),
+                units::set_units(0, "arc_degrees")
+              )
+            )
           )
+        sf::sf_use_s2(o)
       \n\n'), file=f, append=TRUE)
 
       if(!missing(gbif_username) && !missing(gbif_password) &&
