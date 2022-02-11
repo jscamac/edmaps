@@ -605,8 +605,9 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
     if(isTRUE(use_gbif)) {
       cat(glue::glue('
-        o <- sf::sf_use_s2(FALSE)
-        country_reference <-
+      country_reference <-
+        {
+          o <- sf::sf_use_s2(FALSE)
           sf::as_Spatial(
             suppressWarnings(
               sf::st_buffer(
@@ -615,7 +616,8 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
               )
             )
           )
-        sf::sf_use_s2(o)
+          sf::sf_use_s2(o)
+        }
       \n\n'), file=f, append=TRUE)
 
       if(!missing(gbif_username) && !missing(gbif_password) &&
