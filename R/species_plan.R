@@ -608,7 +608,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
       country_reference <-
         {
           o <- sf::sf_use_s2(FALSE)
-          sf::as_Spatial(
+          out <- sf::as_Spatial(
             suppressWarnings(
               sf::st_buffer(
                 rnaturalearth::ne_countries(scale=50, returnclass="sf"),
@@ -617,6 +617,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
             )
           )
           sf::sf_use_s2(o)
+          out
         }
       \n\n'), file=f, append=TRUE)
 
