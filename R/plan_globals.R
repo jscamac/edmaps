@@ -34,8 +34,8 @@
 #' @importFrom tmap tmap_save tmap_arrange
 #' @importFrom stats median
 plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
- nrm_path, containers_data_path, postcode_path,  airport_beta,
- airport_tsi_beta, basemap_mode=c('osm', 'boundaries')) {
+                         nrm_path, containers_data_path, postcode_path,  airport_beta,
+                         airport_tsi_beta, basemap_mode=c('osm', 'boundaries')) {
 
   # prepare extent and resolution
   # force national extent, 1km base res and 5km aggregated res for now
@@ -68,13 +68,11 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         outdir = drake::file_out("risk_layers/abiotic/bioclim_10m")),
 
     # Output res
-    output_resolution = !!list(output_resolution),
-    output_resolution_agg = !!list(output_resolution_agg),
-    # ^ list avoids error: not that many frames on the stack
+    output_resolution = !!output_resolution,
+    output_resolution_agg = !!output_resolution_agg,
 
     # Output extent, passed as argument to this function
-    output_extent = !!list(extent),
-    # ^ list avoids error: not that many frames on the stack
+    output_extent = !!extent,
 
     # Compress large categorical rasters into run-length encoded vectors for
     # rapid access and processing.
