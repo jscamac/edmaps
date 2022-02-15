@@ -2,9 +2,9 @@
 #'
 #' Creates a weight by postcode for each major port.
 #'
-#' @param path Character. File path to xls file containing containers by 
+#' @param path Character. File path to xls file containing containers by
 #'   postcode for each port.
-#' @param sheet_nums Integer. Vector of integers signifying the sheet numbers 
+#' @param sheet_nums Integer. Vector of integers signifying the sheet numbers
 #'   to read in.
 #' @param range A cell range to read from, as described in cell-specification.
 #'   Includes typical _Excel_ ranges such as `"B3:D87"`, possibly including the
@@ -23,12 +23,12 @@
 #' @return An `sf` object or shapefile export.
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom purrr set_names map_df
-#' @importFrom dplyr rename mutate group_by summarise ungroup left_join filter mutate_all
+#' @importFrom dplyr rename mutate group_by summarise ungroup left_join filter mutate_all across
 #' @importFrom tidyr spread replace_na gather
 #' @importFrom sf read_sf st_transform st_write
 #' @export
-container_weights <- function(path, sheet_nums, range = "A7:M2217", 
-  postcode_shp, na = c("", "-", "np"), outfile, return_sf=FALSE) {
+container_weights <- function(path, sheet_nums, range = "A7:M2217",
+                              postcode_shp, na = c("", "-", "np"), outfile, return_sf=FALSE) {
 
   x <- suppressMessages(
     readxl::excel_sheets(path) %>%
@@ -36,7 +36,7 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
       purrr::set_names(sub("^[0-9. ]+([^-]+).*", "\\1", .)) %>%
       purrr::map_df(~ readxl::read_excel(path = path,
                                          range = range,
-                                         sheet = .x, 
+                                         sheet = .x,
                                          na = na), .id = "sheet")) %>%
     dplyr::rename(Port =1, Postcode = 2) %>%
     dplyr::mutate(Postcode = formatC(
@@ -53,12 +53,14 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
     dplyr::mutate(Containers = Containers/sum(Containers)) %>%
     dplyr::ungroup() %>%
     tidyr::spread(Port, Containers)
-  
+
   out <- sf::read_sf(postcode_shp) %>%
-    dplyr::left_join(x, by = c("POA_CODE" = "Postcode")) %>%
-    dplyr::filter(SQKM>0) %>%
-    dplyr::mutate_all(tidyr::replace_na, replace = 0) %>%
-    sf::st_transform(crs = '+init=epsg:3577')
+    dplyr::left_join(x, by = c(POA_CODE = "Postcode")) %>%
+    dplyr::filter(SQKM > 0) %>%
+    mutate(
+      dplyr::across(where(is.numeric), ~tidyr::replace_na(.x, 0))
+    ) %>%
+    sf::st_transform(crs = "+init=epsg:3577")
 
   if(!missing(outfile)) {
     # Create directory if it does not exist
@@ -74,4 +76,3 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
     invisible(NULL)
   }
 }
-
