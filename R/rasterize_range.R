@@ -6,33 +6,33 @@
 #' @param xy Coordinates to define host/species' range. This must be one of: a
 #'   matrix with two columns giving longitude and latitude (in that order); a
 #'   file path to a csv file that contains columns "Longitude" and "Latitude";
-#'   a \code{SpatialPoints} object; or a \code{sf} multipoints object. Points
-#'   will be reduced to the subset that falls within the \code{template} extent.
-#' @param method Either \code{points} to burn \code{xy} points into raster, or
-#'   \code{alphahull} to calculate the alpha hull of \code{xy}, and burn those
+#'   a `SpatialPoints` object; or a `sf` multipoints object. Points
+#'   will be reduced to the subset that falls within the `template` extent.
+#' @param method Either `points` to burn `xy` points into raster, or
+#'   `alphahull` to calculate the alpha hull of `xy`, and burn those
 #'   polygons into raster.
 #' @param alpha Alpha parameter for alpha hull calculation. Ignored if
-#'   \code{method} is \code{'points'}.
-#' @param point_buffer When \code{method = "points"}, the width of a buffer to
-#'   generate around \code{xy} points before burning into the raster. Expected
-#'   to be in the CRS of \code{template}. Ignored if \code{method} is
-#'   \code{'alphahull'}.
-#' @param template \code{RasterLayer} or file path to raster file. The host
+#'   `method` is `'points'`.
+#' @param point_buffer When `method = "points"`, the width of a buffer to
+#'   generate around `xy` points before burning into the raster. Expected
+#'   to be in the CRS of `template`. Ignored if `method` is
+#'   `'alphahull'`.
+#' @param template `RasterLayer` or file path to raster file. The host
 #'   raster resulting from this function will use the extent and resolution of
 #'   this template.
 #' @param outfile Optional file path to write out resulting host raster.
-#' @param xy_crs Coordinate reference system of \code{xy}, passed as numeric
-#'   EPSG code, or any other format accepted by \code{\link{sf::st_set_crs}}. If
-#'   missing and \code{xy} is an \code{sp} or \code{sf} object, the CRS is
-#'   defined by the object. If the latter is undefined, or if \code{xy_crs} is
-#'   missing and \code{xy} is a matrix or path to a csv file, \code{xy} will
-#'   inherit the CRS of \code{template}, and if that is undefined, EPSG:4326
-#'   (WGS84) will be assumed. If \code{xy_crs} is provided and \code{xy} is an
-#'   \code{sf} or \code{sp} object with a defined CRS, \code{xy_crs} will be
+#' @param xy_crs Coordinate reference system of `xy`, passed as numeric
+#'   EPSG code, or any other format accepted by [sf::st_set_crs()]. If
+#'   missing and `xy` is an `sp` or `sf` object, the CRS is
+#'   defined by the object. If the latter is undefined, or if `xy_crs` is
+#'   missing and `xy` is a matrix or path to a csv file, `xy` will
+#'   inherit the CRS of `template`, and if that is undefined, EPSG:4326
+#'   (WGS84) will be assumed. If `xy_crs` is provided and `xy` is an
+#'   `sf` or `sp` object with a defined CRS, `xy_crs` will be
 #'   ignored.
-#' @param plot Logical. Plot the resulting raster? Default = \code{TRUE}.
-#' @return A \code{RasterLayer} with the resulting range burnt into it.
-#'   Additionally, if \code{outfile} is not missing, the raster is written to
+#' @param plot Logical. Plot the resulting raster? Default = `TRUE`.
+#' @return A `RasterLayer` with the resulting range burnt into it.
+#'   Additionally, if `outfile` is not missing, the raster is written to
 #'   that file.
 #' @importFrom dplyr select
 #' @importFrom fasterize fasterize

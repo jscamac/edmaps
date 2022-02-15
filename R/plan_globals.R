@@ -2,31 +2,31 @@
 #'
 #' Create a drake plan that describes targets relating to global parameters
 #' to be used by individual species plans.
-#' @param clum_path Character. File path to \href{http://www.agriculture.gov.au/abares/aclump/Pages/land-use/Catchment-scale-land-use-of-Australia-2018.aspx}{Catchment Scale Land Use of Australia (ACLUM)} raster.
-#' @param nvis_path Character. File path to the \href{https://www.environment.gov.au/land/native-vegetation/national-vegetation-information-system/data-products}{National Vegetation Information System (NVIS)} raster dataset.
-#' @param ndvi_path Character. File path to the \href{http://www.bom.gov.au/jsp/awap/ndvi/index.jsp?colour=colour&time=history/nat/2018110120190430&step=7&map=ndviave&period=6month&area=nat}{Normalised Difference Vegetation Index (NDVI)} raster dataset.
+#' @param clum_path Character. File path to [Catchment Scale Land Use of Australia (ACLUM)](http://www.agriculture.gov.au/abares/aclump/Pages/land-use/Catchment-scale-land-use-of-Australia-2018.aspx) raster.
+#' @param nvis_path Character. File path to the [National Vegetation Information System (NVIS)](https://www.environment.gov.au/land/native-vegetation/national-vegetation-information-system/data-products) raster dataset.
+#' @param ndvi_path Character. File path to the [Normalised Difference Vegetation Index (NDVI)](http://www.bom.gov.au/jsp/awap/ndvi/index.jsp?colour=colour&time=history/nat/2018110120190430&step=7&map=ndviave&period=6month&area=nat) raster dataset.
 #' @param fertiliser_data_path Character. File path to a csv containing data
-#'   describing fertiliser use, available \href{https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/4627.02016-17}{here}.
-#' @param nrm_path Character. File path to shapefile of \href{https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/1270.0.55.003July 2016}{Natural Resource Management Regions}.
+#'   describing fertiliser use, available [here](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/4627.02016-17).
+#' @param nrm_path Character. File path to shapefile of [Natural Resource Management Regions](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/1270.0.55.003July 2016).
 #' @param containers_data_path Character. File path to xlsx file containing
-#'   data about shipping container movements, available \href{https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/5368.0.55.0182009-10}{here}.
+#'   data about shipping container movements, available [here](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/5368.0.55.0182009-10).
 #' @param postcode_path Character. File path to postal areas (i.e. post codes)
-#'   shapefile, available \href{https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/1270.0.55.003July 2011}{here}.
+#'   shapefile, available [here](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/1270.0.55.003July 2011).
 #' @param airport_beta Numeric. Parameter controlling the distribution of
 #'   tourists (international air passengers) around Australian international
 #'   airports. Distance to nearest airport is multiplied by this value and
 #'   exponentiated to give the relative density of tourists at a location. To
-#'   generate a distribution that ensures proportion \emph{p} of tourists
-#'   within distance \emph{d} of nearest airport, specify
-#'   \code{airport_beta=log(p)/d} (e.g. to have 50% of tourists within 200 km
-#'   of an airport, use \code{log(0.5)/200}).
+#'   generate a distribution that ensures proportion _p_ of tourists
+#'   within distance _d_ of nearest airport, specify
+#'   `airport_beta=log(p)/d` (e.g. to have 50% of tourists within 200 km
+#'   of an airport, use `log(0.5)/200`).
 #' @param airport_tsi_beta Numeric. Interpretation is as for
-#'   \code{airport_beta}, but applies to air passengers arriving at Cairns
+#'   `airport_beta`, but applies to air passengers arriving at Cairns
 #'   International Airport (CNS) from the Torres Strait Islands.
-#' @param basemap_mode Type of basemap for static maps. Either \code{'osm'}
-#'   (default), or \code{'boundaries'} (polygons delineating borders of
+#' @param basemap_mode Type of basemap for static maps. Either `'osm'`
+#'   (default), or `'boundaries'` (polygons delineating borders of
 #'   states/territories).
-#' @return A \code{drake} plan containing targets that generate objects used
+#' @return A `drake` plan containing targets that generate objects used
 #'   across species.
 #' @importFrom raster extent
 #' @importFrom drake plan file_in file_out

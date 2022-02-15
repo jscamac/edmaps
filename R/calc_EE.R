@@ -10,7 +10,7 @@
 #'   CI) for the probability a leakage event could result in an establishment.
 #' @param nsims Integer. Number of samples to be taken from event and
 #'   establishment distributions. Default = 100000.
-#' @return A \code{data.frame} containing the possible number of incursions that
+#' @return A `data.frame` containing the possible number of incursions that
 #'   may occur, and their corresponding probabilities.
 #' @author James Camac (\email{james.camac@gmail.com})
 #' @importFrom dplyr arrange

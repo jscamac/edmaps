@@ -1,12 +1,12 @@
 #' Raster max normalization
 #'
 #' Rescales raster values such that maximum is 1.
-#' 
+#'
 #' @param rast Raster object.
-#' @param outfile Character. Output raster file path. If not specified, the 
-#'   resulting \code{RasterLayer} will be  returned to R. Directory will be 
+#' @param outfile Character. Output raster file path. If not specified, the
+#'   resulting `RasterLayer` will be  returned to R. Directory will be
 #'   created recursively if required.
-#' @return A normalised \code{RasterLayer} will be written to \code{outfile} 
+#' @return A normalised `RasterLayer` will be written to `outfile`
 #'   if specified, and returned to R otherwise.
 #' @importFrom raster raster setMinMax maxValue setValues getValues writeRaster
 #' @export

@@ -2,20 +2,20 @@
 #'
 #' Calculate the pathway-specific probability of pest arrival for each raster
 #' cell.
-#' @param EE \code{data.frame} object obtained from \code{\link{calc_EE}}.
+#' @param EE `data.frame` object obtained from [calc_EE()].
 #' @param rast Raster object or character path to raster file containing
 #'   dispersal weights.
 #' @param outfile Character. Output raster file path. If not provided, the
-#'   \code{RasterLayer} will be returned to R.
-#' @param return_rast Logical. Should the \code{RasterLayer} be returned to R?
-#'   Ignored if \code{outfile} is not provided.
-#' @return If \code{outfile} is specified, the resulting \code{RasterLayer} is
-#'   saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
-#'   \code{outfile} is not specified, the resulting \code{RasterLayer} is
-#'   returned, otherwise \code{NULL} is returned invisibly.
+#'   `RasterLayer` will be returned to R.
+#' @param return_rast Logical. Should the `RasterLayer` be returned to R?
+#'   Ignored if `outfile` is not provided.
+#' @return If `outfile` is specified, the resulting `RasterLayer` is
+#'   saved to `outfile`. If `return_rast` is `TRUE` or
+#'   `outfile` is not specified, the resulting `RasterLayer` is
+#'   returned, otherwise `NULL` is returned invisibly.
 #' @importFrom dplyr mutate row_number
 #' @importFrom raster as.data.frame raster writeRaster init
-#' @importFrom stats na.omit
+#' @importFrom stats na.omit setNames
 #' @export
 calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
 

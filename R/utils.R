@@ -4,7 +4,7 @@
 #' notation.
 #'
 #' @param x A character vector of shorthand sequences described by colons (e.g.
-#'   \code{c('1:3', '5:10')}) or hyphens (e.g. \code{c('1-3', '5-10'}).
+#'   `c('1:3', '5:10')` or hyphens (e.g. `c('1-3', '5-10'`).
 #' @return Expanded integer sequences.
 #' @keywords internal
 expand_range <- function(x) {

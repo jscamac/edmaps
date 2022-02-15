@@ -3,49 +3,49 @@
 #' Produce a static map of establishment likelihood, with OpenStreetMap base
 #' layer.
 #'
-#' @param ras A \code{Raster*} object or file path to a (potentially multiband)
+#' @param ras A `Raster*` object or file path to a (potentially multiband)
 #'   raster file.
 #' @param xlim Numeric vector. The longitudinal extent of the area to plot.
 #' @param ylim Numeric vector. The latitudinal extent of the area to plot.
 #' @param layer Character. A layer name to be plotted. Only relevant if loading
-#'   a \code{RasterStack} or \code{RasterBrick}.
+#'   a `RasterStack` or `RasterBrick`.
 #' @param layer_names Optional panel titles names for multipanel maps. If not
 #'   provided, panels will not be given titles.
 #' @param legend_title Character. Legend title.
 #' @param set_value_range A numeric vector containing an upper and lower bound
 #'   value (in units of raster). Values outside this range (including values
 #'   falling on the boundaries) will be masked.
-#' @param scale_type Character. Can be: \code{"none"} (raw data, no rescaling),
-#'   \code{"log10"}, \code{"max normalize"} (proportional to maximum value),
-#'   \code{"minmax normalize"} (rescale values to be between zero and 1 based
-#'   on min and max), or \code{"logit"}. Note that if \code{"log10"} or
-#'   \code{"logit"} is used 0 or 1 values. must be masked (using
-#'   \code{set_value_range}) or rescaled outside of this function.
+#' @param scale_type Character. Can be: `"none"` (raw data, no rescaling),
+#'   `"log10"`, `"max normalize"` (proportional to maximum value),
+#'   `"minmax normalize"` (rescale values to be between zero and 1 based
+#'   on min and max), or `"logit"`. Note that if `"log10"` or
+#'   `"logit"` is used 0 or 1 values. must be masked (using
+#'   `set_value_range`) or rescaled outside of this function.
 #' @param basemap_mode Either `'boundaries'` or `'osm'` (i.e., OpenStreetMap),
 #'   defining whether OpenStreetMap imagery should be used for static map
 #'   basemaps, or simple administrative boundaries. Default is `'osm'`.
 #' @param transparency Numeric. Transparency of raster, between 0-1.
 #' @param colramp_entire_range Logical. Whether to set colour ramp limits based
-#'   on national risk range (\code{TRUE}) or by risk range present in region
-#'   specified by \code{xlim} and \code{ylim}.
+#'   on national risk range (`TRUE`) or by risk range present in region
+#'   specified by `xlim` and `ylim`.
 #' @param surveillance_locs A spatial object or a path to a .csv file
 #'   containing columns named "Latitude" and "Longitude".
 #' @param pt_col Character. The plotting colour for surveillance points.
-#' @param aggregate_raster \code{NULL} or a list containing the aggregation
+#' @param aggregate_raster `NULL` or a list containing the aggregation
 #'   factor (i.e. number of raster cells to aggregate) and the aggregation
-#'   function e.g. \code{list(10, sum)}.
+#'   function e.g. `list(10, sum)`.
 #' @param nrow For multipanel plots, an optional  numeric value defining the
 #'   number of rows of panels.
 #' @param height height of plot in inches (will be rendered at 300 dpi). If not
 #'   defined will use size of current graphic device. Width will be determined
 #'   automatically, based on the aspect ratio given by the plotting extent.
 #' @param outfile Character. File path to save map.
-#' @return If \code{outfile} is provided, a map is saved to that file.
-#'   Otherwise, a \code{tmap} object is returned to R.
-#' @details This function relies on the \code{OpenStreetMap} package to obtain
+#' @return If `outfile` is provided, a map is saved to that file.
+#'   Otherwise, a `tmap` object is returned to R.
+#' @details This function relies on the `OpenStreetMap` package to obtain
 #'   base layer tiles. This in turn requires Java to be installed, and linking
 #'   R with Java can sometimes prove challenging. On macOS, Java errors can
-#'   often be resolved by entering \code{sudo R CMD javareconf} in a terminal (
+#'   often be resolved by entering `sudo R CMD javareconf` in a terminal (
 #'   which updates R's Java configuration variables). On Windows, ensure that
 #'   the Java architecture (32-bit/64-bit) matches that of R. Additionally,
 #'   some Java errors arise when using RStudio but not when using R.

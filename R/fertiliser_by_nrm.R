@@ -5,11 +5,11 @@
 #' @param abs_data Character. File path to ABS .csv file.
 #' @param nrm_shapefile Character. File path to NRM shapefile.
 #' @param outfile Character. Name of shapefile (or other vector data format
-#'   supported by OGR) where output will be saved. If not provided, \code{sf}
+#'   supported by OGR) where output will be saved. If not provided, `sf`
 #'   object will be returned to R.
-#' @param return_sf Logical. Should the \code{sf} object be returned to R?
-#'   Ignored if \code{outfile} is not provided.
-#' @return An \code{sf} object or vector data export.
+#' @param return_sf Logical. Should the `sf` object be returned to R?
+#'   Ignored if `outfile` is not provided.
+#' @return An `sf` object or vector data export.
 #' @importFrom readr read_csv cols_only
 #' @importFrom dplyr mutate filter group_by summarise ungroup select left_join
 #' @importFrom sf read_sf st_transform st_write

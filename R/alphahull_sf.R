@@ -6,7 +6,7 @@
 #' @param alpha Alpha parameter for calculating the hull.
 #' @param buffer_width The width (in xy CRS) to buffer intermediate polylines
 #'   such that they combine into closed polygons.
-#' @return An \code{sf} object.
+#' @return An [`sf`] object.
 #' @references Adapted from ConR:::.alpha.hull.poly and ConR:::.alpha.hull.poly.
 #' @importFrom alphahull ahull anglesArc
 #' @importFrom methods slot

@@ -3,16 +3,16 @@
 #' Combine biotic (and abiotic) layers into a single suitability raster to be
 #' used to scale arrival rates.
 #'
-#' @param x One of: a \code{RasterStack}; a \code{RasterBrick}; a list of 
-#'   \code{RasterLayer} objects, or a vector of file paths to raster files.
+#' @param x One of: a `RasterStack`; a `RasterBrick`; a list of
+#'   `RasterLayer` objects, or a vector of file paths to raster files.
 #' @param outfile Character. Name of geotiff where output will be saved. If not
 #'   provided, raster object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?
-#'   Ignored if \code{outfile} is not provided.
-#' @return If \code{outfile} is specified, the resulting raster is saved as a
-#'   geotiff to that path. If \code{return_rast} is \code{TRUE} or
-#'   \code{outfile} is not specified the resulting raster is returned, otherwise
-#'   \code{NULL} is returned invisibly.
+#'   Ignored if `outfile` is not provided.
+#' @return If `outfile` is specified, the resulting raster is saved as a
+#'   geotiff to that path. If `return_rast` is `TRUE` or
+#'   `outfile` is not specified the resulting raster is returned, otherwise
+#'   `NULL` is returned invisibly.
 #' @importFrom raster stack setMinMax minValue maxValue writeRaster
 #' @export
 suitability <- function(x, outfile, return_rast = FALSE) {
@@ -31,7 +31,7 @@ suitability <- function(x, outfile, return_rast = FALSE) {
     stop("Not all layers are normalised to be within 0 and 1")
   }
 
-  if(class(out) %in% c("RasterStack", "RasterBrick") && 
+  if(class(out) %in% c("RasterStack", "RasterBrick") &&
      raster::nlayers(out) > 1) {
     out <- prod(out)
   }

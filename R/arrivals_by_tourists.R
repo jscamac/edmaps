@@ -3,9 +3,9 @@
 #' Estimates pest arrival due to tourists as a function of distance from airport
 #' and tourist accommodation.
 #'
-#' @param tourist_beds A \code{RasterLayer} or file path to a raster file
+#' @param tourist_beds A `RasterLayer` or file path to a raster file
 #'   containing tourist bed numbers.
-#' @param airport_weights A \code{RasterLayer} or file path to a raster file
+#' @param airport_weights A `RasterLayer` or file path to a raster file
 #'   containing airport distance weights.
 #' @param leakage_rate Numeric vector of 2 values, giving the lower and upper
 #'   bounds of a 95% CI for leakage rate (the number of pest leakage events in
@@ -13,18 +13,18 @@
 #' @param establishment_rate Numeric vector of 2 values, giving the lower and
 #'   upper bounds of a 95% CI for establishment rate (the rate of survival, to
 #'   establishment, for leakage events).
-#' @param outfile Character. Output raster file path. If \code{probability} has
+#' @param outfile Character. Output raster file path. If `probability` has
 #'   length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
 #'   not provided, raster object will be returned to R.
 #' @param return_rast Logical. Should the raster object be returned to R?
-#'   Ignored if \code{outfile} is not provided.
-#' @param overwrite Logical. If \code{TRUE} and \code{outfile} is not missing,
-#'   it will be overwritten if the file specified by \code{outfile} already
+#'   Ignored if `outfile` is not provided.
+#' @param overwrite Logical. If `TRUE` and `outfile` is not missing,
+#'   it will be overwritten if the file specified by `outfile` already
 #'   exists.
-#' @return If \code{outfile} is specified, the resulting raster (multiband if
-#'   \code{probability} has length > 1) is saved as a tiff at that path. If
-#'   \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-#'   resulting raster object is returned, otherwise \code{NULL} is returned
+#' @return If `outfile` is specified, the resulting raster (multiband if
+#'   `probability` has length > 1) is saved as a tiff at that path. If
+#'   `return_rast` is `TRUE` or `outfile` is not specified the
+#'   resulting raster object is returned, otherwise `NULL` is returned
 #'   invisibly.
 #' @family functions estimating arrivals
 #' @importFrom raster raster writeRaster stack

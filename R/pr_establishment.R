@@ -8,13 +8,13 @@
 #'   raster. Cell values must be between 0 (not suitable) and 1 (ideal
 #'   suitability).
 #' @param outfile Character. Output raster file path. If not provided, the
-#' \code{RasterLayer} will be returned to R.
-#' @param return_rast Logical. Should the \code{RasterLayer} be returned to R?
-#'   Ignored if \code{outfile} is not provided.
-#' @return If \code{outfile} is specified, the resulting \code{RasterLayer} is
-#'   saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
-#'   \code{outfile} is not specified, the resulting \code{RasterLayer} is
-#'   returned, otherwise \code{NULL} is returned invisibly.
+#' `RasterLayer` will be returned to R.
+#' @param return_rast Logical. Should the `RasterLayer` be returned to R?
+#'   Ignored if `outfile` is not provided.
+#' @return If `outfile` is specified, the resulting `RasterLayer` is
+#'   saved to `outfile`. If `return_rast` is `TRUE` or
+#'   `outfile` is not specified, the resulting `RasterLayer` is
+#'   returned, otherwise `NULL` is returned invisibly.
 #' @importFrom raster raster stack minValue maxValue writeRaster
 #' @export
 #' @export

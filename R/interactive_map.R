@@ -2,28 +2,27 @@
 #'
 #' Produce an interactive html map.
 #'
-#' @param ras A \code{RasterLayer} or file path to a raster file.
-#' @param layer_name Character. An optional name to assign to \code{ras}.
+#' @param ras A `RasterLayer` or file path to a raster file.
+#' @param layer_name Character. An optional name to assign to `ras`.
 #' @param palette Either a vector of 2 or more colours (e.g. as hex codes or
-#'   colour names) or the name of a palette function supported by \code{tmap}
-#'   (see \code{\link[tmaptools]{palette_explorer}} and
-#'   \code{\link[tmap]{tm_raster}}).
+#'   colour names) or the name of a palette function supported by `tmap`
+#'   (see [tmaptools::palette_explorer()] and [tmap::tm_raster()]).
 #' @param transparency Numeric. Value between 0 and 1 defining the opacity of
 #'   the plotted raster data (1 = fully opaque; 0 = fully transparent).
 #' @param legend Logical. Should a legend be plotted?
 #' @param set_value_range A numeric vector giving upper and lower limits for
 #'   raster values. Values outside this range (including the limits) will be
 #'   set to NA.
-#' @param discrete Logical. Are the values of \code{ras} discrete
+#' @param discrete Logical. Are the values of `ras` discrete
 #'   (categorical)?
-#' @param scale_type Character. Can be one of: \code{"none"} (raw data, no
-#'   rescaling), \code{"log10"}, \code{"max normalize"} (proportional to
-#'   maximum value), \code{"minmax normalize"} (rescale values to be between 0
-#'   and 1 based on min and max) or \code{"logit"}. Note that if
-#'   \code{"log10"} or \code{"logit"} is used, 0 or 1 values must be masked (
-#'   using \code{set_value_range}) or rescaled before passing to this
-#'   function. \code{scale_type} is ignored if \code{discrete} is \code{TRUE}.
-#' @param outfile Character. If \code{NULL}, map will be returned to R and not
+#' @param scale_type Character. Can be one of: `"none"` (raw data, no
+#'   rescaling), `"log10"`, `"max normalize"` (proportional to
+#'   maximum value), `"minmax normalize"` (rescale values to be between 0
+#'   and 1 based on min and max) or `"logit"`. Note that if
+#'   `"log10"` or `"logit"` is used, 0 or 1 values must be masked (
+#'   using `set_value_range`) or rescaled before passing to this
+#'   function. `scale_type` is ignored if `discrete` is `TRUE`.
+#' @param outfile Character. If `NULL`, map will be returned to R and not
 #'   saved. Otherwise, map will be exported as a html file. Full path address
 #'   must be used. If pandoc is available, a standalone html file is created
 #'   (see details).
@@ -32,10 +31,10 @@
 #' @param pt_col Character. The plotting colour for surveillance points.
 #' @param cleanup Logical. If a standalone html file is created, should
 #'   accessory files be removed after the standalone file is generated? This
-#'   will be a folder created within \code{tempdir()}.
+#'   will be a folder created within `tempdir()`.
 #' @return A html map.
 #' @details To create a standalone html file, the
-#'   \href{https://pandoc.org/installing.html}{pandoc} software must be
+#'   [pandoc](https://pandoc.org/installing.html) software must be
 #'   installed and available to R. If pandoc is unavailable, the html file
 #'   will be accompanied by a folder of accessory files.
 #' @importFrom raster extent getValues maxValue minValue ncell projection projectRaster raster setMinMax setValues writeRaster

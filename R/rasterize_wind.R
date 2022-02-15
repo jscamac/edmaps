@@ -6,20 +6,21 @@
 #' @param data Character. A vector polygon dataset (e.g. Shapefile or
 #'   GeoPackage) describing onshore winds, or a file path to such a file.
 #' @param wind_column Character. The column name for the column of the object
-#'   defined by \code{data} that contains wind speed data.
-#' @param template A \code{RasterLayer} or \code{stars} object, or a character
+#'   defined by `data` that contains wind speed data.
+#' @param template A `RasterLayer` or `stars` object, or a character
 #'   file path to a file that can be read by GDAL, defining the extent and
 #'   resolution of analysis, and defining the coastline (edge of non-NA values).
-#'   If a \code{stars} object, the first attribute will be used. Must have a
+#'   If a `stars` object, the first attribute will be used. Must have a
 #'   valid coordinate system. CRS is assumed to be Australian Albers (3577).
 #' @param width Numeric. The width of the coastal buffer (in metres), defining
 #'   how far inland the wind has an effect. E.g. if the pest is thought to be
-#'   carried up to 50km inland by the wind, set this value to \code{50000}.
+#'   carried up to 50km inland by the wind, set this value to `50000`.
 #' @param outfile Character. The target file path for the wind raster.
 #' @importFrom dplyr filter group_by left_join mutate select summarise
 #' @importFrom sf st_as_sf st_boundary st_buffer st_cast st_collection_extract st_coordinates st_geometry_type st_intersection st_join st_make_valid st_nearest_feature st_set_crs st_sf st_union st_voronoi st_drop_geometry
 #' @importFrom stars read_stars st_rasterize write_stars st_as_stars
 #' @importFrom stplanr rnet_get_nodes
+#' @importFrom utils tail
 #' @importFrom magrittr '%>%'
 #' @export
 rasterize_wind <- function(data, wind_column, template, width, outfile) {

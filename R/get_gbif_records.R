@@ -12,14 +12,30 @@
 #'   of any records that have a documented uncertainty above this limit. Records
 #'   with no uncertainty documented will be returned regardless of the value of
 #'   `coord_uncertainty`.
+#' @param basis_of_record An optional character vector of one or more of:
+#'   'FOSSIL_SPECIMEN', 'HUMAN_OBSERVATION', 'LITERATURE', 'LIVING_SPECIMEN',
+#'   'MACHINE_OBSERVATION', 'MATERIAL_SAMPLE', 'OBSERVATION',
+#'   'PRESERVED_SPECIMEN', or 'UNKNOWN', giving the set of allowable values for
+#'   the basis of observation.
+#' @param country An optional 2 letter ISO code defining the country within
+#'   which occurrences should be contained. See
+#'   https://www.iso.org/obp/ui/#search for valid ISO codes (see "Alpha-2 code")
+#'   column.
 #' @param method Either `'search'` (uses the GBIF `/occurrence/search` API
-#'   endpoint) or `'download'` (uses the GBIF `/occurrence/download`API
-#'   endpoint). The former makes paginated queries to the API, while the latter
-#'   performs an asynchronous query (but waits for the resulting dataset to be
-#'   ready for download). The `'search'` method is limited to 100,000 records;
-#'   for large datasets, consider using `'download'`. When using
-#'   `method='download'`, the arguments `username`, `pwd`, and `email` must be
-#'   provided.
+#'   endpoint), `'download'` (uses the GBIF `/occurrence/download`API endpoint),
+#'   or `'auto'`, which uses `'search'` or `'download'` based on occurrence
+#'   count (i.e. dataset size). The `'search'` method makes paginated queries to
+#'   the API, while `'download'` performs an asynchronous query (but waits for
+#'   the resulting dataset to be ready for download). The `'search'` method is
+#'   limited to 100,000 records; for large datasets, consider using `'download'`
+#'   or `'auto'`. When using `'download'` or `'auto'`, the arguments `username`,
+#'   `pwd`, and `email` must be provided. Default is `'auto'`.
+#' @param auto_threshold Integer. If `method` is `'auto'`, this argument defines
+#'   the occurrence count threshold defining whether the `'search'` or
+#'   `'download'` method is used. Default is `10000`, i.e. if fewer than 10000
+#'   records exist for the taxon, the `'search'` method will be used. If 10000
+#'   or greater records, the `'download'` method will be used. Ignored when
+#'   `method` is not `'auto'`.
 #' @param username  GBIF username, required when method is `'download'`.
 #' @param pwd  GBIF password, required when method is `'download'`.
 #' @param email Email address, required when `method = 'download'`. This _may_
@@ -27,7 +43,7 @@
 #' @param retries If `method='download'` and file download fails, how many
 #'   additional attempts should be made to download the file?
 #' @param cleanup Logical. Should temporary files associated with
-#'   `method='download'` be deleted? Default is `TRUE`.
+#'   `'download'` and `'auto'` method be deleted? Default is `TRUE`.
 #' @details This function is a wrapper of `rgbif` such that it can be readily
 #'   used with the `CoordinateCleaner` package.
 #' @return A `data.frame` of species occurrence records.

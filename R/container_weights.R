@@ -7,20 +7,20 @@
 #' @param sheet_nums Integer. Vector of integers signifying the sheet numbers 
 #'   to read in.
 #' @param range A cell range to read from, as described in cell-specification.
-#'   Includes typical \emph{Excel} ranges such as \code{"B3:D87"}, possibly 
-#'   including the sheet name like \code{"Budget!B2:G14"}, and more. 
-#'   Interpreted strictly, even if the range forces the inclusion of leading 
-#'   or trailing empty rows or columns.
+#'   Includes typical _Excel_ ranges such as `"B3:D87"`, possibly including the
+#'   sheet name like `"Budget!B2:G14"`, and more. Interpreted strictly, even if
+#'   the range forces the inclusion of leading or trailing empty rows or
+#'   columns.
 #' @param postcode_shp Character. File path to postcode shape file.
 #' @param na Character vector of strings to interpret as missing values. By
-#'   default, \code{readxl} treats blank cells as missing data.
+#'   default, `readxl` treats blank cells as missing data.
 #' @param outfile Character. Name of shapefile where output will be saved. If
-#'   not provided, \code{sf} object will be returned to R.
-#' @param return_sf Logical. Should the \code{sf} object be returned to R?
-#'   Ignored if \code{outfile} is not provided.
+#'   not provided, `sf` object will be returned to R.
+#' @param return_sf Logical. Should the `sf` object be returned to R?
+#'   Ignored if `outfile` is not provided.
 #' @details For the purposes of this analysis missing data (i.e. NAs) will be
 #'   treated as zeroes.
-#' @return An \code{sf} object or shapefile export.
+#' @return An `sf` object or shapefile export.
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom purrr set_names map_df
 #' @importFrom dplyr rename mutate group_by summarise ungroup left_join filter mutate_all

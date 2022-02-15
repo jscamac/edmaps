@@ -6,43 +6,43 @@
 #' @param species The name of the species. This will be used for naming output
 #'   files and folders.
 #' @param clum_classes An integer vector indicating which ACLUM classes are
-#'   considered host plants for \code{species}. Either \code{clum_classes} or
-#'   \code{nvis_classes} (or both) must be provided. If \code{user_host_path} is
+#'   considered host plants for `species`. Either `clum_classes` or
+#'   `nvis_classes` (or both) must be provided. If `user_host_path` is
 #'   also provided, the union of the two datasets will be used to define host
 #'   distribution.
 #' @param nvis_classes An integer vector indicating which NVIS classes are
-#'   considered host plants for \code{species}. Either \code{clum_classes} or
-#'   \code{nvis_classes} (or both) must be provided.
+#'   considered host plants for `species`. Either `clum_classes` or
+#'   `nvis_classes` (or both) must be provided.
 #' @param host_path Character. Optional file path to a raster dataset that
 #'   describes the distribution of host material for the species. The file must
 #'   be readable by GDAL. All cell values other than zero or NA will be
 #'   considered to be host material. Dataset will be projected and resampled as
 #'   necessary to match the spatial extent and resolution of analysis. If
-#'   \code{clum_classes} is also provided, the union of the two datasets will be
+#'   `clum_classes` is also provided, the union of the two datasets will be
 #'   used to define host distribution. A valid coordinate reference system must
 #'   be associated with the spatial dataset.
 #' @param include_abiotic_weight Logical. Should suitability be dependent on
-#'   climate? Considered TRUE if \code{climate_suitability_path} is provided,
-#'   or if \code{use_gbif} is TRUE.
+#'   climate? Considered TRUE if `climate_suitability_path` is provided,
+#'   or if `use_gbif` is TRUE.
 #' @param climate_suitability_path Optional file path to a raster describing
 #'   climatic suitability across the landscape. If provided, the raster must be
 #'   have the Australian Albers coordinate system (EPSG:3577), spatial
 #'   resolution of 1000 m, and must have xmin = -1888000, xmax = 2122000,
 #'   ymin =-4847000, ymax = -1010000. If not provided and
-#'   \code{include_abiotic_weight} is TRUE, a range bag model will be fit to
+#'   `include_abiotic_weight` is TRUE, a range bag model will be fit to
 #'   estimate climatic suitability.
 #' @param exclude_bioclim_vars Character vector of bioclim variables that
 #'   should not be used when fitting a range bag model (see
-#'   \code{\link{range_bag}}) of climatic suitability. Variables should be
-#'   specified as, e.g., \code{c("bio01", "bio12")}. Ignored if
-#'   \code{climate_suitability_path} is provided.
+#'   [range_bag()]) of climatic suitability. Variables should be
+#'   specified as, e.g., `c("bio01", "bio12")`. Ignored if
+#'   `climate_suitability_path` is provided.
 #' @param include_ndvi Logical. Should biotic suitability be dependent on NDVI?
 #' @param pathways A character vector of invasion pathways that should be
-#'   included. Can be one or more of: \code{'containers'}, \code{'fertiliser'},
-#'   \code{'food'}, \code{'goods'}, \code{'machinery'}, \code{'mail'},
-#'   \code{'nurserystock'}, \code{'residents'}, \code{'torres'},
-#'   \code{'tourists'}, \code{'vessels'}, \code{'northwind'},
-#'   \code{'pacificwind'}, \code{'nzwind'}.
+#'   included. Can be one or more of: `'containers'`, `'fertiliser'`,
+#'   `'food'`, `'goods'`, `'machinery'`, `'mail'`,
+#'   `'nurserystock'`, `'residents'`, `'torres'`,
+#'   `'tourists'`, `'vessels'`, `'northwind'`,
+#'   `'pacificwind'`, `'nzwind'`.
 #' @param aggregated_res A numeric vector of 2 elements, indicating the desired
 #'   resolution of aggregated establishment likelihood rasters, in metres.
 #' @param make_interactive_maps Logical. Should interactive html maps be
@@ -52,20 +52,20 @@
 #' @param ndvi_path Path to the NDVI raster.
 #' @param airport_beta Numeric. Parameter controlling the distribution of
 #'   international tourists passengers around international airport. Default is
-#'   \code{log(0.5)/200} (i.e. 50\% of passengers within 200km of airport).
+#'   `log(0.5)/200` (i.e. 50% of passengers within 200km of airport).
 #' @param airport_tsi_beta Numeric. Parameter controlling the distribution of
 #'   Torres Strait passengers around Cairns airport. Default is
-#'   \code{log(0.5)/10} (i.e., 50\% of passengers within 10km of Cairns
+#'   `log(0.5)/10` (i.e., 50% of passengers within 10km of Cairns
 #'   airport).
 #' @param port_data_path File path to the marine ports .csv file.
 #' @param port_weight_beta Numeric. Defines the decay rate of an exponential
 #'   model. In the context of pests entering via the vessel pathway, this
 #'   reflects the decrease in the relative likelihood of pest arrival at
 #'   locations distant from marine ports. For example,
-#'   \code{prob_weight_beta=log(0.5)/10} would lead to distance-decay that
-#'   leads to 50\% (i.e. \code{0.5}) of establishment likelihood (prior to
-#'   considering other relevant pathways) within a distance of \code{10} map
-#'   units (i.e., 10 kilometres when \code{res} is 1000).
+#'   `prob_weight_beta=log(0.5)/10` would lead to distance-decay that
+#'   leads to 50% (i.e. `0.5`) of establishment likelihood (prior to
+#'   considering other relevant pathways) within a distance of `10` map
+#'   units (i.e., 10 kilometres when `res` is 1000).
 #' @param fertiliser_data_path File path to a csv file containing information
 #'   about fertiliser usage by NRM.
 #' @param nrm_path File path to a polygon shapefile of NRMs (natural resource
@@ -74,27 +74,27 @@
 #'   of containers by postcode.
 #' @param postcode_path File path to postal areas shapefile.
 #' @param occurrence_path Path to a .csv file containing occurrence data. Must
-#'   include columns \code{Longitude} and \code{Latitude}. Coordinates are
+#'   include columns `Longitude` and `Latitude`. Coordinates are
 #'   expected to be in decimal degrees (WGS84).
 #' @param infected_countries A character vector of countries within which the
-#'   \code{species} occurs. Ignored if \code{climate_suitability_path} is
-#'   provided.Only one of \code{infected_countries} or \code{cabi_path} should
+#'   `species` occurs. Ignored if `climate_suitability_path` is
+#'   provided.Only one of `infected_countries` or `cabi_path` should
 #'   be provided.
 #' @param cabi_path Path to a .csv file downloaded from CABI, indicating the
-#'   countries within which the \code{species} occurs. Download links to these
+#'   countries within which the `species` occurs. Download links to these
 #'   files can be found at the bottom of CABI species datasheet webpages, e.g.
 #'   https://www.cabi.org/isc/datasheet/17685. Ignored if
-#'   \code{climate_suitability_path} is provided. Only one of
-#'   \code{infected_countries} or \code{cabi_path} should be provided.
+#'   `climate_suitability_path` is provided. Only one of
+#'   `infected_countries` or `cabi_path` should be provided.
 #' @param use_gbif Logical. Should species occurrence records be sourced from
-#'   GBIF? Ignored if \code{climate_suitability_path} is provided.
+#'   GBIF? Ignored if `climate_suitability_path` is provided.
 #' @param gbif_species Character vector. Taxon names to use when querying GBIF.
-#'   Ignored if \code{climate_suitability_path} is provided.
-#' @param gbif_min_year Integer. The minimum year (\code{yyyy}) to be included
-#'   when downloading GBIF data. Ignored if \code{climate_suitability_path} is
+#'   Ignored if `climate_suitability_path` is provided.
+#' @param gbif_min_year Integer. The minimum year (`yyyy`) to be included
+#'   when downloading GBIF data. Ignored if `climate_suitability_path` is
 #'   provided.
 #' @param gbif_max_uncertainty Numeric. The maximum permissable coordinate
-#'   uncertainty for GBIF records. Ignored if \code{climate_suitability_path} is
+#'   uncertainty for GBIF records. Ignored if `climate_suitability_path` is
 #'   provided.
 #' @param gbif_username GBIF username to use for querying GBIF's occurrence
 #'   download API endpoint. If missing, the less efficient "search" endpoint
@@ -102,25 +102,25 @@
 #' @param gbif_password GBIF password to use for querying GBIF's occurrence
 #'   download API endpoint. If missing, the less efficient "search" endpoint
 #'   is used. Register at http://gbif.org.
-#' @param basemap_mode Type of basemap for static maps. Either \code{'osm'}
-#'   (default), or \code{'boundaries'} (polygons delineating borders of
+#' @param basemap_mode Type of basemap for static maps. Either `'osm'`
+#'   (default), or `'boundaries'` (polygons delineating borders of
 #'   states/territories).
 #' @param minimum_probability_for_maps Numeric. A value between 0 and 1,
 #'   defining the minimum establishment probability to be displayed on plotted
-#'   maps. Values below this threshold will be excluded. Default is \code{1E-5}.
+#'   maps. Values below this threshold will be excluded. Default is `1E-5`.
 #' @param manual_check_flagged_records Logical. Should an interactive map be
-#'   used for manually checking flagged occurrence records? If \code{TRUE}, the
+#'   used for manually checking flagged occurrence records? If `TRUE`, the
 #'   user will have the opportunity to select dubious points (i.e. occurrences
 #'   in countries for which CABI has no record of the species' establishment),
-#'   to be retained. If \code{FALSE} (the default), all such dubious points will
-#'   be excluded. Ignored if \code{climate_suitability_path} is provided. Note
-#'   that manual checking is not possible when using \code{\link{excel_to_plan}}
-#'   since the required interactivity will interrupt plan processing.
+#'   to be retained. If `FALSE` (the default), all such dubious points will
+#'   be excluded. Ignored if `climate_suitability_path` is provided. Note
+#'   that manual checking is not possible when using [excel_to_plan()] since the
+#'   required interactivity will interrupt plan processing.
 #' @param wind_effect_width Numeric. For wind pathways, the distance (in metres)
 #'   inland from the coastline, over which wind-based arrival applies. E.g. if
 #'   pests are expected to be carried by wind up to 50 km inland from the coast,
-#'   use \code{50000}. Ignored if \code{pathways} does not include one or more
-#'   of \code{northwind}, \code{pacificwind}, or code{nzwind}.
+#'   use `50000`. Ignored if `pathways` does not include one or more
+#'   of `northwind`, `pacificwind`, or `nzwind`.
 #' @param leakage_tourists,leakage_returning,leakage_torres,leakage_mail,leakage_vessels,leakage_fertiliser,leakage_machinery,leakage_containers,leakage_nurserystock,leakage_food,leakage_goods,leakage_northwind,leakage_pacificwind,leakage_nzwind
 #'   Numeric vector with length = 2, giving the range (bounds of 95% CI) of the
 #'   number of leakage events per year for the pathway.
@@ -129,19 +129,19 @@
 #'   of survival & establishment to end of pathway, for leakage events on the
 #'   pathway.
 #' @param overwrite Logical. Should the code executed by the resulting plan be
-#'   allowed to overwrite existing raster files? Default is \code{TRUE}.
-#' @details To simplify reproducibility, \code{edmaps} provides an
-#'   \emph{Excel} interface for specifying species parameters relevant to
+#'   allowed to overwrite existing raster files? Default is `TRUE`.
+#' @details To simplify reproducibility, `edmaps` provides an
+#'   _Excel_ interface for specifying species parameters relevant to
 #'   estimating establishment likelihood. An example spreadsheet is
 #'   bundled with the package, available at the path given by
-#'   \code{system.file('extdata/parameters.xlsx', package='edmaps')}. The
+#'   `system.file('extdata/parameters.xlsx', package='edmaps')`. The
 #'   spreadsheet has two sheets, the first specifying "global" parameters
 #'   that will apply to all species (e.g. file paths to rasters that will),
 #'   be used regardless of species identity and the second specifying
 #'   parameters that can vary by species. In the second sheet, each row
 #'   corresponds to a separate species. Tooltips and data validation
 #'   guide the user with respect to expected/allowable data.
-#' @seealso \code{\link{excel_to_plan}}
+#' @seealso [excel_to_plan()]
 #' @importFrom glue glue
 #' @importFrom raster extent raster res compareCRS
 #' @importFrom sp CRS
