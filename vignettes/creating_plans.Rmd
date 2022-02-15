@@ -70,12 +70,9 @@ dorsalis <- species_plan(
   manual_check_flagged_records=FALSE,
   gbif_species=c("Bactrocera dorsalis","Bactrocera invadens", 
                  "Bactrocera papayae", "Bactrocera philippinensis"),
-  total_tourists=13941270,
-  prob_tourists=2.381577e-06*(30/45),
-  total_returning=15486050,
-  prob_returning=2.381577e-06*(15/45),
-  total_torres=51000,
-  prob_torres=21/51000)
+  leakage_tourists=c(7, 67), establishment_tourists=c(0.001, 0.01),
+  leakage_returning=c(3, 33), establishment_returning=c(0.001, 0.01),
+  leakage_torres=c(1, 100), establishment_torres=c(0.001, 0.01))
 ```
 
 
@@ -93,7 +90,9 @@ dorsalis$target
 To create a plan for multiple species, it is simpler to use `excel_to_plan`.
 Using the example xlsx file included with `edmaps`, we can prepare a plan for
 four species: oriental fruitfly, khapra beetle, brown marmorated stink bug and
-gypsy moth. Below, we point `excel_to_plan` to that file.
+gypsy moth. Below, we point `excel_to_plan` to that file. Note that this
+example requires a number of raw data files that are not distributed with the
+`edmaps` package.
 
 ```{r, eval=FALSE}
 f <- system.file('extdata/parameters.xlsx', package='edmaps')
