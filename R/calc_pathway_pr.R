@@ -23,7 +23,7 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
     rast <- raster::raster(rast)
   }
 
-  d <- dplyr::mutate(setNames(raster::as.data.frame(rast), 'value'),
+  d <- dplyr::mutate(stats::setNames(raster::as.data.frame(rast), 'value'),
                      cell=dplyr::row_number()) %>%
     stats::na.omit() %>%
     dplyr::mutate(value = 1 - value, prob_absent=0)

@@ -57,9 +57,9 @@ rasterize_wind <- function(data, wind_column, template, width, outfile) {
   # width to avoid including unwanted regions of coastline.
   wind_buffer <- rbind(
     sf::st_buffer(dplyr::filter(
-      wind, segment_id %in% c(segment_id[1], 'O', tail(segment_id, 1))), 50000),
+      wind, segment_id %in% c(segment_id[1], 'O', utils::tail(segment_id, 1))), 50000),
     sf::st_buffer(dplyr::filter(
-      wind, !segment_id %in% c(segment_id[1], 'O', tail(segment_id, 1))), 200000)
+      wind, !segment_id %in% c(segment_id[1], 'O', utils::tail(segment_id, 1))), 200000)
   ) %>% sf::st_union()
 
   # Create 1000 x 1000m template raster and convert to polygons
