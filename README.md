@@ -44,12 +44,12 @@ Broadly, these steps are grouped as follows:
 **macOS**
 
 - [Command Line Tools](http://osxdaily.com/2014/02/12/install-command-line-tools-mac-os-x/) to build packages from source when required.
-- *macOS* is prone to errors when attempting to link \textit{R} and \textit{Java}. These errors can often be resolved by running `sudo R CMD javareconf` in a terminal (requires administrator privileges).
+- *macOS* is prone to errors when attempting to link _R_ and _Java_. These errors can often be resolved by running `sudo R CMD javareconf` in a terminal (requires administrator privileges).
 
 
 **Linux**
 
-On Linux, system packages must be installed from source, meaning that additional software and system libraries are required. The list below gives \textit{Ubuntu} package names. If using a different distribution, you will need to identify the corresponding package names (e.g.\ for some distributions, \texttt{dev} should be replaced with \texttt{devel}).
+On Linux, system packages must be installed from source, meaning that additional software and system libraries are required. The list below gives _Ubuntu_ package names. If using a different distribution, you will need to identify the corresponding package names (e.g.\ for some distributions, `dev` should be replaced with `devel`).
 
 - libxml2-dev
 - libudunits2-dev
@@ -69,7 +69,7 @@ On Linux, system packages must be installed from source, meaning that additional
 
 The `edmaps` package depends upon a set of other *R* packages in order to calculate likelihoods of establishment. 
 Package functionality often changes as packages evolve, so specific versions of these dependencies (i.e.\ current versions as at 30 September, 2019) were used in the development of `edmaps` and its application to the case study species explored in this report. 
-Binaries or source tarballs of these package versions are archived by the \href{https://mran.microsoft.com/timemachine}{MRAN (Microsoft R Application Network) Time Machine}, and are available at \href{http://cran.microsoft.com/snapshot/2019-09-30/}{http://cran.microsoft.com/snapshot/2019-09-30/}. To ensure expected behaviour and accurate reproduction of outputs, these package versions are recommended. Similarly, recursive dependencies (i.e.,\ dependencies of the direct dependencies, and so on) should also be installed from the above snapshot. Installation of the appropriate versions of dependencies can be automated, as described \hyperref[recreatingenv]{below}.
+Binaries or source tarballs of these package versions are archived by the [MRAN (Microsoft R Application Network) Time Machine](https://mran.microsoft.com/timemachine), and are available at [http://cran.microsoft.com/snapshot/2019-09-30/](http://cran.microsoft.com/snapshot/2019-09-30/). To ensure expected behaviour and accurate reproduction of outputs, these package versions are recommended. Similarly, recursive dependencies (i.e.,\ dependencies of the direct dependencies, and so on) should also be installed from the above snapshot. Installation of the appropriate versions of dependencies can be automated, as described \hyperref[recreatingenv]{below}.
 
 - CoordinateCleaner 2.0-15
 - countrycode 1.2.0
@@ -125,7 +125,7 @@ This data directory contains all the raw spatial layers and data needed to creat
     - NDVI/ (NDVI raster);
     - NVIS\_5.1/ (NVIS raster);
 - **pathway/raw_data/**
-  - Containers/ (contains POA shapefile \& \texttt{containers\_bypostcode.xls})
+  - Containers/ (contains POA shapefile \& `containers\_bypostcode.xls`)
   - Fertiliser/ (contains fertiliser use csv file and NRM shapefile)
   - Major_Airports/ (Australian airport locations)
   - Population/ (human population raster)
@@ -171,7 +171,7 @@ As such it is extremely difficult ensure `edmaps` will run in all settings.
 
 For this reason, and to ensure `edmaps` functionality into perpetuity, we strongly recommend that `edmaps` is implemented in a [*docker*](https://www.docker.com/) container. 
 *Docker* is the world’s leading software container platform that is used to create lightweight, self-contained virtual Linux systems that contain all relevant open source software required to run developed software. 
-Unlike other virtual machines, \textit{Docker} does not bundle a full operating system. 
+Unlike other virtual machines, _Docker_ does not bundle a full operating system. 
 Rather it only installs libraries and settings required to make the developed software work. 
 This means that *Docker* can be used to eliminate the “it works on my machine” problems when running software. 
 The other major advantage is that it removes the need for users to install software dependencies, as the hard work is already done.
@@ -222,7 +222,7 @@ Once completed, all static and interactive maps as well as GIS-compatible raster
 ## Using `edmaps` with `renv`
 
 
-If insufficient privileges exist to use \textit{Docker}, an alternative is to use a [`renv`](https://rstudio.github.io/renv/articles/renv.html) (**r**eproducible **env**ironments) workflow.
+If insufficient privileges exist to use _Docker_, an alternative is to use a [`renv`](https://rstudio.github.io/renv/articles/renv.html) (**r**eproducible **env**ironments) workflow.
 The `renv` *R* package reproduces a pre-defined package environment, ensuring that specified package versions are used. To do this it creates a private, isolated package library for an *R* project, 
 and obtains defined versions of packages from defined repositories. 
 Versions and repositories are specified in a "lock file" (`renv.lock`), and the lock file describing the versions
