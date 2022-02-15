@@ -267,7 +267,7 @@ excel_to_plan <- function(file) {
           scale_type = "log10",
           outfile = drake::file_out(
             !!sprintf("outputs/%1$s/interactive_maps/%1$s_edmap_%2$s.html",
-                      group, group, res[1])
+                      group, res[1])
           )
         ),
         cairns_edmap = static_map(
