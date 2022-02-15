@@ -7,15 +7,15 @@
 extract_worldclim2(path_2_zip, outdir)
 }
 \arguments{
-\item{path_2_zip}{Character. Path to .zip archive downloaded by 
-\code{\link{download_worldclim2}}.}
+\item{path_2_zip}{Character. Path to .zip archive downloaded by
+\code{\link[=download_worldclim2]{download_worldclim2()}}.}
 
-\item{outdir}{Character. File path to which contained files should be 
+\item{outdir}{Character. File path to which contained files should be
 extracted. Will be created (recursively) if necessary.}
 }
 \value{
 Raster data are extracted to \code{outdir} and \code{NULL} is
-  returned invisibly.
+returned invisibly.
 }
 \description{
 Extract WorldClim 2.0 data
@@ -27,5 +27,5 @@ extract_worldclim2('bioclim_10m.zip', outdir='bioclim')
 }
 }
 \seealso{
-\code{\link{download_worldclim2}}
+\code{\link[=download_worldclim2]{download_worldclim2()}}
 }

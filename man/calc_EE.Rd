@@ -7,10 +7,10 @@
 calc_EE(n_events, p_establish, nsims = 1e+05)
 }
 \arguments{
-\item{n_events}{Numeric vector containing lower and upper bounds (95% CI) for
+\item{n_events}{Numeric vector containing lower and upper bounds (95\% CI) for
 the number of leakage events.}
 
-\item{p_establish}{Numeric vector containing the lower and upper bounds (95%
+\item{p_establish}{Numeric vector containing the lower and upper bounds (95\%
 CI) for the probability a leakage event could result in an establishment.}
 
 \item{nsims}{Integer. Number of samples to be taken from event and
@@ -18,7 +18,7 @@ establishment distributions. Default = 100000.}
 }
 \value{
 A \code{data.frame} containing the possible number of incursions that
-  may occur, and their corresponding probabilities.
+may occur, and their corresponding probabilities.
 }
 \description{
 Calculate the probability of one or more establishment events occurring as as

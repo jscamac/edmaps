@@ -13,17 +13,17 @@ weight_airport_dist(
 )
 }
 \arguments{
-\item{airport_dist}{Character. File path to a raster file containing 
+\item{airport_dist}{Character. File path to a raster file containing
 proximity to airports. Map units are expected to be kilometres.}
 
-\item{beta}{Numeric. Parameter passed to the exponential function. Distance 
-to nearest airport is multiplied by this value and exponentiated to give 
-the relative density of tourists at a location. To generate a distribution 
-that ensures proportion \emph{p} of tourists within distance \emph{d} of 
-nearest airport, specify \code{airport_beta=log(p)/d} (e.g. to have 50% of 
+\item{beta}{Numeric. Parameter passed to the exponential function. Distance
+to nearest airport is multiplied by this value and exponentiated to give
+the relative density of tourists at a location. To generate a distribution
+that ensures proportion \emph{p} of tourists within distance \emph{d} of
+nearest airport, specify \code{airport_beta=log(p)/d} (e.g. to have 50\% of
 tourists within 200 km of an airport, use \code{log(0.5)/200}).}
 
-\item{outfile}{Character. Output raster file path. If missing, object will 
+\item{outfile}{Character. Output raster file path. If missing, object will
 be returned to R.}
 
 \item{overwrite}{Logical. Overwite the target raster if it already exists?}
@@ -31,9 +31,9 @@ be returned to R.}
 \item{return_rast}{Logical. Should the raster object be returned to R?}
 }
 \value{
-If \code{return_rast} is TRUE, or if \code{outfile} is missing, 
-  the resulting \code{RasterLayer} object will be returned. Otherwise 
-  \code{NULL} is returned invisibly.
+If \code{return_rast} is TRUE, or if \code{outfile} is missing,
+the resulting \code{RasterLayer} object will be returned. Otherwise
+\code{NULL} is returned invisibly.
 }
 \description{
 Transform airport distances according to a negative exponential function.

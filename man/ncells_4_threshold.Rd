@@ -15,12 +15,12 @@ ncells_4_threshold(
 
 \item{names}{Character. Names corresponding to \code{infiles}.}
 
-\item{proportion_captured}{Numeric vector. Proportion(s) of risk to be 
+\item{proportion_captured}{Numeric vector. Proportion(s) of risk to be
 captured.}
 }
 \value{
 A \code{data.frame} containing the number of cells to be trapped to
-  capture given proportion(s) of total risk across multiple input files.
+capture given proportion(s) of total risk across multiple input files.
 }
 \description{
 Extract number of cells required to meet threshold proportion of risk.

@@ -12,13 +12,13 @@ combine_arrivals(
 )
 }
 \arguments{
-\item{x}{Character vector giving file path(s) to rasters to be included in 
+\item{x}{Character vector giving file path(s) to rasters to be included in
 the summation. All rasters must have the same extent and resolution.}
 
-\item{outfile}{Character. Output raster file path. If not provided, the 
+\item{outfile}{Character. Output raster file path. If not provided, the
 \code{RasterLayer} will be returned to R.}
 
-\item{summarise_uncertainty}{Logical. If \code{TRUE}, and if 
+\item{summarise_uncertainty}{Logical. If \code{TRUE}, and if
 \code{probability} has length > 1, the arrival frequency surfaces for the
 values of \code{probability} will be summarised to their median, min, and
 max cell-wise values (in that order).}
@@ -27,13 +27,13 @@ max cell-wise values (in that order).}
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is 
-  saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or 
-  \code{outfile} is not specified, the resulting \code{RasterLayer} is 
-  returned, otherwise \code{NULL} is returned invisibly. If 
-  \code{summarise_uncertainty} is \code{TRUE} and rasters passed to `x` are
-  multiband, then the resulting stack will have three layers equal to the
-  cell-wise median, minimum, and maximum of the layers, respectively.
+If \code{outfile} is specified, the resulting \code{RasterLayer} is
+saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
+\code{outfile} is not specified, the resulting \code{RasterLayer} is
+returned, otherwise \code{NULL} is returned invisibly. If
+\code{summarise_uncertainty} is \code{TRUE} and rasters passed to \code{x} are
+multiband, then the resulting stack will have three layers equal to the
+cell-wise median, minimum, and maximum of the layers, respectively.
 }
 \description{
 Sums estimated arrivals rates across all entry pathways.

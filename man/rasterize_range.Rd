@@ -41,7 +41,7 @@ this template.}
 \item{outfile}{Optional file path to write out resulting host raster.}
 
 \item{xy_crs}{Coordinate reference system of \code{xy}, passed as numeric
-EPSG code, or any other format accepted by \code{\link{sf::st_set_crs}}. If
+EPSG code, or any other format accepted by \code{\link[sf:st_crs]{sf::st_set_crs()}}. If
 missing and \code{xy} is an \code{sp} or \code{sf} object, the CRS is
 defined by the object. If the latter is undefined, or if \code{xy_crs} is
 missing and \code{xy} is a matrix or path to a csv file, \code{xy} will
@@ -54,8 +54,8 @@ ignored.}
 }
 \value{
 A \code{RasterLayer} with the resulting range burnt into it.
-  Additionally, if \code{outfile} is not missing, the raster is written to
-  that file.
+Additionally, if \code{outfile} is not missing, the raster is written to
+that file.
 }
 \description{
 Rasterize a species' range, either by burning points directly into raster, or

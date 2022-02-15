@@ -20,30 +20,30 @@ get_airport_dist(
 \item{vector_data}{Character. Path to airport data (available
 \href{https://d28rz98at9flks.cloudfront.net/74775/MajorAviationTerminals.gdb.zip}{here}).}
 
-\item{outfile}{Character. Output raster file path. Directory will be 
+\item{outfile}{Character. Output raster file path. Directory will be
 created recursively if it does not exist.}
 
-\item{template_raster}{Optional. \code{Raster*} object or a file path to 
-template raster. If this is provided, \code{extent}, \code{res}, and 
-\code{crs} will be taken from this raster unless they are also passed to 
-this function. If \code{template_raster} is not provided, then 
-\code{extent} and \code{res} must be provided. The template raster will 
-also be used to mask the output raster so that NA cell values will be 
+\item{template_raster}{Optional. \verb{Raster*} object or a file path to
+template raster. If this is provided, \code{extent}, \code{res}, and
+\code{crs} will be taken from this raster unless they are also passed to
+this function. If \code{template_raster} is not provided, then
+\code{extent} and \code{res} must be provided. The template raster will
+also be used to mask the output raster so that NA cell values will be
 propagated.}
 
 \item{extent}{Either a character path to a raster file, an
-\code{\link[raster:extent]{Extent}} object (or an object from which such 
-an extent can be extracted), or a numeric vector with four elements 
+\link[raster:extent]{Extent} object (or an object from which such
+an extent can be extracted), or a numeric vector with four elements
 giving xmin, xmax, ymin, ymax.}
 
 \item{res}{Numeric or integer vector giving the horizontal and vertical
 spatial resolution, in units of \code{crs}. If a single value is given,
 it will be used for both horizontal and vertical resolution.}
 
-\item{crs}{Target coordinate reference system as a PROJ string (character) 
+\item{crs}{Target coordinate reference system as a PROJ string (character)
 or an object of class CRS.}
 
-\item{airport_codes}{Numeric. Airport codes to be used as targets in order 
+\item{airport_codes}{Numeric. Airport codes to be used as targets in order
 to estimate cell proximity.}
 
 \item{return_rast}{Logical. Return \code{RasterLayer} to R?}
@@ -52,14 +52,14 @@ to estimate cell proximity.}
 exists?}
 }
 \value{
-A proximity raster is written to \code{outfile}. If 
-  \code{return_rast} is \code{TRUE}, the raster object is also returned to 
-  R, otherwise \code{NULL} is returned invisibly. This function assumes that 
-  \code{crs} is either an unprojected coordinate system, or that the units of 
-  \code{crs} are metres. Resulting distances are expressed in kilometres.
+A proximity raster is written to \code{outfile}. If
+\code{return_rast} is \code{TRUE}, the raster object is also returned to
+R, otherwise \code{NULL} is returned invisibly. This function assumes that
+\code{crs} is either an unprojected coordinate system, or that the units of
+\code{crs} are metres. Resulting distances are expressed in kilometres.
 }
 \description{
 Generates a raster proximity map indicating the distance from the center of
-each pixel to the centre of the nearest pixel containing a major airport. 
+each pixel to the centre of the nearest pixel containing a major airport.
 Airport coordinates are in the source raster.
 }

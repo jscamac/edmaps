@@ -29,30 +29,30 @@ be set if you wish to reproject object and it is not specified in the
 \code{infile}. The coordinate systems that can be passed includes EPSG
 PCS and GCSes (i.e. EPSG:4296), PROJ.4 declarations (as above), or the
 name of a .prj file containing well known text. Starting with GDAL 2.2,
-if the SRS has an explicit vertical datum that points to a PROJ.4 
-geoidgrids, and the input dataset is a single band dataset, a vertical 
+if the SRS has an explicit vertical datum that points to a PROJ.4
+geoidgrids, and the input dataset is a single band dataset, a vertical
 correction will be applied to the values of the dataset.}
 
-\item{tgt_proj}{Character. The target coordinate system. See 
+\item{tgt_proj}{Character. The target coordinate system. See
 \code{src_proj} for details. If not specified, \code{outfile} will
 inherit the coordinate system of \code{infile}.}
 
-\item{res}{Numeric vector containing x and y resolution. e.g. 
-\code{c(xres, yres)}. Must be specified in the units of 
+\item{res}{Numeric vector containing x and y resolution. e.g.
+\code{c(xres, yres)}. Must be specified in the units of
 \code{tgt_proj}.}
 
-\item{resampling_method}{Character. One of \code{"near"}, 
-\code{"bilinear"}, \code{"cubic"}, \code{"cubicspline"}, 
-\code{"lanczos"}, \code{"average"}, \code{"mode"}, \code{"max"}, 
-\code{"min"}, \code{"med"}, \code{"q1"}, \code{"q3"}. See Details. 
+\item{resampling_method}{Character. One of \code{"near"},
+\code{"bilinear"}, \code{"cubic"}, \code{"cubicspline"},
+\code{"lanczos"}, \code{"average"}, \code{"mode"}, \code{"max"},
+\code{"min"}, \code{"med"}, \code{"q1"}, \code{"q3"}. See Details.
 Default is \code{"near"}.}
 
-\item{tgt_extent}{Numeric vector containing corner coordinates specified as 
-\code{c(xmin, ymin, xmax, ymax)}. Must be specified in the units of 
+\item{tgt_extent}{Numeric vector containing corner coordinates specified as
+\code{c(xmin, ymin, xmax, ymax)}. Must be specified in the units of
 \code{tgt_proj}.}
 
-\item{buffer}{Numeric. Add buffer (specified in units of \code{tgt_proj}). 
-Useful for adding buffers around coasts, and for filling in small gaps 
+\item{buffer}{Numeric. Add buffer (specified in units of \code{tgt_proj}).
+Useful for adding buffers around coasts, and for filling in small gaps
 within raster specified by \code{infile}.}
 
 \item{src_nodata}{Integer. The nodata value for an input file.}
@@ -67,9 +67,9 @@ for more information.}
 exists?}
 }
 \value{
-_rast A raster file is produced on disk. Additionally, if 
-  \code{return_rast} is \code{TRUE} a \code{RasterLayer} object is returned 
-  to R.
+_rast A raster file is produced on disk. Additionally, if
+\code{return_rast} is \code{TRUE} a \code{RasterLayer} object is returned
+to R.
 }
 \description{
 This function can be used to change resolution, projection and extent of a

@@ -8,7 +8,7 @@ expand_range(x)
 }
 \arguments{
 \item{x}{A character vector of shorthand sequences described by colons (e.g.
-\code{c('1:3', '5:10')}) or hyphens (e.g. \code{c('1-3', '5-10'}).}
+\code{c('1:3', '5:10')} or hyphens (e.g. \verb{c('1-3', '5-10'}).}
 }
 \value{
 Expanded integer sequences.

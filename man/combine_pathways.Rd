@@ -13,17 +13,17 @@ the summation, and cell values give the probability of arrival for the
 corresponding pathway. All rasters must have the same extent and
 resolution.}
 
-\item{outfile}{Character. Output raster file path. If not provided, the 
+\item{outfile}{Character. Output raster file path. If not provided, the
 \code{RasterLayer} will be returned to R.}
 
 \item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is 
-  saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or 
-  \code{outfile} is not specified, the resulting \code{RasterLayer} is 
-  returned, otherwise \code{NULL} is returned invisibly.
+If \code{outfile} is specified, the resulting \code{RasterLayer} is
+saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
+\code{outfile} is not specified, the resulting \code{RasterLayer} is
+returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{
 Calculate the probability of arrival across pathways.

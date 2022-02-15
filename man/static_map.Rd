@@ -25,7 +25,7 @@ static_map(
 )
 }
 \arguments{
-\item{ras}{A \code{Raster*} object or file path to a (potentially multiband)
+\item{ras}{A \verb{Raster*} object or file path to a (potentially multiband)
 raster file.}
 
 \item{xlim}{Numeric vector. The longitudinal extent of the area to plot.}
@@ -51,9 +51,9 @@ on min and max), or \code{"logit"}. Note that if \code{"log10"} or
 \code{"logit"} is used 0 or 1 values. must be masked (using
 \code{set_value_range}) or rescaled outside of this function.}
 
-\item{basemap_mode}{Either `'boundaries'` or `'osm'` (i.e., OpenStreetMap),
+\item{basemap_mode}{Either \code{'boundaries'} or \code{'osm'} (i.e., OpenStreetMap),
 defining whether OpenStreetMap imagery should be used for static map
-basemaps, or simple administrative boundaries. Default is `'osm'`.}
+basemaps, or simple administrative boundaries. Default is \code{'osm'}.}
 
 \item{transparency}{Numeric. Transparency of raster, between 0-1.}
 
@@ -81,7 +81,7 @@ automatically, based on the aspect ratio given by the plotting extent.}
 }
 \value{
 If \code{outfile} is provided, a map is saved to that file.
-  Otherwise, a \code{tmap} object is returned to R.
+Otherwise, a \code{tmap} object is returned to R.
 }
 \description{
 Produce a static map of establishment likelihood, with OpenStreetMap base
@@ -89,10 +89,10 @@ layer.
 }
 \details{
 This function relies on the \code{OpenStreetMap} package to obtain
-  base layer tiles. This in turn requires Java to be installed, and linking
-  R with Java can sometimes prove challenging. On macOS, Java errors can
-  often be resolved by entering \code{sudo R CMD javareconf} in a terminal (
-  which updates R's Java configuration variables). On Windows, ensure that
-  the Java architecture (32-bit/64-bit) matches that of R. Additionally,
-  some Java errors arise when using RStudio but not when using R.
+base layer tiles. This in turn requires Java to be installed, and linking
+R with Java can sometimes prove challenging. On macOS, Java errors can
+often be resolved by entering \verb{sudo R CMD javareconf} in a terminal (
+which updates R's Java configuration variables). On Windows, ensure that
+the Java architecture (32-bit/64-bit) matches that of R. Additionally,
+some Java errors arise when using RStudio but not when using R.
 }

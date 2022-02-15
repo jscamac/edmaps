@@ -7,17 +7,16 @@
 fill_na(x, fun, w, outfile, return_rast = FALSE, overwrite = FALSE)
 }
 \arguments{
-\item{x}{A \code{Raster*} object.}
+\item{x}{A \verb{Raster*} object.}
 
 \item{fun}{The function (name or symbol) to apply to the moving windows.
 First argument should represent the vector of cells contained in the focal
 window. Only non-NA cell values will be passed to the function.}
 
-\item{w}{A weights matrix (see \code{\link[raster]{focalWeight}} and
-\code{\link[raster]{focal}} defining the focal window to which fun will be
-applied. Note that all contributing cells will be given equal weight (i.e.
-varying weights are not respected - non-zero & non-NA weights will be
-replaced by 1).}
+\item{w}{A weights matrix (see \code{\link[raster:focalWeight]{raster::focalWeight()}} and \code{\link[raster:focal]{raster::focal()}}
+defining the focal window to which fun will be applied. Note that all
+contributing cells will be given equal weight (i.e. varying weights are not
+respected - non-zero & non-NA weights will be replaced by 1).}
 
 \item{outfile}{Character. File path to an output raster file. If missing, a
 temporary file will be used.}
@@ -29,13 +28,12 @@ exists?}
 }
 \value{
 Returns the resulting \code{RasterLayer} if \code{return_rast} is
-  \code{TRUE}. Returns the output file path otherwise.
+\code{TRUE}. Returns the output file path otherwise.
 }
 \description{
 Apply a function to NA cells within a moving window.
 }
 \details{
 NA values within focal blocks will be ignored. Raster edges will be
-  NA-padded to allow focal computations at the edge (see
-  \code{\link[raster]{focal}}.
+NA-padded to allow focal computations at the edge (see \code{\link[raster:focal]{raster::focal()}}.
 }

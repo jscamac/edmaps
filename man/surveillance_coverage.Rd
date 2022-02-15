@@ -12,21 +12,21 @@ surveillance_coverage(
 )
 }
 \arguments{
-\item{establishment_rasters}{Character vector. A vector of one or more file 
+\item{establishment_rasters}{Character vector. A vector of one or more file
 path to rasters describing establishment likelihood.}
 
 \item{layer_names}{Character. Name to be assigned to each establishment
 raster. If not specified, names of the raster layers will be used.}
 
-\item{surveillance_locations}{Character. Path to a csv file containing 
-surveillance locations, including columns titled "Longitude" and 
+\item{surveillance_locations}{Character. Path to a csv file containing
+surveillance locations, including columns titled "Longitude" and
 "Latitude" with coordinates given in decimal degrees (GDA94).}
 }
 \value{
 The proportion of establishment likelihood captured by current
-  surveillance.
+surveillance.
 }
 \description{
-Calculate the proportion of total establishment likelihood captured by 
+Calculate the proportion of total establishment likelihood captured by
 current surveillance.
 }

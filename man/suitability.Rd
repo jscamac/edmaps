@@ -7,7 +7,7 @@
 suitability(x, outfile, return_rast = FALSE)
 }
 \arguments{
-\item{x}{One of: a \code{RasterStack}; a \code{RasterBrick}; a list of 
+\item{x}{One of: a \code{RasterStack}; a \code{RasterBrick}; a list of
 \code{RasterLayer} objects, or a vector of file paths to raster files.}
 
 \item{outfile}{Character. Name of geotiff where output will be saved. If not
@@ -18,9 +18,9 @@ Ignored if \code{outfile} is not provided.}
 }
 \value{
 If \code{outfile} is specified, the resulting raster is saved as a
-  geotiff to that path. If \code{return_rast} is \code{TRUE} or
-  \code{outfile} is not specified the resulting raster is returned, otherwise
-  \code{NULL} is returned invisibly.
+geotiff to that path. If \code{return_rast} is \code{TRUE} or
+\code{outfile} is not specified the resulting raster is returned, otherwise
+\code{NULL} is returned invisibly.
 }
 \description{
 Combine biotic (and abiotic) layers into a single suitability raster to be

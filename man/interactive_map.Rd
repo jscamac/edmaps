@@ -26,8 +26,7 @@ interactive_map(
 
 \item{palette}{Either a vector of 2 or more colours (e.g. as hex codes or
 colour names) or the name of a palette function supported by \code{tmap}
-(see \code{\link[tmaptools]{palette_explorer}} and
-\code{\link[tmap]{tm_raster}}).}
+(see \code{\link[tmaptools:palette_explorer]{tmaptools::palette_explorer()}} and \code{\link[tmap:tm_raster]{tmap::tm_raster()}}).}
 
 \item{transparency}{Numeric. Value between 0 and 1 defining the opacity of
 the plotted raster data (1 = fully opaque; 0 = fully transparent).}
@@ -71,7 +70,7 @@ Produce an interactive html map.
 }
 \details{
 To create a standalone html file, the
-  \href{https://pandoc.org/installing.html}{pandoc} software must be
-  installed and available to R. If pandoc is unavailable, the html file
-  will be accompanied by a folder of accessory files.
+\href{https://pandoc.org/installing.html}{pandoc} software must be
+installed and available to R. If pandoc is unavailable, the html file
+will be accompanied by a folder of accessory files.
 }

@@ -8,7 +8,10 @@ get_gbif_records(
   taxon,
   min_year,
   coord_uncertainty,
-  method = c("search", "download"),
+  basis_of_record,
+  country,
+  method = c("auto", "search", "download"),
+  auto_threshold = 10000,
   username,
   pwd,
   email,
@@ -20,38 +23,57 @@ get_gbif_records(
 \item{taxon}{Character. Species taxonomic name.}
 
 \item{min_year}{Integer. The minimum year for which records should be
-collated. Default is `NULL`, i.e. no minimum.}
+collated. Default is \code{NULL}, i.e. no minimum.}
 
 \item{coord_uncertainty}{Integer. The maximum allowable documented coordinate
 uncertainty (in metres). If specified, this argument will result in removal
 of any records that have a documented uncertainty above this limit. Records
 with no uncertainty documented will be returned regardless of the value of
-`coord_uncertainty`.}
+\code{coord_uncertainty}.}
 
-\item{method}{Either `'search'` (uses the GBIF `/occurrence/search` API
-endpoint) or `'download'` (uses the GBIF `/occurrence/download`API
-endpoint). The former makes paginated queries to the API, while the latter
-performs an asynchronous query (but waits for the resulting dataset to be
-ready for download). The `'search'` method is limited to 100,000 records;
-for large datasets, consider using `'download'`. When using
-`method='download'`, the arguments `username`, `pwd`, and `email` must be
-provided.}
+\item{basis_of_record}{An optional character vector of one or more of:
+'FOSSIL_SPECIMEN', 'HUMAN_OBSERVATION', 'LITERATURE', 'LIVING_SPECIMEN',
+'MACHINE_OBSERVATION', 'MATERIAL_SAMPLE', 'OBSERVATION',
+'PRESERVED_SPECIMEN', or 'UNKNOWN', giving the set of allowable values for
+the basis of observation.}
 
-\item{username}{GBIF username, required when method is `'download'`.}
+\item{country}{An optional 2 letter ISO code defining the country within
+which occurrences should be contained. See
+https://www.iso.org/obp/ui/#search for valid ISO codes (see "Alpha-2 code")
+column.}
 
-\item{pwd}{GBIF password, required when method is `'download'`.}
+\item{method}{Either \code{'search'} (uses the GBIF \verb{/occurrence/search} API
+endpoint), \code{'download'} (uses the GBIF \verb{/occurrence/download}API endpoint),
+or \code{'auto'}, which uses \code{'search'} or \code{'download'} based on occurrence
+count (i.e. dataset size). The \code{'search'} method makes paginated queries to
+the API, while \code{'download'} performs an asynchronous query (but waits for
+the resulting dataset to be ready for download). The \code{'search'} method is
+limited to 100,000 records; for large datasets, consider using \code{'download'}
+or \code{'auto'}. When using \code{'download'} or \code{'auto'}, the arguments \code{username},
+\code{pwd}, and \code{email} must be provided. Default is \code{'auto'}.}
 
-\item{email}{Email address, required when `method = 'download'`. This _may_
+\item{auto_threshold}{Integer. If \code{method} is \code{'auto'}, this argument defines
+the occurrence count threshold defining whether the \code{'search'} or
+\code{'download'} method is used. Default is \code{10000}, i.e. if fewer than 10000
+records exist for the taxon, the \code{'search'} method will be used. If 10000
+or greater records, the \code{'download'} method will be used. Ignored when
+\code{method} is not \code{'auto'}.}
+
+\item{username}{GBIF username, required when method is \code{'download'}.}
+
+\item{pwd}{GBIF password, required when method is \code{'download'}.}
+
+\item{email}{Email address, required when \code{method = 'download'}. This \emph{may}
 be used to notify user when download is ready.}
 
-\item{retries}{If `method='download'` and file download fails, how many
+\item{retries}{If \code{method='download'} and file download fails, how many
 additional attempts should be made to download the file?}
 
 \item{cleanup}{Logical. Should temporary files associated with
-`method='download'` be deleted? Default is `TRUE`.}
+\code{'download'} and \code{'auto'} method be deleted? Default is \code{TRUE}.}
 }
 \value{
-A `data.frame` of species occurrence records.
+A \code{data.frame} of species occurrence records.
 }
 \description{
 Downloads GBIF records of species, removing auxiliary columns and records
@@ -59,6 +81,6 @@ recorded prior to a specified year, or that have coordinate uncertainty
 above a specified amount.
 }
 \details{
-This function is a wrapper of `rgbif` such that it can be readily
-  used with the `CoordinateCleaner` package.
+This function is a wrapper of \code{rgbif} such that it can be readily
+used with the \code{CoordinateCleaner} package.
 }

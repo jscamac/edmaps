@@ -115,7 +115,7 @@ estimate climatic suitability.}
 
 \item{exclude_bioclim_vars}{Character vector of bioclim variables that
 should not be used when fitting a range bag model (see
-\code{\link{range_bag}}) of climatic suitability. Variables should be
+\code{\link[=range_bag]{range_bag()}}) of climatic suitability. Variables should be
 specified as, e.g., \code{c("bio01", "bio12")}. Ignored if
 \code{climate_suitability_path} is provided.}
 
@@ -216,19 +216,19 @@ user will have the opportunity to select dubious points (i.e. occurrences
 in countries for which CABI has no record of the species' establishment),
 to be retained. If \code{FALSE} (the default), all such dubious points will
 be excluded. Ignored if \code{climate_suitability_path} is provided. Note
-that manual checking is not possible when using \code{\link{excel_to_plan}}
-since the required interactivity will interrupt plan processing.}
+that manual checking is not possible when using \code{\link[=excel_to_plan]{excel_to_plan()}} since the
+required interactivity will interrupt plan processing.}
 
 \item{wind_effect_width}{Numeric. For wind pathways, the distance (in metres)
 inland from the coastline, over which wind-based arrival applies. E.g. if
 pests are expected to be carried by wind up to 50 km inland from the coast,
 use \code{50000}. Ignored if \code{pathways} does not include one or more
-of \code{northwind}, \code{pacificwind}, or code{nzwind}.}
+of \code{northwind}, \code{pacificwind}, or \code{nzwind}.}
 
-\item{leakage_tourists, leakage_returning, leakage_torres, leakage_mail, leakage_vessels, leakage_fertiliser, leakage_machinery, leakage_containers, leakage_nurserystock, leakage_food, leakage_goods, leakage_northwind, leakage_pacificwind, leakage_nzwind}{Numeric vector with length = 2, giving the range (bounds of 95% CI) of the
+\item{leakage_tourists, leakage_returning, leakage_torres, leakage_mail, leakage_vessels, leakage_fertiliser, leakage_machinery, leakage_containers, leakage_nurserystock, leakage_food, leakage_goods, leakage_northwind, leakage_pacificwind, leakage_nzwind}{Numeric vector with length = 2, giving the range (bounds of 95\% CI) of the
 number of leakage events per year for the pathway.}
 
-\item{establishment_tourists, establishment_returning, establishment_torres, establishment_mail, establishment_vessels, establishment_fertiliser, establishment_machinery, establishment_containers, establishment_nurserystock, establishment_food, establishment_goods, establishment_northwind, establishment_pacificwind, establishment_nzwind}{Numeric vector with length = 2, giving the bounds of the 95% CI of the rate
+\item{establishment_tourists, establishment_returning, establishment_torres, establishment_mail, establishment_vessels, establishment_fertiliser, establishment_machinery, establishment_containers, establishment_nurserystock, establishment_food, establishment_goods, establishment_northwind, establishment_pacificwind, establishment_nzwind}{Numeric vector with length = 2, giving the bounds of the 95\% CI of the rate
 of survival & establishment to end of pathway, for leakage events on the
 pathway.}
 
@@ -241,17 +241,17 @@ outputs.
 }
 \details{
 To simplify reproducibility, \code{edmaps} provides an
-  \emph{Excel} interface for specifying species parameters relevant to
-  estimating establishment likelihood. An example spreadsheet is
-  bundled with the package, available at the path given by
-  \code{system.file('extdata/parameters.xlsx', package='edmaps')}. The
-  spreadsheet has two sheets, the first specifying "global" parameters
-  that will apply to all species (e.g. file paths to rasters that will),
-  be used regardless of species identity and the second specifying
-  parameters that can vary by species. In the second sheet, each row
-  corresponds to a separate species. Tooltips and data validation
-  guide the user with respect to expected/allowable data.
+\emph{Excel} interface for specifying species parameters relevant to
+estimating establishment likelihood. An example spreadsheet is
+bundled with the package, available at the path given by
+\code{system.file('extdata/parameters.xlsx', package='edmaps')}. The
+spreadsheet has two sheets, the first specifying "global" parameters
+that will apply to all species (e.g. file paths to rasters that will),
+be used regardless of species identity and the second specifying
+parameters that can vary by species. In the second sheet, each row
+corresponds to a separate species. Tooltips and data validation
+guide the user with respect to expected/allowable data.
 }
 \seealso{
-\code{\link{excel_to_plan}}
+\code{\link[=excel_to_plan]{excel_to_plan()}}
 }

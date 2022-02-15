@@ -9,14 +9,14 @@ calculate_median(files, outfile)
 \arguments{
 \item{files}{A vector of file paths to (optionally multiband) raster files.}
 
-\item{outfile}{Character. Output raster file path. If not provided, object 
-will be returned to R. Directory will be created recursively if it does 
+\item{outfile}{Character. Output raster file path. If not provided, object
+will be returned to R. Directory will be created recursively if it does
 not exist.}
 }
 \value{
 If \code{outfile} is specified, the resulting raster is saved as a
-  geotiff to that path and NULL is returned. If \code{outfile} is not
-  specified the resulting raster is returned.
+geotiff to that path and NULL is returned. If \code{outfile} is not
+specified the resulting raster is returned.
 }
 \description{
 Calculate the cellwise median of two or more Raster* objects, by layer.

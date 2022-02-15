@@ -15,8 +15,8 @@ aggregate_raster(
 \arguments{
 \item{rast}{Raster* object or file path to a raster file.}
 
-\item{outfile}{Character. Output raster file path. If not provided, object 
-will be returned to R. Directory will be created  recursively if it does 
+\item{outfile}{Character. Output raster file path. If not provided, object
+will be returned to R. Directory will be created  recursively if it does
 not exist.}
 
 \item{aggregate_factor}{Integer. Aggregation factor expressed as number of
@@ -32,9 +32,9 @@ Ignored if \code{outfile} is not provided.}
 }
 \value{
 If \code{outfile} is specified, the resulting raster is saved as a
-  geotiff to that path. If \code{return_rast} is \code{TRUE} or
-  \code{outfile} is not specified the resulting raster is returned,
-  otherwise \code{NULL} is returned invisibly.
+geotiff to that path. If \code{return_rast} is \code{TRUE} or
+\code{outfile} is not specified the resulting raster is returned,
+otherwise \code{NULL} is returned invisibly.
 }
 \description{
 Aggregate raster cells (and optionally layers) to coarser resolution.

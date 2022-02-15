@@ -7,7 +7,7 @@
 calc_pathway_pr(EE, rast, outfile, return_rast = TRUE)
 }
 \arguments{
-\item{EE}{\code{data.frame} object obtained from \code{\link{calc_EE}}.}
+\item{EE}{\code{data.frame} object obtained from \code{\link[=calc_EE]{calc_EE()}}.}
 
 \item{rast}{Raster object or character path to raster file containing
 dispersal weights.}
@@ -20,9 +20,9 @@ Ignored if \code{outfile} is not provided.}
 }
 \value{
 If \code{outfile} is specified, the resulting \code{RasterLayer} is
-  saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
-  \code{outfile} is not specified, the resulting \code{RasterLayer} is
-  returned, otherwise \code{NULL} is returned invisibly.
+saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
+\code{outfile} is not specified, the resulting \code{RasterLayer} is
+returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{
 Calculate the pathway-specific probability of pest arrival for each raster

@@ -9,13 +9,13 @@ min_max_normalize(rast, outfile)
 \arguments{
 \item{rast}{Raster object.}
 
-\item{outfile}{Character. Output raster file path. If not specified, the 
-resulting \code{RasterLayer} will be  returned to R. Directory will be 
+\item{outfile}{Character. Output raster file path. If not specified, the
+resulting \code{RasterLayer} will be  returned to R. Directory will be
 created recursively if required.}
 }
 \value{
-A normalised \code{RasterLayer} will be written to \code{outfile} 
-  if specified, and returned to R otherwise.
+A normalised \code{RasterLayer} will be written to \code{outfile}
+if specified, and returned to R otherwise.
 }
 \description{
 Performs a min-max normalization on a raster object.

@@ -13,12 +13,12 @@ captured_by_ncells(infiles, names, n_cells, all = TRUE)
 
 \item{n_cells}{Integer. The number of cells to consider.}
 
-\item{all}{Logical. If \code{TRUE}, return the proportion captured from 1 to 
-\emph{n} cells. If \code{FALSE}, return the cumulative proportion.}
+\item{all}{Logical. If \code{TRUE}, return the proportion captured from 1 to \emph{n}
+cells. If \code{FALSE}, return the cumulative proportion.}
 }
 \value{
 Proportion of establishment likelihood captured, or a vector of
-  cumulative proportions.
+cumulative proportions.
 }
 \description{
 Calculate the proportion of establishment likelihood captured in top n cells.

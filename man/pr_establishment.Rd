@@ -22,9 +22,9 @@ Ignored if \code{outfile} is not provided.}
 }
 \value{
 If \code{outfile} is specified, the resulting \code{RasterLayer} is
-  saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
-  \code{outfile} is not specified, the resulting \code{RasterLayer} is
-  returned, otherwise \code{NULL} is returned invisibly.
+saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
+\code{outfile} is not specified, the resulting \code{RasterLayer} is
+returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{
 Calculate probability of establishment for each raster cell as a function of

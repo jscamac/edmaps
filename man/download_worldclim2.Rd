@@ -28,5 +28,5 @@ download_worldclim2('bioclim_10m', 'bio', '10m')
 }
 }
 \seealso{
-\code{\link{extract_worldclim2}}
+\code{\link[=extract_worldclim2]{extract_worldclim2()}}
 }

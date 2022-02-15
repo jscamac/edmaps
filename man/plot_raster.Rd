@@ -22,7 +22,7 @@ be used.}
 
 \item{occurrence_data}{A \code{data.frame}, \code{sf} object,
 \code{SpatialPointsDataFrame} object, or path to a .csv file containing
-columns named "Latitude" and "Longitude". If \code{NULL}, no points will 
+columns named "Latitude" and "Longitude". If \code{NULL}, no points will
 be plotted.}
 
 \item{pt_col}{Character. Colour of points (if plotted).}
@@ -36,7 +36,7 @@ Required if \code{outfile} is provided.}
 }
 \value{
 A \code{tmap} object. If \code{outfile} is provided, a map will also
-  be written to that file.
+be written to that file.
 }
 \description{
 Plot a raster.

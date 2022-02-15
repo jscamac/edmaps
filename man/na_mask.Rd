@@ -18,13 +18,12 @@ number is provided, it will be used for both horizontal and vertical
 resolution.}
 
 \item{extent}{One of of: a numeric vector giving the desired extent of the
-output raster as \code{c(xmin, xmax, ymin, ymax)}; an 
-\code{\link[raster:extent]{Extent}} object; or an object from which such 
-an \code{Extent} object can be extracted.}
+output raster as \code{c(xmin, xmax, ymin, ymax)}; an \link[raster:extent]{Extent}
+object; or an object from which such an \code{Extent} object can be extracted.}
 }
 \value{
-A raster is written to \code{outfile}, with NA cells transferred 
-  from \code{infile} and all other cells set to 1.
+A raster is written to \code{outfile}, with NA cells transferred
+from \code{infile} and all other cells set to 1.
 }
 \description{
 Create a mask raster, retaining NA and setting all non-NA cells to 1. Input

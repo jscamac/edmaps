@@ -14,9 +14,9 @@ record_flagger(
 )
 }
 \arguments{
-\item{occurrence_records}{A `data.frame`, `sf` object or `SpatialPoints*`
+\item{occurrence_records}{A \code{data.frame}, \code{sf} object or \verb{SpatialPoints*}
 object, or a path to a .csv file containing the locations of species of
-interest. (If a `data.frame` is provided, it must contain the named columns
+interest. (If a \code{data.frame} is provided, it must contain the named columns
 "Latitude" and "Longitude").}
 
 \item{infected_countries}{Character vector of countries with known established
@@ -26,22 +26,22 @@ populations.}
 datasheet containing the country-scale distributional data for the pest.
 Note that if infected_countries the CABI data will not be used.}
 
-\item{manual_check}{Logical. Allows interactive selection of which 
-unverified points to retain. Interactive map will only be produced if 
-unverified records are present and if this argument is set to `TRUE`.}
+\item{manual_check}{Logical. Allows interactive selection of which
+unverified points to retain. Interactive map will only be produced if
+unverified records are present and if this argument is set to \code{TRUE}.}
 
-\item{return_df}{Logical. Return the object as a `data.frame` or as an `sf`
-object (i.e. `TRUE`, the default).}
+\item{return_df}{Logical. Return the object as a \code{data.frame} or as an \code{sf}
+object (i.e. \code{TRUE}, the default).}
 }
 \value{
-A `data.frame` or an `sf` points object flagging records 
-  found in countries in which do not occur in infected_countries OR
-  is not reported as being present in CABI.
+A \code{data.frame} or an \code{sf} points object flagging records
+found in countries in which do not occur in infected_countries OR
+is not reported as being present in CABI.
 }
 \description{
-`record_flagger` cross references occurrence records against either a vector
-of country names with established populations specified in `infected_countries` 
-or those presented in a CABI distribution file. It will then either flag 
-or automatically remove occurrence records that occur in countries outside 
+\code{record_flagger} cross references occurrence records against either a vector
+of country names with established populations specified in \code{infected_countries}
+or those presented in a CABI distribution file. It will then either flag
+or automatically remove occurrence records that occur in countries outside
 one of these lists.
 }

@@ -8,23 +8,24 @@ rle_compress(x, outfile, quiet = FALSE)
 }
 \arguments{
 \item{x}{File path to the categorical raster to be compressed, or a
-\code{Raster*} object.}
+\verb{Raster*} object.}
 
-\item{outfile}{Character (optional). Path to target .rds file that will 
-store RLE results. Directory will be created recursively if it doesn't 
+\item{outfile}{Character (optional). Path to target .rds file that will
+store RLE results. Directory will be created recursively if it doesn't
 exist.}
 
 \item{quiet}{Logical. Should progress messages be suppressed?}
 }
 \value{
 A list with five elements:
-\describe{
-  \item{starts}{Cell numbers corresponding to run starts}
-  \item{lengths}{Run lengths}
-  \item{values}{Run values}
-  \item{extent}{Raster extent}
-  \item{res}{Raster resolution}
+\itemize{
+\item \code{starts}: Cell numbers corresponding to run starts
+\item \code{lengths}: Run lengths
+\item \code{values}: Run values
+\item \code{extent}: Raster extent
+\item \code{res}: Raster resolution
 }
+
 This object is additionally saved in rds format to \code{outfile}, if
 provided.
 }

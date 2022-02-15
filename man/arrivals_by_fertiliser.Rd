@@ -18,11 +18,11 @@ arrivals_by_fertiliser(
 containing weights to distribute arrivals by.}
 
 \item{leakage_rate}{Numeric vector of 2 values, giving the lower and upper
-bounds of a 95% CI for leakage rate (the number of pest leakage events in
+bounds of a 95\% CI for leakage rate (the number of pest leakage events in
 a random year).}
 
 \item{establishment_rate}{Numeric vector of 2 values, giving the lower and
-upper bounds of a 95% CI for establishment rate (the rate of survival, to
+upper bounds of a 95\% CI for establishment rate (the rate of survival, to
 establishment, for leakage events).}
 
 \item{outfile}{Character. Output raster file path. If \code{probability} has
@@ -38,10 +38,10 @@ exists.}
 }
 \value{
 If \code{outfile} is specified, the resulting raster (multiband if
-  \code{probability} has length > 1) is saved as a tiff at that path. If
-  \code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-  resulting raster object is returned, otherwise \code{NULL} is returned
-  invisibly.
+\code{probability} has length > 1) is saved as a tiff at that path. If
+\code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
+resulting raster object is returned, otherwise \code{NULL} is returned
+invisibly.
 }
 \description{
 Estimates pest arrivals by fertiliser imports.

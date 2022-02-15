@@ -19,8 +19,7 @@ plot_establishment_captured(
 )
 }
 \arguments{
-\item{data}{A \code{data.frame} as derived from 
-\code{\link{captured_by_ncells}}.}
+\item{data}{A \code{data.frame} as derived from \code{\link[=captured_by_ncells]{captured_by_ncells()}}.}
 
 \item{xlab}{Character. x axis label.}
 
@@ -28,12 +27,12 @@ plot_establishment_captured(
 
 \item{legend_title}{Character. Optional legend title.}
 
-\item{legend}{Legend position. Either a position name (one of 
-\code{"none"}, \code{"top"}, \code{"bottom"}, \code{"left"}, or 
-\code{"right"}, or a vector of two normalised coordinates ranging from 0 
+\item{legend}{Legend position. Either a position name (one of
+\code{"none"}, \code{"top"}, \code{"bottom"}, \code{"left"}, or
+\code{"right"}, or a vector of two normalised coordinates ranging from 0
 to 1, e.g. \code{c(1, 0)} (for bottom-right).}
 
-\item{prop_line}{Numeric. Proportion in which to add a vertical line. 
+\item{prop_line}{Numeric. Proportion in which to add a vertical line.
 Default is NULL (no line).}
 
 \item{y_limit}{Numeric vector giving the minimum and maximum y-axis limits.
@@ -42,11 +41,11 @@ If omitted this will be determined based on the data.}
 \item{width}{Width of plot. If not defined will use size of current graphic
 device.}
 
-\item{height}{Height of plot. If not defined will use size of current 
+\item{height}{Height of plot. If not defined will use size of current
 graphic device.}
 
-\item{units}{Character. Units corresponding to \code{height} and 
-\code{width}. Can be \code{"in"}, \code{"cm"}, or \code{"mm"}. Default is 
+\item{units}{Character. Units corresponding to \code{height} and
+\code{width}. Can be \code{"in"}, \code{"cm"}, or \code{"mm"}. Default is
 inches (\code{"in"}).}
 
 \item{outfile}{Character. Output image file path. Containing directory
@@ -54,9 +53,9 @@ will be created recursively if it does not already exist.}
 }
 \value{
 An image is written to \code{outfile} if provided, and otherwise a
-  \code{ggplot} object is returned.
+\code{ggplot} object is returned.
 }
 \description{
-Plots the cumulative proportion of establishment likelihood captured as a 
+Plots the cumulative proportion of establishment likelihood captured as a
 greater number of top ranking risk cells is considered.
 }

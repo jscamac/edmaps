@@ -15,7 +15,7 @@ alphahull_sf(xy, alpha, buffer_width)
 such that they combine into closed polygons.}
 }
 \value{
-An \code{sf} object.
+An \code{\link{sf}} object.
 }
 \description{
 Convert an alphahull ahull object into an sf object.

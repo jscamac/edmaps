@@ -15,17 +15,17 @@ container_weights(
 )
 }
 \arguments{
-\item{path}{Character. File path to xls file containing containers by 
+\item{path}{Character. File path to xls file containing containers by
 postcode for each port.}
 
-\item{sheet_nums}{Integer. Vector of integers signifying the sheet numbers 
+\item{sheet_nums}{Integer. Vector of integers signifying the sheet numbers
 to read in.}
 
 \item{range}{A cell range to read from, as described in cell-specification.
-Includes typical \emph{Excel} ranges such as \code{"B3:D87"}, possibly 
-including the sheet name like \code{"Budget!B2:G14"}, and more. 
-Interpreted strictly, even if the range forces the inclusion of leading 
-or trailing empty rows or columns.}
+Includes typical \emph{Excel} ranges such as \code{"B3:D87"}, possibly including the
+sheet name like \code{"Budget!B2:G14"}, and more. Interpreted strictly, even if
+the range forces the inclusion of leading or trailing empty rows or
+columns.}
 
 \item{postcode_shp}{Character. File path to postcode shape file.}
 
@@ -46,5 +46,5 @@ Creates a weight by postcode for each major port.
 }
 \details{
 For the purposes of this analysis missing data (i.e. NAs) will be
-  treated as zeroes.
+treated as zeroes.
 }
