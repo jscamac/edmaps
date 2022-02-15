@@ -148,25 +148,25 @@
 #' @importFrom drake code_to_plan
 #' @export
 species_plan <- function(species, clum_classes, nvis_classes, host_path,
-  pathways, include_abiotic_weight=TRUE, climate_suitability_path,
-  exclude_bioclim_vars=NULL, include_ndvi=TRUE, aggregated_res=c(5000, 5000),
-  make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
-  airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
-  port_weight_beta, fertiliser_data_path, nrm_path, containers_data_path,
-  postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE,
-  gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000, gbif_username,
-  gbif_password, basemap_mode=c('osm', 'boundaries'),
-  minimum_probability_for_maps=1e-5, manual_check_flagged_records=FALSE,
-  wind_effect_width, leakage_tourists, establishment_tourists,
-  leakage_returning, establishment_returning, leakage_torres,
-  establishment_torres, leakage_mail, establishment_mail, leakage_vessels,
-  establishment_vessels, leakage_fertiliser, establishment_fertiliser,
-  leakage_machinery, establishment_machinery, leakage_containers,
-  establishment_containers, leakage_nurserystock, establishment_nurserystock,
-  leakage_food, establishment_food, leakage_goods, establishment_goods,
-  leakage_northwind, establishment_northwind, leakage_pacificwind,
-  establishment_pacificwind, leakage_nzwind, establishment_nzwind,
-  overwrite=TRUE) {
+                         pathways, include_abiotic_weight=TRUE, climate_suitability_path,
+                         exclude_bioclim_vars=NULL, include_ndvi=TRUE, aggregated_res=c(5000, 5000),
+                         make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
+                         airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
+                         port_weight_beta, fertiliser_data_path, nrm_path, containers_data_path,
+                         postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE,
+                         gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000, gbif_username,
+                         gbif_password, basemap_mode=c('osm', 'boundaries'),
+                         minimum_probability_for_maps=1e-5, manual_check_flagged_records=FALSE,
+                         wind_effect_width, leakage_tourists, establishment_tourists,
+                         leakage_returning, establishment_returning, leakage_torres,
+                         establishment_torres, leakage_mail, establishment_mail, leakage_vessels,
+                         establishment_vessels, leakage_fertiliser, establishment_fertiliser,
+                         leakage_machinery, establishment_machinery, leakage_containers,
+                         establishment_containers, leakage_nurserystock, establishment_nurserystock,
+                         leakage_food, establishment_food, leakage_goods, establishment_goods,
+                         leakage_northwind, establishment_northwind, leakage_pacificwind,
+                         establishment_pacificwind, leakage_nzwind, establishment_nzwind,
+                         overwrite=TRUE) {
 
   # prepare extent and resolution
   res <- c(1000, 1000) # enforce 1km for now - memory safe
@@ -345,7 +345,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
     datatype="INT2S", overwrite = %5$s
         )
 }\n\n',
-  host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
+host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
 
   # Pathway arrivals
   if('tourists' %in% pathways) {
@@ -604,7 +604,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   if(missing(climate_suitability_path) && isTRUE(include_abiotic_weight)) {
 
     if(isTRUE(use_gbif)) {
-      cat(glue::glue('
+      cat('
       country_reference <-
         {
           o <- sf::sf_use_s2(FALSE)
@@ -619,7 +619,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
           sf::sf_use_s2(o)
           out
         }
-      \n\n'), file=f, append=TRUE)
+      \n\n', file=f, append=TRUE)
 
       if(!missing(gbif_username) && !missing(gbif_password) &&
          nchar(sub('^\\s+$', '', gbif_username)) > 0 &&
