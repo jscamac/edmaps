@@ -48,38 +48,82 @@
 #'   used with the `CoordinateCleaner` package.
 #' @return A `data.frame` of species occurrence records.
 #' @importFrom magrittr %>%
-#' @importFrom rgbif name_backbone pred pred_gte occ_download occ_search occ_download_wait
-#' @importFrom dplyr bind_rows filter mutate select
 #' @importFrom countrycode countrycode
-#' @importFrom readr read_delim cols_only col_character col_double col_integer
-#' @importFrom utils download.file unzip
+#' @importFrom dplyr bind_rows filter mutate
 #' @importFrom httr RETRY write_disk
+#' @importFrom readr col_character col_double col_integer cols_only read_delim
+#' @importFrom rgbif name_backbone occ_count occ_download occ_download_wait occ_search pred pred_gte pred_in
+#' @importFrom utils unzip
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty,
-                             method=c('search', 'download'), username, pwd,
-                             email, retries=10, cleanup=TRUE) {
-  # warning about 100k limit
+                             basis_of_record, country,
+                             method=c('auto', 'search', 'download'),
+                             auto_threshold=10000,
+                             username, pwd, email, retries=10, cleanup=TRUE) {
+
   method <- match.arg(method)
-  if(method=='download' & any(missing(username), missing(pwd), missing(email))) {
-    warning('When using `method="download"`, username, pwd, and email must ',
-            'be provided. Reverting to `method="search".')
+  if (!missing(basis_of_record) &&
+      !all(basis_of_record %in% c("FOSSIL_SPECIMEN", "HUMAN_OBSERVATION",
+                                  "LITERATURE", "LIVING_SPECIMEN",
+                                  "MACHINE_OBSERVATION", "MATERIAL_SAMPLE",
+                                  "OBSERVATION", "PRESERVED_SPECIMEN",
+                                  "UNKNOWN"))
+  ) {
+    stop("basis_of_record must be a vector of one or more of: ",
+         "'FOSSIL_SPECIMEN', 'HUMAN_OBSERVATION', 'LITERATURE', ",
+         "'LIVING_SPECIMEN', 'MACHINE_OBSERVATION', 'MATERIAL_SAMPLE', ",
+         "'OBSERVATION', 'PRESERVED_SPECIMEN', 'UNKNOWN'")
+  }
+  if(!missing(country) && length(country) > 1) {
+    stop('country must have length 1.')
+  }
+  if(!missing(country) &&
+     !is.na(countrycode::countrycode(country, origin='iso2c', destination = 'iso2c'))) {
+    stop("country not found. Check allowable values in countrycode::codelist[, c('country.name.en', 'iso2c')]")
+  }
+  if(method=='auto' & auto_threshold > 100000) {
+    warning('auto_threshold can not be greater than 100000. ',
+            'Adjusting to 100000.')
+    auto_threshold <- 100000
+  }
+  if(method %in% c('download', 'auto') &
+     any(missing(username), missing(pwd), missing(email))) {
+    warning('When using method is "download" or "auto", username, pwd, and ',
+            'email must be provided. Reverting to `method="search".')
     method <- 'search'
   }
 
   match_species <- function(sp) {
     sapply(sp, function(x) {
-      species_match <- rgbif::name_backbone(name = x)
-      if(!'usageKey' %in% names(species_match))
-        stop("No matches found in GBIF for ", sp)
-      key <- species_match$usageKey[1]
-      message(sprintf("%s matched to %s (key: %s)", x,
-                      species_match$scientificName[1], key))
+      species_matches <- rgbif::name_backbone(name = x)
+      if(nrow(species_matches)==0) {
+        stop('No matches found in GBIF for ', sp)
+      }
+      key <- species_matches$usageKey[1]
+      message(sprintf('%s matched to %s (key: %s)', x,
+                      species_matches$canonicalName[1], key))
       key
     })
   }
 
   key <- match_species(taxon)
-  .f <- function(k, min_year, coord_uncertainty) {
+  .f <- function(k, min_year, coord_uncertainty, basis_of_record, country) {
+
+    if(method=='auto') {
+      args <- list(taxonKey=k, georeferenced=TRUE)
+      if(!missing(min_year)) args$from <- min_year
+      if(!missing(country)) args$country <- country
+
+      n_occ <- if(!missing(basis_of_record)) {
+        sum(sapply(basis_of_record, function(b) {
+          args$basisOfRecord <- b
+          do.call(rgbif::occ_count, args)
+        }))
+      } else {
+        do.call(rgbif::occ_count, args)
+      }
+      method <- if(n_occ < auto_threshold) 'search' else 'download'
+    }
     switch(
       method,
       search={
@@ -116,13 +160,11 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
                 n, k, 100000)
             )
           }
-          dat <- rgbif::occ_search(
-            taxonKey=k, limit=100000, hasCoordinate=TRUE,
-            hasGeospatialIssue=FALSE,
-            fields=c('key', 'scientificName', 'decimalLongitude',
-                     'decimalLatitude', 'coordinateUncertaintyInMeters',
-                     'year', 'countryCode')
-          )$data
+          args <- list(taxonKey = k, limit = 1e+05, hasCoordinate = TRUE, hasGeospatialIssue = FALSE,
+                       fields = c("key", "scientificName", "decimalLongitude", "decimalLatitude",
+                                  "coordinateUncertaintyInMeters", "year", "countryCode"))
+          if (!missing(country)) args$country <- country
+          dat <- do.call(rgbif::occ_search, args)$data
         }
         if("coordinateUncertaintyInMeters" %in% names(dat) &&
            !missing(coord_uncertainty)) {
@@ -142,6 +184,10 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         )
         if(!missing(min_year)) args <-
             c(list(rgbif::pred_gte('year', min_year)), args)
+        if (!missing(basis_of_record)) args <- c(list(rgbif::pred_in("basisOfRecord",
+                                                                     basis_of_record)), args)
+        if (!missing(country)) args <- c(list(rgbif::pred_in("country", country)),
+                                         args)
 
         dl_key <- do.call(rgbif::occ_download, args)
         message('GBIF download key: ', dl_key)
@@ -152,7 +198,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         csv <- utils::unzip(f, exdir=tempfile())
 
         dat <- readr::read_delim(
-          file=csv, delim='\t', quote='',
+          csv, '\t',
           col_types=readr::cols_only(
             gbifID=readr::col_character(),
             scientificName=readr::col_character(),
@@ -165,14 +211,15 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         if(isTRUE(cleanup)) unlink(c(f, dirname(csv)), recursive=TRUE)
         if(!missing(coord_uncertainty)) {
           dat <- dat %>% dplyr::filter(coordinateUncertaintyInMeters <=
-                                     coord_uncertainty |
-                                     is.na(coordinateUncertaintyInMeters))
+                                         coord_uncertainty |
+                                         is.na(coordinateUncertaintyInMeters))
         }
         dat
       }
     )
   }
-  out <- lapply(key, .f, min_year=min_year, coord_uncertainty=coord_uncertainty)
+  out <- lapply(key, .f, min_year=min_year, coord_uncertainty=coord_uncertainty,
+                basis_of_record=basis_of_record, country=country)
 
   if(is.list(out)) {
     out <-  out %>% dplyr::bind_rows()
@@ -183,8 +230,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
     dplyr::mutate(countryCode = countrycode::countrycode(
       countryCode, origin =  'iso2c', destination = 'iso3c')
     )
-
   out <- dplyr::filter(out, !is.na(decimalLongitude), !is.na(decimalLatitude))
+
   return(out)
 }
-
