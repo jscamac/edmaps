@@ -1,4 +1,4 @@
 library(testthat)
 library(edmaps)
 
-test_check("edmaps")
+#test_check("edmaps")
