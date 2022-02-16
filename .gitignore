@@ -4,3 +4,5 @@ Meta
 .Rproj.user
 .Rhistory
 rosm.cache/*
+/doc/
+/Meta/
