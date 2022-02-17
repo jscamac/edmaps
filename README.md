@@ -32,17 +32,16 @@ A collated repository of the required spatial layers needed for `edmaps` can be 
 
 Broadly this repository contains the following data types:
 
-- abiotic/
-  - bioclim_10m/ (a folder containing worldclim2 bioclim variables at 10' resolution; Note you can replace this with finer resolution files if you wish)
+- **abiotic/**
   - occurrences/ (user-collated occurrence records and CABI data. Generally set up as a sub folder for each species. CABI distribution data is downloaded from CABI datasheets in csv format. For example see [here](https://www.cabi.org/isc/datasheet/27377).
-- auxiliary/ (a folder containing spatial layers for facilitating `edmaps` in identifying coastal zones and area of extent)
-- biotic/
+- **auxiliary/** (a folder containing spatial layers for facilitating `edmaps` in identifying coastal zones and area of extent)
+- **biotic/**
   - citrus_native_hosts_example.tif (An example native host layer created using `edmaps::rasterize_range()`)
   - raw_data/
     - ACLUM/ (Australian landuse raster);
     - NDVI/ (NDVI raster);
     - NVIS\_5.1/ (NVIS raster);
-- pathway/raw_data/
+- **pathway/raw_data/**
   - Containers/ (contains POA shapefile \& `containers\_bypostcode.xls`)
   - Fertiliser/ (contains fertiliser use csv file and NRM shapefile)
   - Major_Airports/ (Australian airport locations)
@@ -59,6 +58,7 @@ To use `edmaps` first download this data repository. This can be done by either 
 git clone https://github.com/jscamac/edmaps_data_Australia.git
 ```
 
+## Defining your workflow...
 Once the data repository is downloaded you can access the `user_input/parameters.xlsx` workbook.
 This excel workbook is the main user-defined file that defines the workflow that edmaps will implement.
 The workbook contains two tabs one for specifying global parameters and another for specifying pest-specific parameters. 
@@ -101,7 +101,7 @@ While we recommend the *Docker* approach, we acknowledge that not all users will
 As such we also outline one additional approach for implementation using the *R* package `renv`. This approach will ensure the correct versions of *R* pacakge dependencies are installed, however, it cannot ensure the correct version of system requirements (e.g. *R*, *Java*, *pandoc*, *proj* and *gdal* libraries) are installed.
 
 
-### Using `edmaps` with Docker (recommended)
+## Using `edmaps` with Docker (recommended)
 We have created a *Docker* image that contains all the system libraries, software (e.g. *R*, *Java*, *pandoc*) and *R* packages 
 required to install and run workflows produced by `edmaps`.
 
