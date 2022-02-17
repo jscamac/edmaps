@@ -40,9 +40,9 @@ Broadly this repository contains the following data types:
   - raw_data/
     - ACLUM/ (Australian landuse raster);
     - NDVI/ (NDVI raster);
-    - NVIS\_5.1/ (NVIS raster);
+    - NVIS_5.1/ (NVIS raster);
 - **pathway/raw_data/**
-  - Containers/ (contains POA shapefile \& `containers\_bypostcode.xls`)
+  - Containers/ (contains POA shapefile \& `containers_bypostcode.xls`)
   - Fertiliser/ (contains fertiliser use csv file and NRM shapefile)
   - Major_Airports/ (Australian airport locations)
   - Population/ (human population raster)
