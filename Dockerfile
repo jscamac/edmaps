@@ -1,47 +1,38 @@
-FROM rocker/tidyverse:3.6.0
-LABEL maintainer="James Camac"
-LABEL email="james.camac@gmail.com"
+FROM rocker/geospatial:4.1.2
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libudunits2-dev \
-    libgeos-dev \
-    libgdal-dev \
-    gdal-bin \
-    default-jdk \
-    liblzma-dev \
-    libbz2-dev  \
-    libicu-dev  \
-    libpcre3-dev \
-    libz-dev \
-    wget
+# Install dependencies
+RUN install2.r --skipinstalled TRUE \
+    countrycode \
+    CoordinateCleaner \
+    drake \
+    fasterize \
+    furrr \
+    gdalUtilities \
+    geometry \
+    glue \
+    htmlwidgets \
+    leaflet \
+    leaflet.opacity \
+    leafem \
+    mapedit \
+    rasterVis \
+    rgbif \
+    rnaturalearth \
+    viridis \
+    testthat \
+    future.callr \
+    rnaturalearthdata \
+    styler \
+    OpenStreetMap \
+    rnaturalearthhires
 
-WORKDIR /tmp/gdal
-RUN wget http://download.osgeo.org/gdal/2.4.2/gdal-2.4.2.tar.gz \
- && tar zxf gdal-2.4.2.tar.gz \
- && cd gdal-2.4.2 \
- && ./configure \
- && make \
- && make install \
- && ldconfig \
- && rm -r /tmp/gdal
-
-## Copies your description file into the Docker Container, specifying dependencies
-COPY DESCRIPTION ./
-# The above line adds only the description file for the project
-RUN R -e "remotes::install_deps(upgrade='never', repos='http://cran.microsoft.com/snapshot/2019-09-30/')"
-
-## Install other required packages.
-RUN R -e "install.packages(c('OpenStreetMap', 'testthat', 'future.callr', 'rnaturalearthdata', 'lubridate', 'styler'), repos='http://cran.microsoft.com/snapshot/2019-09-30/')"
+## Install hi res geospatial data
+RUN installGithub.r \
+    ropenscilabs/rnaturalearthhires
 
 ## Install edmaps
-RUN R -e "remotes::install_github('jscamac/edmaps')"
+RUN installGithub.r \
+    jscamac/edmaps
 
-WORKDIR /home
-
-
-
-
-
-
-
-
+# Set working directory
+WORKDIR /home/Project
