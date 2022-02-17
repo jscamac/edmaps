@@ -191,7 +191,6 @@ if(!requireNamespace('renv', quietly=TRUE) || packageVersion('renv') != '0.15.2'
   library(renv, lib.loc='lib')
 }
 
-
 # Set up package environment
 renv::consent(provided=TRUE)
 renv::init(bare=TRUE, settings=list(use.cache=FALSE))
