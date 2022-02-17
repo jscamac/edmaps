@@ -36,7 +36,7 @@ Broadly this repository contains the following data types:
   - occurrences/ (user-collated occurrence records and CABI data. Generally set up as a sub folder for each species. CABI distribution data is downloaded from CABI datasheets in csv format. For example see [here](https://www.cabi.org/isc/datasheet/27377).
 - **auxiliary/** (a folder containing spatial layers for facilitating `edmaps` in identifying coastal zones and area of extent)
 - **biotic/**
-  - citrus_native_hosts_example.tif (An example native host layer created using `edmaps::rasterize_range()`)
+  - `citrus_native_hosts_example.tif` (An example native host layer created using `edmaps::rasterize_range()`)
   - raw_data/
     - ACLUM/ (Australian landuse raster);
     - NDVI/ (NDVI raster);
@@ -48,7 +48,8 @@ Broadly this repository contains the following data types:
   - Population/ (human population raster)
   - Ports/ (port locations/use csv file)
   - Tourist_Beds/ (tourist bed shapefile)
-- user_input/`parameters.xlsx` (An example file for specifying global and species parameters)
+- **user_input/**
+  - `parameters.xlsx` (An example file for specifying global and species parameters)
 - `renv.lock` (A renv lock file that contains the R package dependencies required to run edmaps outside of docker)
 
 
