@@ -27,7 +27,7 @@
 #' @export
 excel_to_plan <- function(file) {
   globals <- readxl::read_excel(file, sheet='Global parameters', skip=1,
-                                col_types=c('text', 'skip', 'list')) %>%
+                                col_types=c('text', 'skip', 'list', 'skip')) %>%
     tidyr::spread(Variable, Value) %>%
     # standardise variable names
     dplyr::select(make_interactive_maps=`Make interactive maps?`,
@@ -44,12 +44,18 @@ excel_to_plan <- function(file) {
                   fertiliser_data_path=`Fertiliser data path`,
                   nrm_path=`NRM shapefile path`,
                   wind_path=`Wind data path`,
+                  pop_density_path=`Population density data path`,
+                  airports_path=`Major airports data path`,
+                  tourist_beds_path=`Tourist beds data path`,
                   airport_beta=`Airport distance penalty (tourists)`,
-                  airport_tsi_beta=`Airport distance penalty (Torres)`) %>%
+                  airport_tsi_beta=`Airport distance penalty (Torres)`,
+                  processed_data_path=`Processed data directory`) %>%
     lapply(unlist)
 
   # Check that supplied file paths exist
   paths_global <- na.omit(unlist(globals[grep('_path$', names(globals))]))
+  if(!dir.exists(globals$processed_data_path))
+    dir.create(globals$processed_data_path, recursive=TRUE)
   if(length(paths_global) > 0 && !all(file.exists(paths_global))) {
     stop('File not found:\n    - ',
          paste0(paths_global[!file.exists(paths_global)], collapse='\n    - '))
@@ -438,10 +444,12 @@ excel_to_plan <- function(file) {
       drake::drake_plan(
         rasterize_wind(drake::file_in(!!globals$wind_path),
                        !!wind_pathways$pathways[i],
-                       template=drake::file_in('risk_layers/auxiliary/aus_mask_clum_1000.tif'),
+                       template=drake::file_in(!!sprintf('%s/aus_mask_clum_1000.tif',
+                                                       globals$processed_data_path)),
                        width=!!wind_pathways$wind_effect_width[i],
                        outfile=drake::file_out(
-                         !!sprintf('risk_layers/pathway/processed/%s_%s.tif',
+                         !!sprintf('%s/%s_%s.tif',
+                                   globals$processed_data_path,
                                    wind_pathways$pathways[i],
                                    format(wind_pathways$wind_effect_width[i],
                                           scientific=FALSE, trim=TRUE))

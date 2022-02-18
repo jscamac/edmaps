@@ -47,9 +47,15 @@
 #'   resolution of aggregated establishment likelihood rasters, in metres.
 #' @param make_interactive_maps Logical. Should interactive html maps be
 #'   generated?
+#' @param processed_data_path Path to a directory that will be used to store
+#'   processed datasets. This will be created, recursively, if it does not
+#'   exist.
 #' @param clum_path Path to the ACLUM raster.
 #' @param nvis_path Path to the NVIS raster.
 #' @param ndvi_path Path to the NDVI raster.
+#' @param pop_density_path Path to the population density raster.
+#' @param airports_path Path to the major airports vector dataset.
+#' @param tourist_beds_path Path to the tourist beds vector dataset.
 #' @param airport_beta Numeric. Parameter controlling the distribution of
 #'   international tourists passengers around international airport. Default is
 #'   `log(0.5)/200` (i.e. 50% of passengers within 200km of airport).
@@ -150,7 +156,8 @@
 species_plan <- function(species, clum_classes, nvis_classes, host_path,
                          pathways, include_abiotic_weight=TRUE, climate_suitability_path,
                          exclude_bioclim_vars=NULL, include_ndvi=TRUE, aggregated_res=c(5000, 5000),
-                         make_interactive_maps=TRUE, clum_path,  nvis_path,  ndvi_path,
+                         make_interactive_maps=TRUE, processed_data_path, clum_path,
+                         nvis_path,  ndvi_path, pop_density_path, airports_path, tourist_beds_path,
                          airport_beta=log(0.5)/200, airport_tsi_beta=log(0.5)/10, port_data_path,
                          port_weight_beta, fertiliser_data_path, nrm_path, containers_data_path,
                          postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE,
@@ -231,23 +238,18 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
   # hardcode some paths to processed data (some of these won't exist until
   # they're created by the plan)
-  airport_weight_path <- sprintf(
-    "risk_layers/pathway/processed/airport_dist_weight_%s.tif", res[1])
-  cairns_airport_weight_path <- sprintf(
-    "risk_layers/pathway/processed/cairns_airport_dist_weight_%s.tif", res[1])
-  ndvi_norm_path <- sprintf(
-    "risk_layers/biotic/processed/NDVI_norm_%s.tif", res[1])
-  tourist_beds_path <- sprintf(
-    "risk_layers/pathway/processed/tourism_beds_%s.tif", res[1])
-  climate_path <- "risk_layers/abiotic/bioclim_10m"
-  fert_weight_path <- sprintf(
-    "outputs/not_pest_specific/fert_weight_%s.tif", res[1])
-  pop_density_path <-
-    "risk_layers/pathway/raw_data/Population/pop_density_1000m.tif"
-  clum_rle_path <- sprintf(
-    'risk_layers/biotic/processed/clum_rle_%s.rds', res[1])
-  nvis_rle_path <- sprintf(
-    'risk_layers/biotic/processed/nvis_rle_%s.rds', res[1])
+  airport_weight_path <- sprintf("%s/airport_dist_weight_%s.tif",
+                                 processed_data_path, res[1])
+  cairns_airport_weight_path <- sprintf("%s/cairns_airport_dist_weight_%s.tif",
+                                        processed_data_path, res[1])
+  ndvi_norm_path <- sprintf("%s/NDVI_norm_%s.tif", processed_data_path, res[1])
+  tourist_beds_raster_path <- sprintf("%s/tourism_beds_%s.tif", processed_data_path,
+                                      res[1])
+  climate_path <- sprintf("%s/bioclim_10m", processed_data_path)
+  fert_weight_path <- sprintf("outputs/not_pest_specific/fert_weight_%s.tif",
+                              res[1])
+  clum_rle_path <- sprintf('%s/clum_rle_%s.rds', processed_data_path, res[1])
+  nvis_rle_path <- sprintf('%s/nvis_rle_%s.rds', processed_data_path, res[1])
 
 
   file.create(f <- tempfile())
@@ -351,7 +353,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   if('tourists' %in% pathways) {
     cat(glue::glue('
       tourist_arrivals <- arrivals_by_tourists(
-        tourist_beds = drake::file_in("{tourist_beds_path}"),
+        tourist_beds = drake::file_in("{tourist_beds_raster_path}"),
         airport_weight = drake::file_in("{airport_weight_path}"),
         leakage_rate = {deparse(leakage_tourists)},
         establishment_rate = {deparse(establishment_tourists)},
@@ -411,7 +413,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       marine_port_weights =
         port_weights(
           template_raster = drake::file_in(
-            "risk_layers/auxiliary/aus_mask_clum_{res[1]}.tif"
+            "{processed_data_path}/aus_mask_clum_{res[1]}.tif"
           ),
         port_data = drake::file_in("{port_data_path}"),
           beta = {port_weight_beta},
@@ -531,7 +533,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   if('northwind' %in% pathways) {
     cat(glue::glue('
       northwind_arrivals <- arrivals_by_wind(
-        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/North_Wind_%s.tif\",
+        wind = drake::file_in("{sprintf(\"{processed_data_path}/North_Wind_%s.tif\",
           format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
         leakage_rate = {deparse(leakage_northwind)},
         establishment_rate = {deparse(establishment_northwind)},
@@ -546,7 +548,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   if('pacificwind' %in% pathways) {
     cat(glue::glue('
       pacificwind_arrivals <- arrivals_by_wind(
-        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/Pacific_Wind_%s.tif\",
+        wind = drake::file_in("{sprintf(\"{processed_data_path}/Pacific_Wind_%s.tif\",
           format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
         leakage_rate = {deparse(leakage_pacificwind)},
         establishment_rate = {deparse(establishment_pacificwind)},
@@ -561,7 +563,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   if('nzwind' %in% pathways) {
     cat(glue::glue('
       nzwind_arrivals <- arrivals_by_wind(
-        wind = drake::file_in("{sprintf(\"risk_layers/pathway/processed/NZ_Wind_%s.tif\",
+        wind = drake::file_in("{sprintf(\"{processed_data_path}/NZ_Wind_%s.tif\",
           format(wind_effect_width, scientific=FALSE, trim=TRUE))}"),
         leakage_rate = {deparse(leakage_nzwind)},
         establishment_rate = {deparse(establishment_nzwind)},
@@ -1204,15 +1206,21 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   plan <- drake::code_to_plan(f)
   plan$target <- ifelse(plan$target=='country_reference', 'country_reference',
                         paste0(species, '_', plan$target))
-  rbind(plan_globals(
-    clum_path=clum_path,
-    nvis_path=nvis_path,
-    ndvi_path=ndvi_path,
-    fertiliser_data_path=fertiliser_data_path,
-    nrm_path=nrm_path,
-    containers_data_path=containers_data_path,
-    postcode_path=postcode_path,
-    airport_beta=airport_beta,
-    airport_tsi_beta=airport_tsi_beta,
-    basemap_mode=basemap_mode), plan)
+  rbind(
+    plan_globals(
+      clum_path=clum_path,
+      nvis_path=nvis_path,
+      ndvi_path=ndvi_path,
+      fertiliser_data_path=fertiliser_data_path,
+      nrm_path=nrm_path,
+      containers_data_path=containers_data_path,
+      postcode_path=postcode_path,
+      tourist_beds_path=tourist_beds_path,
+      pop_density_path=pop_density_path,
+      airports_path=airports_path,
+      processed_data_path=processed_data_path,
+      airport_beta=airport_beta,
+      airport_tsi_beta=airport_tsi_beta,
+      basemap_mode=basemap_mode),
+    plan)
 }

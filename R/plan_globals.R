@@ -6,12 +6,17 @@
 #' @param nvis_path Character. File path to the [National Vegetation Information System (NVIS)](https://www.environment.gov.au/land/native-vegetation/national-vegetation-information-system/data-products) raster dataset.
 #' @param ndvi_path Character. File path to the [Normalised Difference Vegetation Index (NDVI)](http://www.bom.gov.au/jsp/awap/ndvi/index.jsp?colour=colour&time=history/nat/2018110120190430&step=7&map=ndviave&period=6month&area=nat) raster dataset.
 #' @param fertiliser_data_path Character. File path to a csv containing data
-#'   describing fertiliser use, available [here](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/4627.02016-17).
-#' @param nrm_path Character. File path to shapefile of [Natural Resource Management Regions](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/1270.0.55.003July 2016).
+#'   describing fertiliser use.
+#' @param nrm_path Character. File path to shapefile of Natural Resource
+#'   Management (NRM) Regions.
 #' @param containers_data_path Character. File path to xlsx file containing
-#'   data about shipping container movements, available [here](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/5368.0.55.0182009-10).
+#'   data about shipping container movements.
 #' @param postcode_path Character. File path to postal areas (i.e. post codes)
-#'   shapefile, available [here](https://www.abs.gov.au/AUSSTATS/abs@@.nsf/DetailsPage/1270.0.55.003July 2011).
+#'   shapefile.
+#' @param pop_density_path Character. File path to population density raster.
+#' @param tourist_beds_path Character. File path to tourist beds shapefile.
+#' @param airports_path Character. File path to major aviation terminals
+#'   shapefile.
 #' @param airport_beta Numeric. Parameter controlling the distribution of
 #'   tourists (international air passengers) around Australian international
 #'   airports. Distance to nearest airport is multiplied by this value and
@@ -26,6 +31,10 @@
 #' @param basemap_mode Type of basemap for static maps. Either `'osm'`
 #'   (default), or `'boundaries'` (polygons delineating borders of
 #'   states/territories).
+#' @param processed_data_path Character. File path to directory for storing
+#'   processed and intermediate datasets.
+#' @details Datasets used by this function are available in the [_edmaps data
+#'   Australia_ repository](https://github.com/jscamac/edmaps_data_Australia).
 #' @return A `drake` plan containing targets that generate objects used
 #'   across species.
 #' @importFrom raster extent
@@ -34,8 +43,14 @@
 #' @importFrom tmap tmap_save tmap_arrange
 #' @importFrom stats median
 plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
-                         nrm_path, containers_data_path, postcode_path,  airport_beta,
-                         airport_tsi_beta, basemap_mode=c('osm', 'boundaries')) {
+                         nrm_path, containers_data_path, postcode_path,
+                         pop_density_path, tourist_beds_path, airports_path, airport_beta,
+                         airport_tsi_beta, basemap_mode=c('osm', 'boundaries'),
+                         processed_data_path) {
+
+  if(!dir.exists(processed_data_path)) {
+    dir.create(processed_data_path, recursive=TRUE)
+  }
 
   # prepare extent and resolution
   # force national extent, 1km base res and 5km aggregated res for now
@@ -44,28 +59,19 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
   output_resolution_agg <- c(5000, 5000)
   agg_factor <- output_resolution_agg[1]/output_resolution[1]
 
-  major_aviation_terminals <-
-    "risk_layers/pathway/raw_data/Major_Airports/MajorAviationTerminals.gdb"
-
-  tourist_beds <-
-    "risk_layers/pathway/raw_data/Tourist_Beds/TourBedsAlbers1km.shp"
-
-  pop_density <-
-    "risk_layers/pathway/raw_data/Population/pop_density_1000m.tif"
-
   drake::drake_plan(
     # Download worldclim2
     download_worldclim =
       download_worldclim2(
-        outfile = drake::file_out('downloads/bioclim_10m.zip'),
+        outfile = drake::file_out(sprintf('%s/bioclim_10m.zip'), processed_data_path),
         variable = 'bio',
         resolution = '10m'), # 10 arc-minutes
 
     # Extract zipfile
     extract_worldclim =
       extract_worldclim2(
-        path_2_zip = drake::file_in('downloads/bioclim_10m.zip'),
-        outdir = drake::file_out("risk_layers/abiotic/bioclim_10m")),
+        path_2_zip = drake::file_in(sprintf('%s/bioclim_10m.zip', processed_data_path)),
+        outdir = drake::file_out(sprintf("%s/bioclim_10m", processed_data_path))),
 
     # Output res
     output_resolution = !!output_resolution,
@@ -79,13 +85,13 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     compress_clum =
       rle_compress(x=drake::file_in(!!clum_path),
                    outfile=drake::file_out(
-                     !!sprintf('risk_layers/biotic/processed/clum_rle_%s.rds',
+                     !!sprintf('%s/clum_rle_%s.rds', processed_data_path,
                                output_resolution[1]))),
 
     compress_nvis =
       rle_compress(x=drake::file_in(!!nvis_path),
                    outfile=drake::file_out(
-                     !!sprintf('risk_layers/biotic/processed/nvis_rle_%s.rds',
+                     !!sprintf('%s/nvis_rle_%s.rds', processed_data_path,
                                output_resolution[1]))),
 
 
@@ -94,7 +100,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     aus_mask_clum =
       na_mask(infile=drake::file_in(!!clum_path),
               outfile=drake::file_out(!!sprintf(
-                'risk_layers/auxiliary/aus_mask_clum_%s.tif',
+                '%s/aus_mask_clum_%s.tif', processed_data_path,
                 output_resolution[1]
               )),
               res=output_resolution),
@@ -105,7 +111,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
       initialise_raster(
         drake::file_in(!!clum_path),
         drake::file_out(!!sprintf(
-          "risk_layers/auxiliary/clum_template_Float32_%s.tif",
+          "%s/clum_template_Float32_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         res=output_resolution, datatype='Float32',
@@ -113,7 +119,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
 
     template_float32 =
       drake::file_in(!!sprintf(
-        "risk_layers/auxiliary/clum_template_Float32_%s.tif",
+        "%s/clum_template_Float32_%s.tif", processed_data_path,
         output_resolution[1]
       )),
 
@@ -121,10 +127,10 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     # Risk layers (non-species specific)
     tourist_rooms =
       rasterize_vector(
-        vector_data = drake::file_in(!!tourist_beds),
+        vector_data = drake::file_in(!!tourist_beds_path),
         template_raster = template_float32,
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/pathway/processed/tourism_beds_%s.tif",
+          "%s/tourism_beds_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         field = "TouRmEst",
@@ -133,14 +139,13 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
 
     airport_proximity =
       get_airport_dist(
-        vector_data = drake::file_in(!!major_aviation_terminals),
+        vector_data = drake::file_in(!!airports_path),
         template_raster = drake::file_in(!!sprintf(
-          'risk_layers/auxiliary/aus_mask_clum_%s.tif',
-          output_resolution[1]
+          '%s/aus_mask_clum_%s.tif', processed_data_path, output_resolution[1]
         )),
         airport_codes = c("BNE","MEL","PER", "ADL","CNS","DRW", "SYD","CNB"),
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/pathway/processed/airport_proximity_%s.tif",
+          "%s/airport_proximity_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         overwrite = TRUE),
@@ -148,25 +153,24 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     airport_distance_weight =
       weight_airport_dist(
         airport_dist = drake::file_in(!!sprintf(
-          "risk_layers/pathway/processed/airport_proximity_%s.tif",
+          "%s/airport_proximity_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         beta = !!airport_beta,
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/pathway/processed/airport_dist_weight_%s.tif",
+          "%s/airport_dist_weight_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         overwrite = TRUE),
 
     cairns_airport_proximity =
       get_airport_dist(
-        vector_data = drake::file_in(!!major_aviation_terminals),
+        vector_data = drake::file_in(!!airports_path),
         template_raster = drake::file_in(!!sprintf(
-          'risk_layers/auxiliary/aus_mask_clum_%s.tif',
-          output_resolution[1]
+          '%s/aus_mask_clum_%s.tif', processed_data_path, output_resolution[1]
         )),
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/pathway/processed/cairns_airport_proximity_%s.tif",
+          "%s/cairns_airport_proximity_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         airport_codes = "CNS",
@@ -175,12 +179,12 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     cairns_airport_distance_weight =
       weight_airport_dist(
         airport_dist = drake::file_in(!!sprintf(
-          "risk_layers/pathway/processed/cairns_airport_proximity_%s.tif",
+          "%s/cairns_airport_proximity_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         beta = !!airport_tsi_beta,
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/pathway/processed/cairns_airport_dist_weight_%s.tif",
+          "%s/cairns_airport_dist_weight_%s.tif", processed_data_path,
           output_resolution[1]
         )),
         overwrite = TRUE),
@@ -188,7 +192,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     fertiliser_landuses =
       binarize_and_aggregate(
         rle = drake::file_in(!!sprintf(
-          "risk_layers/biotic/processed/clum_rle_%s.rds", output_resolution[1]
+          "%s/clum_rle_%s.rds", processed_data_path, output_resolution[1]
         )),
         outfile = drake::file_out(!!sprintf(
           "outputs/not_pest_specific/fert_landuses_%s.tif", output_resolution[1]
@@ -230,7 +234,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
       gdal_reproject(
         infile = drake::file_in(!!ndvi_path),
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/biotic/processed/NDVI_%s.tif", output_resolution[1]
+          "%s/NDVI_%s.tif", processed_data_path, output_resolution[1]
         )),
         src_proj = "EPSG:4283", # GDA94
         tgt_proj = "EPSG:3577", # Australian Albers
@@ -242,18 +246,17 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     NDVI_normalised =
       min_max_normalize(
         rast = drake::file_in(!!sprintf(
-          "risk_layers/biotic/processed/NDVI_%s.tif", output_resolution[1]
+          "%s/NDVI_%s.tif", processed_data_path, output_resolution[1]
         )),
         outfile = drake::file_out(!!sprintf(
-          "risk_layers/biotic/processed/NDVI_norm_%s.tif", output_resolution[1]
+          "%s/NDVI_norm_%s.tif", processed_data_path, output_resolution[1]
         ))),
 
     # Plots
     plot_tourist_rooms =
       static_map(
         ras = drake::file_in(!!sprintf(
-          "risk_layers/pathway/processed/tourism_beds_%s.tif",
-          output_resolution[1]
+          "%s/tourism_beds_%s.tif", processed_data_path, output_resolution[1]
         )),
         xlim = c(112.76, 155),
         ylim = c(-44.03, -9.21),
@@ -271,7 +274,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
 
     plot_pop_density =
       static_map(
-        ras = drake::file_in(!!pop_density),
+        ras = drake::file_in(!!pop_density_path),
         xlim = c(112.76, 155),
         ylim = c(-44.03, -9.21),
         basemap_mode = !!basemap_mode,
@@ -291,7 +294,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         tmap::tmap_arrange(
           static_map(
             ras = drake::file_in(!!sprintf(
-              "risk_layers/pathway/processed/airport_proximity_%s.tif",
+              "%s/airport_proximity_%s.tif", processed_data_path,
               output_resolution[1]
             )),
             xlim = c(112.76, 155),
@@ -304,7 +307,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
           ),
           static_map(
             ras = drake::file_in(!!sprintf(
-              "risk_layers/pathway/processed/airport_dist_weight_%s.tif",
+              "%s/airport_dist_weight_%s.tif", processed_data_path,
               output_resolution[1]
             )),
             xlim = c(112.76, 155),
@@ -328,7 +331,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
         tmap::tmap_arrange(
           static_map(
             ras = drake::file_in(!!sprintf(
-              "risk_layers/pathway/processed/cairns_airport_proximity_%s.tif",
+              "%s/cairns_airport_proximity_%s.tif", processed_data_path,
               output_resolution[1]
             )),
             xlim = c(138.9, 151.1),
@@ -341,7 +344,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
           ),
           static_map(
             ras = drake::file_in(!!sprintf(
-              "risk_layers/pathway/processed/cairns_airport_dist_weight_%s.tif",
+              "%s/cairns_airport_dist_weight_%s.tif", processed_data_path,
               output_resolution[1]
             )),
             xlim = c(138.9, 151.1),
@@ -383,7 +386,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     NDVI_plot =
       static_map(
         ras = drake::file_in(!!sprintf(
-          "risk_layers/biotic/processed/NDVI_%s.tif", output_resolution[1]
+          "%s/NDVI_%s.tif", processed_data_path, output_resolution[1]
         )),
         xlim = c(112.76, 155),
         ylim = c(-44.03, -9.21),

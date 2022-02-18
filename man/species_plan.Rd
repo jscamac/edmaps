@@ -16,9 +16,13 @@ species_plan(
   include_ndvi = TRUE,
   aggregated_res = c(5000, 5000),
   make_interactive_maps = TRUE,
+  processed_data_path,
   clum_path,
   nvis_path,
   ndvi_path,
+  pop_density_path,
+  airports_path,
+  tourist_beds_path,
   airport_beta = log(0.5)/200,
   airport_tsi_beta = log(0.5)/10,
   port_data_path,
@@ -127,11 +131,21 @@ resolution of aggregated establishment likelihood rasters, in metres.}
 \item{make_interactive_maps}{Logical. Should interactive html maps be
 generated?}
 
+\item{processed_data_path}{Path to a directory that will be used to store
+processed datasets. This will be created, recursively, if it does not
+exist.}
+
 \item{clum_path}{Path to the ACLUM raster.}
 
 \item{nvis_path}{Path to the NVIS raster.}
 
 \item{ndvi_path}{Path to the NDVI raster.}
+
+\item{pop_density_path}{Path to the population density raster.}
+
+\item{airports_path}{Path to the major airports vector dataset.}
+
+\item{tourist_beds_path}{Path to the tourist beds vector dataset.}
 
 \item{airport_beta}{Numeric. Parameter controlling the distribution of
 international tourists passengers around international airport. Default is
