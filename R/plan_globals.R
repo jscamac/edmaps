@@ -63,15 +63,15 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
     # Download worldclim2
     download_worldclim =
       download_worldclim2(
-        outfile = drake::file_out(sprintf('%s/bioclim_10m.zip'), processed_data_path),
+        outfile = drake::file_out(!!sprintf('%s/bioclim_10m.zip', processed_data_path)),
         variable = 'bio',
         resolution = '10m'), # 10 arc-minutes
 
     # Extract zipfile
     extract_worldclim =
       extract_worldclim2(
-        path_2_zip = drake::file_in(sprintf('%s/bioclim_10m.zip', processed_data_path)),
-        outdir = drake::file_out(sprintf("%s/bioclim_10m", processed_data_path))),
+        path_2_zip = drake::file_in(!!sprintf('%s/bioclim_10m.zip', processed_data_path)),
+        outdir = drake::file_out(!!sprintf("%s/bioclim_10m", processed_data_path))),
 
     # Output res
     output_resolution = !!output_resolution,
