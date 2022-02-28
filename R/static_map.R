@@ -76,6 +76,8 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     stop('height must be specified.')
   }
 
+  if(missing(legend_title)) legend_title <- ''
+
   basemap_mode <- match.arg(basemap_mode)
 
   # If an incorrect scale_type is specified
@@ -120,32 +122,32 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
   minval <- min(raster::minValue(ras)) # min value after clamping values
   maxval <- max(raster::maxValue(ras)) # max value after clamping values
 
-    # Convert to log10 scale
-    if(scale_type == "log10") {
-      if(minval <= 0) {
-        stop('Cannot log transform raster containing zero or negative values.')
-      } else {
-        ras <- log10(ras)
-      }
+  # Convert to log10 scale
+  if(scale_type == "log10") {
+    if(minval <= 0) {
+      stop('Cannot log transform raster containing zero or negative values.')
+    } else {
+      ras <- log10(ras)
     }
+  }
 
-    # Max normalize
-    if(scale_type == "max normalize") {
-      ras <- max_normalize(ras)
-    }
-    # Min Max normalize
-    if(scale_type == "minmax normalize") {
-      ras <- min_max_normalize(ras)
-    }
+  # Max normalize
+  if(scale_type == "max normalize") {
+    ras <- max_normalize(ras)
+  }
+  # Min Max normalize
+  if(scale_type == "minmax normalize") {
+    ras <- min_max_normalize(ras)
+  }
 
-    # Convert to logit scale
-    if(scale_type == "logit") {
-      if(minval <= 0 || maxval >= 1) {
-        stop('Cannot logit transform raster containing values <= 0 or >= 1.')
-      } else {
-        ras <-  stats::qlogis(ras)
-      }
+  # Convert to logit scale
+  if(scale_type == "logit") {
+    if(minval <= 0 || maxval >= 1) {
+      stop('Cannot logit transform raster containing values <= 0 or >= 1.')
+    } else {
+      ras <-  stats::qlogis(ras)
     }
+  }
 
   # get min and max values again after transforming
   full_range <- c(min(raster::minValue(ras)),
@@ -154,16 +156,17 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
   # Reproject raster to web mercator
   # https://github.com/mtennekes/tmap/issues/410
   # https://github.com/mtennekes/tmap/issues/412
-    raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
-    gdalUtilities::gdalwarp(
-      f, f2 <- tempfile(fileext='.tif'),
-      t_srs = "EPSG:3857",
-      tr = if(basemap_mode=='osm') basemap_res else c(5000, 5000),
+  raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
+  gdalUtilities::gdalwarp(
+    f, f2 <- tempfile(fileext='.tif'),
+    t_srs = "EPSG:3857",
+    tr = if(basemap_mode=='osm') basemap_res else c(5000, 5000),
     r = if(scale_type=='discrete') "near" else "bilinear",
     te=e, te_srs='EPSG:4283')
-    # ^ This will interpolate the aggregated data if
-    #   aggregate_raster is not NULL
+  # ^ This will interpolate the aggregated data if
+  #   aggregate_raster is not NULL
   ras <- raster::setMinMax(raster::stack(f2))
+  names(ras) <- layer_names
   minval <- min(raster::minValue(ras)) # get min value again after cropping/projecting
   maxval <- max(raster::maxValue(ras)) # get max value again after cropping/projecting
 
