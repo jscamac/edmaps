@@ -57,7 +57,7 @@
 #'   some Java errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom raster aggregate extent maxValue minValue ncell projectRaster raster setMinMax writeRaster
+#' @importFrom raster aggregate extent maxValue minValue ncell raster setMinMax writeRaster
 #' @importFrom sf st_as_sf st_crop st_crs st_read st_transform
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_compass tm_dots tm_facets tm_layout tm_polygons tm_raster tm_rgb tm_scale_bar tm_shape tmap_mode tmap_options tmap_save
@@ -83,7 +83,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     "none", "log10", "max normalize", "minmax normalize", "logit",
     "discrete"))
 
-  if(is.character(ras)) ras <- raster::raster(ras)
+  if(is.character(ras)) ras <- raster::stack(ras)
 
   if(missing(layer_names)) {
     layer_names <- rep('', dim(ras)[3])
@@ -117,11 +117,8 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
 
-  minval <- raster::minValue(ras)
-
-  if(!is.na(minval)) {
-
-    maxval <- raster::maxValue(ras)
+  minval <- min(raster::minValue(ras)) # min value after clamping values
+  maxval <- max(raster::maxValue(ras)) # max value after clamping values
 
     # Convert to log10 scale
     if(scale_type == "log10") {
@@ -150,37 +147,33 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
       }
     }
 
-  }
-
-  full_range <- c(min(raster::minValue(ras), na.rm=TRUE),
-                  max(raster::maxValue(ras), na.rm=TRUE))
-
-  if(isTRUE(colramp_entire_range)) {
-    limit_cols <- full_range
-  } else {
-    limit_cols <- c(raster::minValue(ras), raster::maxValue(ras))
-  }
-
+  # get min and max values again after transforming
+  full_range <- c(min(raster::minValue(ras)),
+                  max(raster::maxValue(ras)))
 
   # Reproject raster to web mercator
   # https://github.com/mtennekes/tmap/issues/410
   # https://github.com/mtennekes/tmap/issues/412
-  if(scale_type == "discrete") {
-    raster::projectRaster(
-      ras, crs = "+init=epsg:3857",
-      res = if(basemap_mode=='osm') basemap_res else c(5000, 5000),
-      method = "ngb", te=e, te_srs='EPSG:4283')
-  } else {
     raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(
       f, f2 <- tempfile(fileext='.tif'),
       t_srs = "EPSG:3857",
       tr = if(basemap_mode=='osm') basemap_res else c(5000, 5000),
-      r = "bilinear", te=e, te_srs='EPSG:4283')
+    r = if(scale_type=='discrete') "near" else "bilinear",
+    te=e, te_srs='EPSG:4283')
     # ^ This will interpolate the aggregated data if
     #   aggregate_raster is not NULL
-    ras <- raster::setMinMax(raster::raster(f2))
+  ras <- raster::setMinMax(raster::stack(f2))
+  minval <- min(raster::minValue(ras)) # get min value again after cropping/projecting
+  maxval <- max(raster::maxValue(ras)) # get max value again after cropping/projecting
+
+  if(is.na(minval)) warning('Raster has no data within extent and constrained range of values.')
+  if(isTRUE(colramp_entire_range)) {
+    limit_cols <- full_range
+  } else {
+    limit_cols <- c(minval, maxval)
   }
+
 
   # Set tmap options
   if(basemap_mode=='osm') {
@@ -206,7 +199,6 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     suppressMessages(tmap::tmap_mode(tmode))
   })
 
-  minval <- raster::minValue(ras)
 
   m <- if(basemap_mode=='osm') {
     tmap::tm_shape(basemap) +
