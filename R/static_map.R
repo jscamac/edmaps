@@ -5,8 +5,10 @@
 #'
 #' @param ras A `Raster*` object or file path to a (potentially multiband)
 #'   raster file.
-#' @param xlim Numeric vector. The longitudinal extent of the area to plot.
-#' @param ylim Numeric vector. The latitudinal extent of the area to plot.
+#' @param xlim Numeric vector. The longitudinal extent of the area to plot, in
+#'   WGS84 coordinates.
+#' @param ylim Numeric vector. The latitudinal extent of the area to plot, in
+#'   WGS84 coordinates.
 #' @param layer Character. A layer name to be plotted. Only relevant if loading
 #'   a `RasterStack` or `RasterBrick`.
 #' @param layer_names Optional panel titles names for multipanel maps. If not
@@ -15,12 +17,16 @@
 #' @param set_value_range A numeric vector containing an upper and lower bound
 #'   value (in units of raster). Values outside this range (including values
 #'   falling on the boundaries) will be masked.
-#' @param scale_type Character. Can be: `"none"` (raw data, no rescaling),
-#'   `"log10"`, `"max normalize"` (proportional to maximum value),
-#'   `"minmax normalize"` (rescale values to be between zero and 1 based
-#'   on min and max), or `"logit"`. Note that if `"log10"` or
-#'   `"logit"` is used 0 or 1 values. must be masked (using
-#'   `set_value_range`) or rescaled outside of this function.
+#' @param scale_type Character. One of:
+#'   - `"none"` (raw data, no rescaling);
+#'   - `"log10"`;
+#'   - `"max normalize"` (proportional to maximum value);
+#'   - `"minmax normalize"` (rescale values to be between zero and 1 based
+#'   on min and max);
+#'   - `"logit"`; or
+#'   - `"discrete"`.
+#'   Note that if `"log10"` or `"logit"` is used 0 or 1 values. must be masked
+#'   (using `set_value_range`) or rescaled outside of this function.
 #' @param basemap_mode Either `'boundaries'` or `'osm'` (i.e., OpenStreetMap),
 #'   defining whether OpenStreetMap imagery should be used for static map
 #'   basemaps, or simple administrative boundaries. Default is `'osm'`.
