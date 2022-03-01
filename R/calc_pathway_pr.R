@@ -19,8 +19,14 @@
 #' @export
 calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
 
+  if(any(EE$probability < 0 | EE$probability > 1)) {
+    stop('Probabilities passed to `EE` must be in the range 0-1.')
+  }
+
   if(is.character(rast)) {
     rast <- raster::raster(rast)
+  } else if(!is(rast, 'RasterLayer')) {
+    stop('rast must be a RasterLayer or a file path to a raster file.')
   }
 
   d <- dplyr::mutate(stats::setNames(raster::as.data.frame(rast), 'value'),
@@ -30,6 +36,8 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
   # ^ Transform to probability (given incursion) that pest does *not* arrive at
   # cell (i.e. arrives at some other cell)
 
+  if(any(d$value > 1)) stop('dispersal weights in `rast` must not be negative.')
+
   # Loop over rows of EE, calculating the probability the cell does *not*
   # receive the pest, given the number of incursions and corresponding
   # probability of that number of incursions.
@@ -37,6 +45,7 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
     d$prob_absent <- d$prob_absent + EE$probability[i] *
       d$value^EE$N_incursions[i]
   }
+  d$prob_absent <- pmin(pmax(d$prob_absent, 0), 1)
 
   # Initialise raster and populate with probability of presence
   out <- raster::init(rast, function(x) 0)
