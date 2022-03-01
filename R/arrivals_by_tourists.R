@@ -41,11 +41,19 @@ arrivals_by_tourists <- function(tourist_beds, airport_weights,
   }
 
   # Load rasters
-  tb <- raster::raster(tourist_beds)
-  ad_weight <- raster::raster(airport_weights)
+  if(is.character(tourist_beds)) {
+    tourist_beds <- raster::raster(tourist_beds)
+  } else if(!is(tourist_beds, 'Raster')) {
+    stop('tourist_beds must be a RasterLayer or a file path to a raster file.')
+  }
+  if(is.character(airport_weights)) {
+    airport_weights <- raster::raster(airport_weights)
+  } else if(!is(airport_weights, 'Raster')) {
+    stop('airport_weights must be a RasterLayer or a file path to a raster file.')
+  }
 
   # Multiply rasters
-  r <- tb * ad_weight
+  r <- tourist_beds * airport_weights
 
   # Convert weighted values to national proportion
   r <- calc_proportion(r)

@@ -37,14 +37,12 @@ arrivals_by_wind <- function(wind_speed, leakage_rate, establishment_rate,
 
   # Load raster
   if(is.character(wind_speed)) {
-    wind <- raster::raster(wind_speed)
-  } else if(is(wind_speed, 'RasterLayer')) {
-    wind <- wind_speed
-  } else {
+    wind_speed <- raster::raster(wind_speed)
+  } else if(!is(wind_speed, 'RasterLayer')) {
     stop('wind_speed must be a RasterLayer or a file path to a raster file.')
   }
   # Calculate proportion of population density
-  prop_wind <- calc_proportion(wind)
+  prop_wind <- calc_proportion(wind_speed)
 
   # Disperse and calculate arrival rate
   EE <- calc_EE(leakage_rate, establishment_rate)

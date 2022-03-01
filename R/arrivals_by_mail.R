@@ -39,15 +39,13 @@ arrivals_by_mail <- function(pop_density, leakage_rate, establishment_rate,
 
   # Load raster
   if(is.character(pop_density)) {
-    pop <- raster::raster(pop_density)
-  } else if(is(pop_density, 'RasterLayer')) {
-    pop <- pop_density
-  } else {
+    pop_density <- raster::raster(pop_density)
+  } else if(!is(pop_density, 'RasterLayer')) {
     stop('pop_density must be a RasterLayer or a file path to a raster file.')
   }
 
   # Calculate proportion of population density
-  prop_pop <- calc_proportion(pop)
+  prop_pop <- calc_proportion(pop_density)
 
   # Disperse mail and calculate arrival rate
   EE <- calc_EE(leakage_rate, establishment_rate)

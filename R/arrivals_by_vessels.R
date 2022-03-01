@@ -39,6 +39,8 @@ arrivals_by_vessels <- function(port_weight, leakage_rate, establishment_rate,
 
   if(is.character(port_weight)) {
     port_weight <- raster::raster(port_weight)
+  } else if(!is(port_weight, 'RasterLayer')) {
+    stop('port_weight must be a RasterLayer or a file path to a raster file.')
   }
 
   # Disperse passengers and calculate arrival rate

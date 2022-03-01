@@ -39,19 +39,20 @@ arrivals_by_torres <- function(pop_density, airport_weight, leakage_rate,
     stop('establishment_rate must be a vector of two values.')
   }
 
-  # Load raster
+  # Load rasters
   if(is.character(pop_density)) {
-    pop <- raster::raster(pop_density)
-  } else if(is(pop_density, 'RasterLayer')) {
-    pop <- pop_density
-  } else {
+    pop_density <- raster::raster(pop_density)
+  } else if(!is(pop_density, 'RasterLayer')) {
     stop('pop_density must be a RasterLayer or a file path to a raster file.')
   }
-
-  ad_weight <- raster::raster(airport_weight)
+  if(is.character(airport_weight)) {
+    airport_weight <- raster::raster(airport_weight)
+  } else if(!is(airport_weight, 'RasterLayer')) {
+    stop('airport_weight must be a RasterLayer or a file path to a raster file.')
+  }
 
   # Multiply rasters
-  r <- pop * ad_weight
+  r <- pop_density * airport_weight
 
   # Convert weighted values to national proportion
   r <- calc_proportion(r)
