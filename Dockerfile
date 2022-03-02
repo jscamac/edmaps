@@ -24,7 +24,8 @@ RUN install2.r --skipinstalled TRUE \
     rnaturalearthdata \
     styler \
     OpenStreetMap \
-    rnaturalearthhires
+    rnaturalearthhires \
+    future.apply
 
 ## Install hi res geospatial data
 RUN installGithub.r \
