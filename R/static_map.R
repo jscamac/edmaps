@@ -263,7 +263,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     ))
     m <- m +
       tmap::tm_shape(locs) +
-      tmap::tm_dots(col = pt_col, shape=shape, size=0.25)
+      tmap::tm_dots(col = pt_col, shape=shape)
   }
 
   # outfile supplied
