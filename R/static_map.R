@@ -36,6 +36,9 @@
 #'   specified by `xlim` and `ylim`.
 #' @param surveillance_locs A spatial object or a path to a .csv file
 #'   containing columns named "Latitude" and "Longitude".
+#' @param shape shape(s) to use for surveillance locations. Default is 21. If you have
+#'  multiple bands, and you'd like to use different symbols on each panel, specify a vector of shapes.
+#'  (e.g. c(NA, 21,21,21) will not include shapes on the first panel, but will on the rest 
 #' @param pt_col Character. The plotting colour for surveillance points.
 #' @param aggregate_raster `NULL` or a list containing the aggregation
 #'   factor (i.e. number of raster cells to aggregate) and the aggregation
@@ -69,7 +72,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
                        set_value_range, scale_type = "none",
                        basemap_mode=c('osm', 'boundaries'),
                        transparency = 0.7, colramp_entire_range = TRUE,
-                       surveillance_locs, pt_col = "red", aggregate_raster,
+                       surveillance_locs, shape = 21, pt_col = "red", aggregate_raster,
                        nrow, height, outfile) {
 
   if(missing(height)) {
@@ -260,7 +263,7 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     ))
     m <- m +
       tmap::tm_shape(locs) +
-      tmap::tm_dots(col = pt_col, shape=21, size=0.25)
+      tmap::tm_dots(col = pt_col, shape=shape, size=0.25)
   }
 
   # outfile supplied
