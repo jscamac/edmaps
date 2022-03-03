@@ -9,10 +9,10 @@
 #'   WGS84 coordinates.
 #' @param ylim Numeric vector. The latitudinal extent of the area to plot, in
 #'   WGS84 coordinates.
-#' @param layer Character. A layer name to be plotted. Only relevant if loading
-#'   a `RasterStack` or `RasterBrick`.
-#' @param layer_names Optional panel titles names for multipanel maps. If not
-#'   provided, panels will not be given titles.
+#' @param subset_layers Vector. A vector of layer names or numeric positions to be included in plot. Only relevant if loading
+#'   a `RasterStack` or `RasterBrick`. If missing all layers are included.
+#' @param layer_names Character vector. A vector of panel titles (only relevant if ras is a stack). If not
+#'   provided, names from ras will be used. If provided, length must equal `raster::nlayers(ras)`, or match `length(subset_layers)`.
 #' @param legend_title Character. Legend title.
 #' @param set_value_range A numeric vector containing an upper and lower bound
 #'   value (in units of raster). Values outside this range (including values
@@ -68,7 +68,7 @@
 #' @importFrom utils read.csv
 #' @importFrom magrittr "%>%"
 #' @export
-static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
+static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title,
                        set_value_range, scale_type = "none",
                        basemap_mode=c('osm', 'boundaries'),
                        transparency = 0.7, colramp_entire_range = TRUE,
@@ -79,25 +79,37 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
     stop('height must be specified.')
   }
 
+  # If legend is not specified make it blank
   if(missing(legend_title)) legend_title <- ''
 
   basemap_mode <- match.arg(basemap_mode)
+
 
   # If an incorrect scale_type is specified
   scale_type <- match.arg(scale_type, c(
     "none", "log10", "max normalize", "minmax normalize", "logit",
     "discrete"))
 
+  # Load raster if file path is provided
   if(is.character(ras)) ras <- raster::stack(ras)
 
+  # Subset layers if subset_layeyrs is specified
+  if(!missing(subset_layers)) {
+    ras <- raster::subset(ras, subset_layers)
+  }
+
+  # If raster layer_names are not provided use defaults
+  # If provided ensure length matches
   if(missing(layer_names)) {
-    layer_names <- rep('', dim(ras)[3])
-  } else if(length(layer_names) != dim(ras)[3]) {
+    layer_names <- names(ras)
+  } else if(length(layer_names) != raster::nlayers(ras)) {
     stop('layer_names has invalid length')
   }
 
+  # Calculate min and max of raster layers for possible transformation
   ras <- raster::setMinMax(ras)
 
+  # Set bounded box based on xlim and ylim
   e <- tmaptools::bb(xlim=xlim, ylim=ylim)
 
   if(basemap_mode=='osm') {
@@ -214,38 +226,31 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
       tmap::tm_polygons(col='white')
   }
 
-  if(all(is.na(minval))) {
-    m <- m +
-      tmap::tm_shape(ras) +
-      tmap::tm_raster(style='cont', midpoint=NA,
-                      title=legend_title,
-                      breaks=pretty(limit_cols, n=7),
-                      alpha=transparency,
-                      legend.is.portrait=FALSE) +
-      tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
-      tmap::tm_compass() +
-      tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
-                      legend.position=c('left', 'bottom'),
-                      inner.margin=c(1/height, 0, 0, 0),
-                      legend.text.size=0.8)
-  } else {
-    m <- m +
-      tmap::tm_shape(ras) +
-      tmap::tm_raster(palette='inferno', style='cont', midpoint=NA,
-                      title=legend_title,
-                      breaks=pretty(limit_cols, n=7),
-                      alpha=transparency,
-                      legend.is.portrait=FALSE) +
-      tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
-      tmap::tm_compass() +
-      tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
-                      legend.position=c('left', 'bottom'),
-                      inner.margin=c(1/height, 0, 0, 0),
-                      legend.text.size=0.8)
+  # If raster contains only NULLs don't set palette. Otherwise use inferno
+  # Useful when plotting panels with empty rasters (due to probabilities below threshold etc)
+  m <- m +
+    tmap::tm_shape(ras) +
+    tmap::tm_raster(palette= ifelse(all(is.na(minval)),NULL, 'inferno'), 
+                    style='cont', 
+                    midpoint=NA,
+                    title=legend_title,
+                    breaks=pretty(limit_cols, n=7),
+                    alpha=transparency,
+                    legend.is.portrait=FALSE) +
+    tmap::tm_scale_bar(position=c('left', 'bottom'), text.size=0.75) +
+    tmap::tm_compass() +
+    tmap::tm_layout(outer.margins=c(0, 0, 0, 0),
+                    legend.position=c('left', 'bottom'),
+                    inner.margin=c(1/height, 0, 0, 0),
+                    legend.text.size=0.8)
+
+  # Add panel labels if layers >1
+  if(isTRUE(raster::nlayers(ras) >1)) {
+  m <- m + tmap::tm_layout(panel.labels=layer_names)
+  m <- m + tmap::tm_layout(legend.outside.position='bottom')
   }
 
-  if(!all(layer_names == '')) m <- m + tmap::tm_layout(panel.labels=layer_names)
-  m <- m + tmap::tm_layout(legend.outside.position='bottom')
+  # If nrow is defined (otherwise default features used)
   if(!missing(nrow)) m <- m + tmap::tm_facets(nrow=nrow)
 
   # Add surveillance locations (if required)
@@ -259,8 +264,9 @@ static_map <- function(ras, xlim, ylim, layer, layer_names, legend_title,
       sf::st_as_sf(surveillance_locs, coords = c("Longitude", "Latitude"),
                    crs = 4326) %>%
         sf::st_transform(crs = sf::st_crs(ras)) %>%
-        sf::st_crop(y = raster::extent(ras))
-    ))
+        sf::st_crop(y = raster::extent(ras)))
+    )
+    # Add surveillance locations to map
     m <- m +
       tmap::tm_shape(locs) +
       tmap::tm_dots(col = pt_col, shape=shape)
