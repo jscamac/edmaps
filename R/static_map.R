@@ -60,7 +60,7 @@
 #'   some Java errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom raster aggregate extent maxValue minValue ncell raster setMinMax writeRaster
+#' @importFrom raster aggregate extent maxValue minValue ncell setMinMax writeRaster subset nlayers stack
 #' @importFrom sf st_as_sf st_crop st_crs st_read st_transform
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_compass tm_dots tm_facets tm_layout tm_polygons tm_raster tm_rgb tm_scale_bar tm_shape tmap_mode tmap_options tmap_save
