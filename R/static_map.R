@@ -230,7 +230,7 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
   # Useful when plotting panels with empty rasters (due to probabilities below threshold etc)
   m <- m +
     tmap::tm_shape(ras) +
-    tmap::tm_raster(palette= ifelse(all(is.na(minval)),NULL, 'inferno'), 
+    tmap::tm_raster(palette= if(all(is.na(NA))) NULL else "inferno", 
                     style='cont', 
                     midpoint=NA,
                     title=legend_title,
