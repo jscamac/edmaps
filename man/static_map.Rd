@@ -8,7 +8,7 @@ static_map(
   ras,
   xlim,
   ylim,
-  layer,
+  subset_layers,
   layer_names,
   legend_title,
   set_value_range,
@@ -17,6 +17,7 @@ static_map(
   transparency = 0.7,
   colramp_entire_range = TRUE,
   surveillance_locs,
+  shape = 21,
   pt_col = "red",
   aggregate_raster,
   nrow,
@@ -28,15 +29,17 @@ static_map(
 \item{ras}{A \verb{Raster*} object or file path to a (potentially multiband)
 raster file.}
 
-\item{xlim}{Numeric vector. The longitudinal extent of the area to plot.}
+\item{xlim}{Numeric vector. The longitudinal extent of the area to plot, in
+WGS84 coordinates.}
 
-\item{ylim}{Numeric vector. The latitudinal extent of the area to plot.}
+\item{ylim}{Numeric vector. The latitudinal extent of the area to plot, in
+WGS84 coordinates.}
 
-\item{layer}{Character. A layer name to be plotted. Only relevant if loading
-a \code{RasterStack} or \code{RasterBrick}.}
+\item{subset_layers}{Vector. A vector of layer names or numeric positions to be included in plot. Only relevant if loading
+a \code{RasterStack} or \code{RasterBrick}. If missing all layers are included.}
 
-\item{layer_names}{Optional panel titles names for multipanel maps. If not
-provided, panels will not be given titles.}
+\item{layer_names}{Character vector. A vector of panel titles (only relevant if ras is a stack). If not
+provided, names from ras will be used. If provided, length must equal \code{raster::nlayers(ras)}, or match \code{length(subset_layers)}.}
 
 \item{legend_title}{Character. Legend title.}
 
@@ -44,12 +47,17 @@ provided, panels will not be given titles.}
 value (in units of raster). Values outside this range (including values
 falling on the boundaries) will be masked.}
 
-\item{scale_type}{Character. Can be: \code{"none"} (raw data, no rescaling),
-\code{"log10"}, \code{"max normalize"} (proportional to maximum value),
-\code{"minmax normalize"} (rescale values to be between zero and 1 based
-on min and max), or \code{"logit"}. Note that if \code{"log10"} or
-\code{"logit"} is used 0 or 1 values. must be masked (using
-\code{set_value_range}) or rescaled outside of this function.}
+\item{scale_type}{Character. One of:
+\itemize{
+\item \code{"none"} (raw data, no rescaling);
+\item \code{"log10"};
+\item \code{"max normalize"} (proportional to maximum value);
+\item \code{"minmax normalize"} (rescale values to be between zero and 1 based
+on min and max); or
+\item \code{"discrete"}.
+Note that if \code{"log10"} is used 0 or 1 values. must be masked
+(using \code{set_value_range}) or rescaled outside of this function.
+}}
 
 \item{basemap_mode}{Either \code{'boundaries'} or \code{'osm'} (i.e., OpenStreetMap),
 defining whether OpenStreetMap imagery should be used for static map
@@ -63,6 +71,10 @@ specified by \code{xlim} and \code{ylim}.}
 
 \item{surveillance_locs}{A spatial object or a path to a .csv file
 containing columns named "Latitude" and "Longitude".}
+
+\item{shape}{shape(s) to use for surveillance locations. Default is 21. If you have
+multiple bands, and you'd like to use different symbols on each panel, specify a vector of shapes.
+(e.g. c(NA, 21,21,21) will not include shapes on the first panel, but will on the rest}
 
 \item{pt_col}{Character. The plotting colour for surveillance points.}
 
