@@ -51,10 +51,11 @@ plot_raster <- function(object, legend_title, occurrence_data = NULL,
       sf::st_crop(sf::st_bbox(ras))
   ))
 
+  rng <- c(raster::minValue(ras), raster::maxValue(ras))
   m <- tmap::tm_shape(ras) +
     tmap::tm_raster(palette='inferno', style='cont', midpoint=NA,
                     title=legend_title,
-                    breaks=seq(0, 1, 0.1),
+                    breaks=pretty(x = rng, n = 10, min.n = 5),
                     legend.is.portrait=FALSE) +
     tmap::tm_shape(world_map) +
     tmap::tm_polygons(alpha=0, border.col='black', border.alpha=1) +
