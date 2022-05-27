@@ -22,10 +22,9 @@
 #'   - `"log10"`;
 #'   - `"max normalize"` (proportional to maximum value);
 #'   - `"minmax normalize"` (rescale values to be between zero and 1 based
-#'   on min and max);
-#'   - `"logit"`; or
+#'   on min and max); or
 #'   - `"discrete"`.
-#'   Note that if `"log10"` or `"logit"` is used 0 or 1 values. must be masked
+#'   Note that if `"log10"` is used 0 or 1 values. must be masked
 #'   (using `set_value_range`) or rescaled outside of this function.
 #' @param basemap_mode Either `'boundaries'` or `'osm'` (i.e., OpenStreetMap),
 #'   defining whether OpenStreetMap imagery should be used for static map
@@ -74,30 +73,30 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
                        transparency = 0.7, colramp_entire_range = TRUE,
                        surveillance_locs, shape = 21, pt_col = "red", aggregate_raster,
                        nrow, height, outfile) {
-
+  
   if(missing(height)) {
     stop('height must be specified.')
   }
-
+  
   # If legend is not specified make it blank
   if(missing(legend_title)) legend_title <- ''
-
+  
   basemap_mode <- match.arg(basemap_mode)
-
-
+  
+  
   # If an incorrect scale_type is specified
   scale_type <- match.arg(scale_type, c(
-    "none", "log10", "max normalize", "minmax normalize", "logit",
+    "none", "log10", "max normalize", "minmax normalize",
     "discrete"))
-
+  
   # Load raster if file path is provided
   if(is.character(ras)) ras <- raster::stack(ras)
-
+  
   # Subset layers if subset_layeyrs is specified
   if(!missing(subset_layers)) {
     ras <- raster::subset(ras, subset_layers)
   }
-
+  
   # If raster layer_names are not provided use defaults
   # If provided ensure length matches
   if(missing(layer_names)) {
@@ -105,13 +104,13 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
   } else if(length(layer_names) != raster::nlayers(ras)) {
     stop('layer_names has invalid length')
   }
-
+  
   # Calculate min and max of raster layers for possible transformation
   ras <- raster::setMinMax(ras)
-
+  
   # Set bounded box based on xlim and ylim
   e <- tmaptools::bb(xlim=xlim, ylim=ylim)
-
+  
   if(basemap_mode=='osm') {
     basemap <- tmaptools::read_osm(e, zoom=NULL)
     basemap_res <- c(abs(attr(basemap, 'dimensions')$x$delta),
@@ -121,53 +120,49 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
                                        package='edmaps')) %>%
       sf::st_crop(e)
   }
-
+  
   # Aggregate raster (if required)
   if(!missing(aggregate_raster)) {
     ras <- raster::aggregate(ras, fact = aggregate_raster[[1]],
                              fun = aggregate_raster[[2]])
     ras[is.nan(ras)] <- NA
   }
-
+  
   # Restrict Raster value range?
   if(!missing(set_value_range)) {
     ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
-
+  
   minval <- min(raster::minValue(ras)) # min value after clamping values
-  maxval <- max(raster::maxValue(ras)) # max value after clamping values
-
-  # Convert to log10 scale
-  if(scale_type == "log10") {
-    if(minval <= 0) {
-      stop('Cannot log transform raster containing zero or negative values.')
-    } else {
-      ras <- log10(ras)
+  
+  # If raster is not empty
+  if(!is.na(minval)) {
+    # Convert to log10 scale
+    if(scale_type == "log10") {
+      if(minval <= 0)  {
+        stop('Cannot log transform raster containing zero or negative values.')
+      } else {
+        ras <- log10(ras)
+      }
+    }
+    
+    if(isTRUE(colramp_entire_range)) {
+      # Max normalize
+      if(scale_type == "max normalize") {
+        ras <- max_normalize(ras)
+      }
+      
+      # Min Max normalize
+      if(scale_type == "minmax normalize") {
+        ras <- min_max_normalize(ras)
+      }
     }
   }
-
-  # Max normalize
-  if(scale_type == "max normalize") {
-    ras <- max_normalize(ras)
-  }
-  # Min Max normalize
-  if(scale_type == "minmax normalize") {
-    ras <- min_max_normalize(ras)
-  }
-
-  # Convert to logit scale
-  if(scale_type == "logit") {
-    if(minval <= 0 || maxval >= 1) {
-      stop('Cannot logit transform raster containing values <= 0 or >= 1.')
-    } else {
-      ras <-  stats::qlogis(ras)
-    }
-  }
-
+  
   # get min and max values again after transforming
   full_range <- c(min(raster::minValue(ras)),
                   max(raster::maxValue(ras)))
-
+  
   # Reproject raster to web mercator
   # https://github.com/mtennekes/tmap/issues/410
   # https://github.com/mtennekes/tmap/issues/412
@@ -182,17 +177,29 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
   #   aggregate_raster is not NULL
   ras <- raster::setMinMax(raster::stack(f2))
   names(ras) <- layer_names
-  minval <- min(raster::minValue(ras)) # get min value again after cropping/projecting
-  maxval <- max(raster::maxValue(ras)) # get max value again after cropping/projecting
-
+  
   if(is.na(minval)) warning('Raster has no data within extent and constrained range of values.')
   if(isTRUE(colramp_entire_range)) {
     limit_cols <- full_range
   } else {
+    # Normalize over constrained range?
+    # Max normalize
+    if(scale_type == "max normalize") {
+      ras <- max_normalize(ras)
+    }
+    
+    # Min Max normalize
+    if(scale_type == "minmax normalize") {
+      ras <- min_max_normalize(ras)
+    }
+    minval <- min(raster::minValue(ras)) # get min value again after cropping/projecting
+    maxval <- max(raster::maxValue(ras)) # get max value again after cropping/projecting
+    
+    
     limit_cols <- c(minval, maxval)
   }
-
-
+  
+  
   # Set tmap options
   if(basemap_mode=='osm') {
     opts <- tmap::tmap_options(
@@ -210,14 +217,14 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
         "World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"))
     )
   }
-
+  
   suppressMessages(tmode <- tmap::tmap_mode('plot'))
   on.exit({
     tmap::tmap_options(opts)
     suppressMessages(tmap::tmap_mode(tmode))
   })
-
-
+  
+  
   m <- if(basemap_mode=='osm') {
     tmap::tm_shape(basemap) +
       tmap::tm_rgb()
@@ -225,12 +232,12 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
     tmap::tm_shape(basemap) +
       tmap::tm_polygons(col='white')
   }
-
+  
   # If raster contains only NULLs don't set palette. Otherwise use inferno
   # Useful when plotting panels with empty rasters (due to probabilities below threshold etc)
   m <- m +
     tmap::tm_shape(ras) +
-    tmap::tm_raster(palette= if(all(is.na(NA))) NULL else "inferno", 
+    tmap::tm_raster(palette= if(all(is.na(minval))) NULL else "inferno", 
                     style='cont', 
                     midpoint=NA,
                     title=legend_title,
@@ -243,23 +250,23 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
                     legend.position=c('left', 'bottom'),
                     inner.margin=c(1/height, 0, 0, 0),
                     legend.text.size=0.8)
-
+  
   # Add panel labels if layers >1
   if(isTRUE(raster::nlayers(ras) >1)) {
-  m <- m + tmap::tm_layout(panel.labels=layer_names)
-  m <- m + tmap::tm_layout(legend.outside.position='bottom')
+    m <- m + tmap::tm_layout(panel.labels=layer_names)
+    m <- m + tmap::tm_layout(legend.outside.position='bottom')
   }
-
+  
   # If nrow is defined (otherwise default features used)
   if(!missing(nrow)) m <- m + tmap::tm_facets(nrow=nrow)
-
+  
   # Add surveillance locations (if required)
   if(!missing(surveillance_locs)) {
     if(is.character(surveillance_locs)) {
       surveillance_locs <- utils::read.csv(surveillance_locs) %>%
         dplyr::filter(!is.na(Longitude), !is.na(Latitude))
     }
-
+    
     locs <- suppressWarnings(suppressMessages(
       sf::st_as_sf(surveillance_locs, coords = c("Longitude", "Latitude"),
                    crs = 4326) %>%
@@ -271,7 +278,7 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
       tmap::tm_shape(locs) +
       tmap::tm_dots(col = pt_col, shape=shape)
   }
-
+  
   # outfile supplied
   if(!missing(outfile)) {
     # Create directory if it does not exist
