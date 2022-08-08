@@ -2,54 +2,54 @@
 #'
 #' Compress categorical raster data using run length encoding.
 #'
-#' @param x File path to the categorical raster to be compressed, or a
-#'   `Raster*` object.
+#' @param x Either a `RasterLayer` object, single-layer [`SpatRaster`] object,
+#'   or file path to a categorical raster to be compressed.
 #' @param outfile Character (optional). Path to target .rds file that will
-#'   store RLE results. Directory will be created recursively if it doesn't
-#'   exist.
+#'   store run-length encoded results. Directory will be created recursively if
+#'   it doesn't exist.
 #' @param quiet Logical. Should progress messages be suppressed?
-#' @return A list with five elements:
-#'   * `starts`: Cell numbers corresponding to run starts
-#'   * `lengths`: Run lengths
-#'   * `values`: Run values
-#'   * `extent`: Raster extent
-#'   * `res`: Raster resolution
-#'
-#' This object is additionally saved in rds format to `outfile`, if
-#' provided.
-#' @importFrom raster raster blockSize getValues extent res
-#' @importFrom furrr future_map future_options
+#' @param overwrite Logical. Should `outfile` be overwritten if it already
+#'   exists? Ignored if `outfile` is not provided.
+#' @return A `raster_rle` object (extending `tibble`) with three columns
+#'   (`lengths`, `values`, and `starts`) and attributes (`extent`, a
+#'   [`SpatExtent`] object, `res`, and `crs`). This object is additionally saved
+#'   in rds format to `outfile`, if provided.
+#' @importFrom terra rast blocks values ext res
+#' @importFrom furrr future_map furrr_options
+#' @importFrom readr write_csv read_csv
+#' @importFrom dplyr bind_rows mutate
+#' @importFrom magrittr %>%
+#' @importFrom methods is
 #' @export
-rle_compress <- function(x, outfile, quiet=FALSE) {
+rle_compress <- function(x, outfile, quiet=FALSE, overwrite=FALSE) {
+  if(!missing(outfile) && file.exists(outfile) && !overwrite) {
+    stop(sprintf('outfile (%s) exists and overwrite=FALSE.', outfile),
+         call.=FALSE)
+  }
   now <- Sys.time()
-  if(is.character(x)) x <- raster::raster(x)
+  if(is.character(x) || is(x, 'RasterLayer')) x <- terra::rast(x)
+  if(dim(x)[3] > 1) stop('x must have a single layer', call.=FALSE)
   if(!missing(outfile) && !dir.exists(dirname(outfile))) {
     dir.create(dirname(outfile), recursive=TRUE)
   }
-  bs <- raster::blockSize(x)
+  bs <- terra::blocks(x)
   if(!isTRUE(quiet)) message(sprintf('Processing raster (%s blocks)', bs$n))
-  outdir_len <- sprintf('%s/%s_len', tempdir(), round(as.numeric(now)))
-  outdir_val <- sprintf('%s/%s_val', tempdir(), round(as.numeric(now)))
-  if(!dir.exists(outdir_len)) dir.create(outdir_len)
-  if(!dir.exists(outdir_val)) dir.create(outdir_val)
+  outdir <- sprintf('%s/%s', tempdir(), round(as.numeric(now)))
+  if(!dir.exists(outdir)) dir.create(outdir)
   timespent <- Sys.time() - now
   if(!isTRUE(quiet)) {
-    message(sprintf('%.02f %s: Writing intermediate files to:\n  - %s\n  - %s',
+    message(sprintf('%.02f %s: Writing intermediate files to %s',
                     timespent, attr(timespent, 'unit'),
-                    outdir_len, outdir_val))
+                    outdir))
   }
   furrr::future_map(1:bs$n, function(i) {
-    v <- raster::getValues(x, row=bs$row[i], nrows=bs$nrows[i])
+    v <- terra::values(x, row=bs$row[i], nrows=bs$nrows[i])[, 1]
     v[is.na(v)] <- Inf
-    out <- rle(v)
-    cat(out$lengths, file=file.path(
-      outdir_len,
-      sprintf(sprintf('len_%%0%sd.txt', nchar(bs$n)), i)))
-    cat(out$values, file=file.path(
-      outdir_val,
-      sprintf(sprintf('val_%%0%sd.txt', nchar(bs$n)), i)))
-  }, .options =
-    furrr::furrr_options(globals=c('bs', 'x', 'outdir_len', 'outdir_val'))
+    out <- as.data.frame(unclass(rle(v)))
+    f <- sprintf(sprintf('%s/%%0%sd.txt', outdir, nchar(bs$n)), i)
+    readr::write_csv(out, f)
+    f
+  }, .options=furrr::furrr_options(globals=c('bs', 'x', 'outdir'))
   )
 
   timespent <- Sys.time() - now
@@ -57,16 +57,16 @@ rle_compress <- function(x, outfile, quiet=FALSE) {
     message(sprintf('%.02f %s: Combining RLE vectors from chunked output',
                     timespent, attr(timespent, 'unit')))
   }
-  len <- unlist(lapply(list.files(outdir_len, '^len_\\d+\\.txt$',
-                                  full.names=TRUE), scan, quiet=TRUE))
-  val <- unlist(lapply(list.files(outdir_val, '^val_\\d+\\.txt$',
-                                  full.names=TRUE), scan, quiet=TRUE))
-  val[is.infinite(val)] <- NA
-  starts <- c(1, cumsum(len)[-length(len)] + 1)
-  out <- list(starts=starts, lengths=len, values=val,
-              extent=raster::extent(x), res=raster::res(x),
-              crs=raster::crs(x))
-  class(out) <- 'raster_rle'
-  if(!missing(outfile)) saveRDS(out, outfile)
-  out
+  runs <- lapply(list.files(outdir, '^\\d+\\.txt$', full.names=TRUE),
+                 readr::read_csv, progress=!quiet, show_col_types=FALSE) %>%
+    dplyr::bind_rows() %>%
+    dplyr::mutate(values=ifelse(is.infinite(values), NA, values),
+                  starts=c(1, cumsum(lengths)[-nrow(.)] + 1))
+
+  attr(runs, 'extent') <- terra::ext(x)
+  attr(runs, 'res') <- terra::res(x)
+  attr(runs, 'crs') <- terra::crs(x)
+  class(runs) <- c('raster_rle', class(runs))
+  if(!missing(outfile)) saveRDS(runs, outfile)
+  runs
 }

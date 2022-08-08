@@ -2,31 +2,31 @@
 #'
 #' Create an empty or constant raster with specified attributes.
 #'
-#' @param x Optional. Raster* object or a file path to template raster. If this
-#'   is provided, `extent`, `res`, and `crs` will be taken from
-#'   this raster unless they are also passed to this function. If `x` is
-#'   not provided, then `extent` and `res` must be provided.
+#' @param x Optional. Raster* or [`SpatRaster`] object or a file path to
+#'   template raster. If this is provided, `extent`, `res`, and `crs` will be
+#'   taken from this raster unless they are also passed to this function. If `x`
+#'   is not provided, then `extent` and `res` must be provided.
 #' @param outfile Target raster file path. Directory will be created
 #'   (recursively) if it doesn't exist.
 #' @param extent Either a character path to a raster file, an
-#'   [Extent][raster::extent()] object (or an object from which such an extent
+#'   [SpatExtent][terra::ext()] object (or an object from which such an extent
 #'   can be extracted), or a numeric vector with four elements giving xmin,
 #'   xmax, ymin, ymax.
 #' @param res Numeric or integer vector giving the horizontal and vertical
-#'   spatial resolution of the target raster, in units of `crs`. If a
-#'   single value is given, it will be used for both horizontal and vertical
+#'   spatial resolution of the target raster, in units of `crs`. If a single
+#'   value is given, it will be used for both horizontal and vertical
 #'   resolution.
-#' @param crs Target coordinate reference system as a PROJ string (character)
-#'   or an object of class CRS. If missing and `x` is supplied, the crs
-#'   of `x` will be used.
+#' @param crs Target coordinate reference system as a PROJ string (character) or
+#'   an object of class CRS. If missing and `x` is supplied, the crs of `x` will
+#'   be used.
 #' @param init Numeric. A value assigned to all cells of the created raster.
 #' @param datatype Character. Data type for the created raster. See
-#'   [raster::dataType()].
+#'   [terra::writeraster()].
 #' @param overwrite Logical. Should `outfile` be overwritten if it exists?
-#' @param return_rast Logical. Should the resulting raster be returned?
+#' @param return_rast Logical. Should the resulting [`SpatRaster`] be returned?
 #' @return An empty raster is created at `outfile`, and the corresponding
-#'   `RasterLayer` is returned if `return_rast` is `TRUE`.
-#' @importFrom raster raster writeRaster extent crs
+#'   [`SpatRaster`] is returned if `return_rast` is `TRUE`.
+#' @importFrom tera rast writeRaster ext crs
 #' @importFrom methods is
 #' @export
 initialise_raster <- function(x, outfile, extent, res, crs, init=NA,
@@ -43,24 +43,24 @@ initialise_raster <- function(x, outfile, extent, res, crs, init=NA,
   }
 
   if(!missing(x)) {
-    template <- raster::raster(x)
-    if(missing(extent)) extent <- raster::extent(template)
-    if(missing(res)) res <- raster::res(template)
-    if(missing(crs)) crs <- raster::crs(template)
+    template <- terra::rast(x)
+    if(missing(extent)) extent <- terra::ext(template)
+    if(missing(res)) res <- terra::res(template)
+    if(missing(crs)) crs <- terra::crs(template)
   } else {
     if(missing(extent) || missing(res)) {
       stop('If x is not supplied, both extent and res must be supplied.')
     }
     if(missing(crs)) crs <- NA
     # extract extent from raster provided as file path
-    if(is.character(extent)) extent <- raster::extent(raster::raster(extent))
+    if(is.character(extent)) extent <- terra::ext(terra::rast(extent))
     # extract extent from object
-    if(!is(extent, 'Extent')) extent <- raster::extent(extent)
+    if(!is(extent, 'SpatExtent')) extent <- terra::ext(extent)
   }
   if(!dir.exists(dirname(outfile))) dir.create(dirname(outfile), recursive=TRUE)
-  r <- raster::raster(ext=extent, resolution=res, crs=crs, vals=init)
-  raster::writeRaster(r, outfile, datatype=datatype,
-                      overwrite=overwrite, options='COMPRESS=LZW')
+  r <- terra::rast(ext=extent, resolution=res, crs=crs, vals=init)
+  terra::writeRaster(r, outfile, datatype=datatype, overwrite=overwrite,
+                     options='COMPRESS=LZW')
 
   if(isTRUE(return_rast)) r else invisible(NULL)
 }

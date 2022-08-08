@@ -3,38 +3,36 @@
 #' Combine biotic (and abiotic) layers into a single suitability raster to be
 #' used to scale arrival rates.
 #'
-#' @param x One of: a `RasterStack`; a `RasterBrick`; a list of
-#'   `RasterLayer` objects, or a vector of file paths to raster files.
-#' @param outfile Character. Name of geotiff where output will be saved. If not
-#'   provided, raster object will be returned to R.
-#' @param return_rast Logical. Should the raster object be returned to R?
-#'   Ignored if `outfile` is not provided.
-#' @return If `outfile` is specified, the resulting raster is saved as a
-#'   geotiff to that path. If `return_rast` is `TRUE` or
-#'   `outfile` is not specified the resulting raster is returned, otherwise
-#'   `NULL` is returned invisibly.
-#' @importFrom raster stack setMinMax minValue maxValue writeRaster
+#' @param x One of: a [`SpatRaster`] object; a `RasterLayer`, a list of
+#'   [`SpatRaster`] objects, or a vector of file paths to raster files.
+#' @param outfile Character. Filename where output will be saved. If not
+#'   provided, [`SpatRaster`] object will be returned to R.
+#' @param return_rast Logical. Should the [`SpatRaster`] object be returned to
+#'   R? Ignored if `outfile` is not provided.
+#' @return If `outfile` is specified, the resulting [`SpatRaster`] object is
+#'   saved as to that path. If `return_rast` is `TRUE` or `outfile` is not
+#'   specified the resulting [`SpatRaster`] is returned, otherwise `NULL` is
+#'   returned invisibly.
+#' @importFrom terra rast setMinMax minmax writeRaster
+#' @importFrom methods is
 #' @export
 suitability <- function(x, outfile, return_rast = FALSE) {
 
-  if(is.list(x)) {
-    out <- raster::stack(x)
-  } else if(is.character(x)) {
-    out <- raster::stack(x)
+  out <- if(is.character(x) ||
+            is(x, 'RasterLayer') ||
+            is.list(x) && all(sapply(x, function(r) is(r, 'SpatRaster')))) {
+    terra::rast(x)
   } else {
-    out <- x
+    x
   }
-  out <- raster::setMinMax(out)
+  terra::setMinMax(out)
 
   # Check layers are all between zero and 1
-  if(min(raster::minValue(out)) < 0 || max(raster::maxValue(out)) > 1) {
+  if(min(terra::minmax(out)[1, ]) < 0 || max(terra::minmax(out)[2, ]) > 1) {
     stop("Not all layers are normalised to be within 0 and 1")
   }
 
-  if(class(out) %in% c("RasterStack", "RasterBrick") &&
-     raster::nlayers(out) > 1) {
-    out <- prod(out)
-  }
+  if(dim(out)[3] > 1) out <- prod(out)
 
   if(!missing(outfile)) {
     # Create directory if it does not exist
@@ -42,7 +40,7 @@ suitability <- function(x, outfile, return_rast = FALSE) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite = TRUE)
+    terra::writeRaster(out, outfile, overwrite = TRUE)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out

@@ -3,8 +3,8 @@
 #' Estimates pest arrivals due to Torres Strait air passengers coming into
 #' Cairns.
 #'
-#' @param pop_density A `RasterLayer` or file path to a raster file
-#'   containing population density.
+#' @param pop_density A [`SpatRaster`] or `RasterLayer` object, or a file path
+#'   to a raster file containing population density.
 #' @param airport_weight A `RasterLayer` or file path to a raster file
 #'   containing distance from Cairns airport weights.
 #' @param leakage_rate Numeric vector of 2 values, giving the lower and upper
@@ -15,19 +15,18 @@
 #'   establishment, for leakage events).
 #' @param outfile Character. Output raster file path. If `probability` has
 #'   length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
-#'   not provided, raster object will be returned to R.
-#' @param return_rast Logical. Should the raster object be returned to R?
-#'   Ignored if `outfile` is not provided.
-#' @param overwrite Logical. If `TRUE` and `outfile` is not missing,
-#'   it will be overwritten if the file specified by `outfile` already
-#'   exists.
-#' @return If `outfile` is specified, the resulting raster (multiband if
+#'   not provided, the [`SpatRaster`] object will be returned to R.
+#' @param return_rast Logical. Should the [`SpatRaster`] object be returned to
+#'   R? Ignored if `outfile` is not provided.
+#' @param overwrite Logical. Should `outfile` be overwritten if it exists?
+#'   Default is `FALSE`.
+#' @return If `outfile` is specified, the resulting [`SpatRaster`] (multiband if
 #'   `probability` has length > 1) is saved as a tiff at that path. If
-#'   `return_rast` is `TRUE` or `outfile` is not specified the
-#'   resulting raster object is returned, otherwise `NULL` is returned
-#'   invisibly.
+#'   `return_rast` is `TRUE` or `outfile` is not specified the resulting
+#'   [`SpatRaster`] object is returned, otherwise `NULL` is returned invisibly.
 #' @family functions estimating arrivals
-#' @importFrom raster raster writeRaster stack
+#' @importFrom terra rast writeRaster
+#' @importFrom methods is
 #' @export
 arrivals_by_torres <- function(pop_density, airport_weight, leakage_rate,
   establishment_rate, outfile, return_rast=FALSE, overwrite=FALSE) {
@@ -40,15 +39,17 @@ arrivals_by_torres <- function(pop_density, airport_weight, leakage_rate,
   }
 
   # Load rasters
-  if(is.character(pop_density)) {
-    pop_density <- raster::raster(pop_density)
-  } else if(!is(pop_density, 'RasterLayer')) {
-    stop('pop_density must be a RasterLayer or a file path to a raster file.')
+  if(is.character(pop_density) || is(pop_density, 'RasterLayer')) {
+    pop_density <- terra::rast(pop_density)
+  } else if(!is(pop_density, 'SpatRaster')) {
+    stop('pop_density must be a SpatRaster or RasterLayer object, ',
+         'or a file path to a raster file.')
   }
-  if(is.character(airport_weight)) {
-    airport_weight <- raster::raster(airport_weight)
-  } else if(!is(airport_weight, 'RasterLayer')) {
-    stop('airport_weight must be a RasterLayer or a file path to a raster file.')
+  if(is.character(airport_weight) || is(airport_weight, 'RasterLayer')) {
+    airport_weight <- terra::rast(airport_weight)
+  } else if(!is(airport_weight, 'SpatRaster')) {
+    stop('airport_weight must be a SpatRaster or RasterLayer object, ',
+         'or a file path to a raster file.')
   }
 
   # Multiply rasters
@@ -67,7 +68,7 @@ arrivals_by_torres <- function(pop_density, airport_weight, leakage_rate,
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite = overwrite)
+    terra::writeRaster(out, outfile, overwrite = overwrite)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out

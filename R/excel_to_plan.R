@@ -21,7 +21,7 @@
 #' @importFrom dplyr select rename mutate bind_rows filter
 #' @importFrom tidyr spread unnest
 #' @importFrom drake file_in file_out drake_plan
-#' @importFrom raster stack unstack writeRaster
+#' @importFrom terra rast as.list writeRaster
 #' @importFrom countrycode countrycode
 #' @importFrom magrittr '%>%'
 #' @export
@@ -239,10 +239,10 @@ excel_to_plan <- function(file) {
       agg_factor <- aggregated_res[1]/res[1]
       group_plan <- drake::drake_plan(
         establishment_likelihood = {
-          s <- raster::stack(drake::file_in(!!ff))
-          r <- Reduce(function(x, y) prod(x, y, na.rm=TRUE), raster::unstack(1 - s))
+          s <- terra::rast(drake::file_in(!!ff))
+          r <- Reduce(function(x, y) prod(x, y, na.rm=TRUE), terra::as.list(1 - s))
           if(!dir.exists(dirname(!!f_edmap))) dir.create(dirname(!!f_edmap))
-          raster::writeRaster(1 - r, drake::file_out(!!f_edmap), overwrite=TRUE)
+          terra::writeRaster(1 - r, drake::file_out(!!f_edmap), overwrite=TRUE)
         },
         establishment_likelihood_agg = aggregate_raster(
           rast = drake::file_in(!!f_edmap),

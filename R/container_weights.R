@@ -20,7 +20,8 @@
 #'   Ignored if `outfile` is not provided.
 #' @details For the purposes of this analysis missing data (i.e. NAs) will be
 #'   treated as zeroes.
-#' @return An `sf` object or shapefile export.
+#' @return An `sf` object if `return_sf` is `TRUE` if if `outfile` is missing;
+#'   `NULL` otherwise.
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom purrr set_names map_df
 #' @importFrom dplyr rename mutate group_by summarise ungroup left_join filter mutate_all across

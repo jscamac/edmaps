@@ -3,19 +3,20 @@
 #' Calculate the pathway-specific probability of pest arrival for each raster
 #' cell.
 #' @param EE `data.frame` object obtained from [calc_EE()].
-#' @param rast Raster object or character path to raster file containing
-#'   dispersal weights.
+#' @param rast RasterLayer object, single-layer SpatRaster object, or character
+#'   path to a single raster file containing dispersal weights.
 #' @param outfile Character. Output raster file path. If not provided, the
-#'   `RasterLayer` will be returned to R.
-#' @param return_rast Logical. Should the `RasterLayer` be returned to R?
-#'   Ignored if `outfile` is not provided.
-#' @return If `outfile` is specified, the resulting `RasterLayer` is
-#'   saved to `outfile`. If `return_rast` is `TRUE` or
-#'   `outfile` is not specified, the resulting `RasterLayer` is
-#'   returned, otherwise `NULL` is returned invisibly.
-#' @importFrom dplyr mutate row_number
-#' @importFrom raster as.data.frame raster writeRaster init
-#' @importFrom stats na.omit setNames
+#'   [`SpatRaster`] object will be returned to R.
+#' @param return_rast Logical. Should the [`SpatRaster`] object be returned to
+#'   R? Ignored if `outfile` is not provided.
+#' @return If `outfile` is specified, the resulting [`SpatRaster`] object is
+#'   saved to `outfile`. If `return_rast` is `TRUE` or `outfile` is not
+#'   specified, the resulting [`SpatRaster`] object is returned, otherwise
+#'   `NULL` is returned invisibly.
+#' @importFrom dplyr mutate
+#' @importFrom terra as.data.frame rast writeRaster init
+#' @importFrom methods is
+#' @importFrom stats setNames
 #' @export
 calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
 
@@ -23,15 +24,15 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
     stop('Probabilities passed to `EE` must be in the range 0-1.')
   }
 
-  if(is.character(rast)) {
-    rast <- raster::raster(rast)
-  } else if(!is(rast, 'RasterLayer')) {
-    stop('rast must be a RasterLayer or a file path to a raster file.')
+  if(is(rast, 'RasterLayer') || is.character(rast) && length(rast) == 1) {
+    rast <- terra::rast(rast)
+  } else if(!is(rast, 'SpatRaster') || dim(rast)[3] > 1) {
+    stop('rast must be a  must be a single-layer SpatRaster object, ',
+         'a RasterLayer object, or a single file path to a raster file.')
   }
 
-  d <- dplyr::mutate(stats::setNames(raster::as.data.frame(rast), 'value'),
-                     cell=dplyr::row_number()) %>%
-    stats::na.omit() %>%
+  d <- terra::as.data.frame(rast, cells=TRUE) %>%
+    stats::setNames(c('cell', 'value')) %>%
     dplyr::mutate(value = 1 - value, prob_absent=0)
   # ^ Transform to probability (given incursion) that pest does *not* arrive at
   # cell (i.e. arrives at some other cell)
@@ -48,7 +49,7 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
   d$prob_absent <- pmin(pmax(d$prob_absent, 0), 1)
 
   # Initialise raster and populate with probability of presence
-  out <- raster::init(rast, function(x) 0)
+  out <- terra::init(rast, fun=0)
   out[d$cell] <- ifelse(is.na(d$prob_absent), 0, 1 - d$prob_absent)
 
 
@@ -58,7 +59,7 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite = TRUE)
+    terra::writeRaster(out, outfile, overwrite = TRUE)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out

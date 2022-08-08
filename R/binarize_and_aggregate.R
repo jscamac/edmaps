@@ -8,26 +8,25 @@
 #'   to such an object saved as .rds.
 #' @param outfile Character. The target file path for the binarized raster.
 #' @param res output resolution as a numeric vector of 1 or 2 elements, or a
-#'   `Raster*` object from which resolution can be extracted. If not
-#'   provided, resolution will be taken from input. If `res` differs
-#'   from that of `infile`, new cells will be assigned value 1 if any
-#'   original cells belonging to `categories` have their centroids within
-#'   the new cell.
-#' @param extent Output extent as an `Extent` object or an object from
-#'   which an Extent object can be extracted. If not provided, extent will be
-#'   taken from input. If `extent` differs from that of `infile`,
-#'   new cells will be assigned value 1 if any original cells belonging to
+#'   [`SpatRaster`] or `Raster*` object from which resolution can be extracted.
+#'   If not provided, resolution will be taken from input. If `res` differs from
+#'   that of `infile`, new cells will be assigned value 1 if any original cells
+#'   belonging to `categories` have their centroids within the new cell.
+#' @param extent Output extent as a [`SpatExtent`] object or an object from
+#'   which a [`SpatExtent`] object can be extracted. If not provided, extent
+#'   will be taken from input. If `extent` differs from that of `infile`, new
+#'   cells will be assigned value 1 if any original cells belonging to
 #'   `categories` have their centroids within the new cell.
 #' @param categories Integer or numeric vector of class values to be laballed as
 #'   1 in the target raster.
 #' @param overwrite Logical. Should `outfile` be overwritten if it exists?
-#' @param return_rast Logical. Should the target raster be returned to R as a
-#'   `Raster` layer (`TRUE`) or not returned (`FALSE`)?
+#' @param return_rast Logical. Should the target [`SpatRaster`] be returned to R
+#' (`TRUE`), or not returned (`FALSE`)?
 #' @param quiet Logical. Should progress messages be suppressed?
 #' @return A binarized raster layer is written to `outfile`, and if
 #'   `return_rast` is `TRUE`, the raster is additionally returned to R
-#'   as a `Raster` layer.
-#' @importFrom raster extension extent res raster xyFromCell cellFromXY writeRaster
+#'   as a [`SpatRaster`] layer.
+#' @importFrom terra ext res rast xyFromCell cellFromXY writeRaster
 #' @importFrom methods is
 #' @export
 binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories,
@@ -57,7 +56,7 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
   # if rle is not provided, create raster_rle from infile
   if(missing(rle)) {
     rle <- rle_compress(infile, file.path(
-      dirname(infile), raster::extension(basename(infile), 'rds')),
+      dirname(infile), paste0(basename(infile), '.rds')),
       quiet=quiet)
   } else if(is.character(rle)) {
     if(!isTRUE(quiet))
@@ -71,13 +70,13 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
          ' saved as .rds')
 
 
-  extent <- if(!missing(extent)) raster::extent(extent) else rle$extent
-  if(missing(res)) res <- rle$res
+  extent <- if(!missing(extent)) terra::ext(extent) else attr(rle, 'extent')
+  if(missing(res)) res <- attr(rle, 'res')
   if(is.numeric(res)) {
     if(length(res) == 1) res <- c(res, res)
     if(length(res) > 2) stop('Supplied res invalid.')
-  } else if(is(res, 'Raster')) {
-    res <- raster::res(res)
+  } else if(is(res, 'Raster') || is(res, 'SpatRaster')) {
+    res <- terra::res(res)
   }
 
   # Process RLE data
@@ -87,9 +86,9 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
                     timespent, attr(timespent, 'unit')))
   }
   i <- which(rle$values %in% categories)
-  r0 <- raster::raster(rle$extent, res=rle$res, crs=rle$crs)
-  #r1 <- raster::raster(outfile)
-  r1 <- raster::raster(extent, res=res, crs=rle$crs, vals=0)
+  r0 <- terra::rast(attr(rle, 'extent'), res=attr(rle, 'res'),
+                    crs=attr(rle, 'crs'))
+  r1 <- terra::rast(extent, res=res, crs=attr(rle, 'crs'), vals=0)
   x2 <- cumsum(rle$lengths[i])
   timespent <- Sys.time() - now
   if(!isTRUE(quiet)) {
@@ -110,8 +109,8 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
     z <- unlist(mapply(
       seq.int, rle$starts[x3[[j]]], length.out=rle$lengths[x3[[j]]],
       SIMPLIFY=FALSE))
-    xy0 <- raster::xyFromCell(r0, z)
-    cell1 <- as.integer(setdiff(raster::cellFromXY(r1, xy0), NA))
+    xy0 <- terra::xyFromCell(r0, z)
+    cell1 <- as.integer(setdiff(terra::cellFromXY(r1, xy0), NA))
     cell1
   })))
   cat('\n')
@@ -130,8 +129,8 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
   r1[r1==0] <- NA
   # ^ initialising with 0 above and then reassigning NA avoids warnings about
   #   min/max Inf.
-  raster::writeRaster(r1, outfile, datatype='INT2U', overwrite=overwrite)
+  terra::writeRaster(r1, outfile, datatype='INT2U', overwrite=overwrite)
 
   if(isTRUE(return_rast) || missing(outfile))
-    raster::raster(outfile) else invisible(NULL)
+    terra::raster(outfile) else invisible(NULL)
 }

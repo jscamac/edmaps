@@ -25,45 +25,41 @@
 #'   `"min"`, `"med"`, `"q1"`, `"q3"`. See Details.
 #'   Default is `"near"`.
 #' @param tgt_extent Numeric vector containing corner coordinates specified as
-#'   `c(xmin, ymin, xmax, ymax)`. Must be specified in the units of
-#'   `tgt_proj`.
-#' @param buffer Numeric. Add buffer (specified in units of `tgt_proj`).
-#'   Useful for adding buffers around coasts, and for filling in small gaps
-#'   within raster specified by `infile`.
+#'   `c(xmin, ymin, xmax, ymax)`. Must be specified in the units of `tgt_proj`.
+#' @param buffer Numeric. Add buffer (specified in units of `tgt_proj`). Useful
+#'   for adding buffers around coasts, and for filling in small gaps within
+#'   raster specified by `infile`.
 #' @param src_nodata Integer. The nodata value for an input file.
 #' @param datatype A character string indicating the output data type. See the
-#'   [gdalwarp docs](https://gdal.org/programs/gdalwarp.html)
-#'   for more information.
-#' @param return_rast Logical. Return `RaserLayer` to R?
+#'   [gdalwarp docs](https://gdal.org/programs/gdalwarp.html) for more
+#'   information.
+#' @param return_rast Logical. Return [`SpatRaster`] to R?
 #' @param overwrite Logical. Should `outfile` be overwritten if it already
 #'   exists?
 #' @return_rast A raster file is produced on disk. Additionally, if
-#'   `return_rast` is `TRUE` a `RasterLayer` object is returned
-#'   to R.
+#'   `return_rast` is `TRUE` a [`SpatRaster`] object is returned to R.
 #' @details The resampling methods available are as follows:
-#' \itemize{
-#' \item{near: nearest neighbour resampling (default, fastest algorithm, worst
-#' interpolation quality).}
-#' \item{bilinear: bilinear resampling.}
-#' \item{cubic: cubic resampling.}
-#' \item{cubicspline: cubic spline resampling.}
-#' \item{lanczos: Lanczos windowed sinc resampling.}
-#' \item{average: average resampling, computes the average of all non-NODATA
-#' contributing pixels. (GDAL >= 1.10.0).}
-#' \item{mode: mode resampling, selects the value which appears most often of
-#' all the sampled points. (GDAL >= 1.10.0).}
-#' \item{max: maximum resampling, selects the maximum value from all non-NODATA
-#' contributing pixels. (GDAL >= 2.0.0).}
-#' \item{min: minimum resampling, selects the minimum value from all non-NODATA
-#' contributing pixels. (GDAL >= 2.0.0).}
-#' \item{med: median resampling, selects the median value of all non-NODATA
-#' contributing pixels. (GDAL >= 2.0.0).}
-#' \item{q1: first quartile resampling, selects the first quartile value of all
-#' non-NODATA contributing pixels. (GDAL >= 2.0.0).}
-#' \item{q3: third quartile resampling, selects the third quartile value of all
-#' non-NODATA contributing pixels. (GDAL >= 2.0.0).}
-#' }
-#' @importFrom raster raster res
+#' * near: nearest neighbour resampling (default, fastest algorithm, worst
+#' interpolation quality).
+#' * bilinear: bilinear resampling.
+#' * cubic: cubic resampling.
+#' * cubicspline: cubic spline resampling.
+#' * lanczos: Lanczos windowed sinc resampling.
+#' * average: average resampling, computes the average of all non-NODATA
+#'   contributing pixels. (GDAL >= 1.10.0).
+#' * mode: mode resampling, selects the value which appears most often of
+#'   all the sampled points. (GDAL >= 1.10.0).
+#' * max: maximum resampling, selects the maximum value from all non-NODATA
+#'   contributing pixels. (GDAL >= 2.0.0).
+#' * min: minimum resampling, selects the minimum value from all non-NODATA
+#'   contributing pixels. (GDAL >= 2.0.0).
+#' * med: median resampling, selects the median value of all non-NODATA
+#'   contributing pixels. (GDAL >= 2.0.0).
+#' * q1: first quartile resampling, selects the first quartile value of all
+#'   non-NODATA contributing pixels. (GDAL >= 2.0.0).
+#' * q3: third quartile resampling, selects the third quartile value of all
+#'   non-NODATA contributing pixels. (GDAL >= 2.0.0).
+#' @importFrom terra rast res focalMat
 #' @importFrom gdalUtilities gdalwarp
 #' @export
 gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
@@ -88,7 +84,7 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
 
   # if scalar passed to res, replicate to length 2
   if(!missing(res) && length(res)==1) res <- c(res, res)
-  if(missing(res)) res <- raster::res(raster::raster(infile))
+  if(missing(res)) res <- terra::res(terra::rast(infile))
 
   # ensure buffer is numeric if provided
   if(!missing(buffer) && !is.numeric(buffer))
@@ -117,12 +113,12 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
 
   if(!missing(buffer)) {
     if(buffer > 0) {
-      r <- raster::raster(outfile)
-      w <- raster::focalWeight(r, buffer, type='circle')
+      r <- terra::rast(outfile)
+      w <- terra::focalMat(r, buffer, type='circle')
       fill_na(r, median, w, outfile, overwrite=TRUE)
     }
   }
 
-  if(isTRUE(return_rast)) raster::raster(outfile) else invisible(NULL)
+  if(isTRUE(return_rast)) terra::rast(outfile) else invisible(NULL)
 
 }
