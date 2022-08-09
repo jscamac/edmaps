@@ -78,7 +78,7 @@ get_airport_dist <- function(vector_data, outfile, template_raster, extent,
   gdalUtilities::gdal_rasterize(vector_data, f, burn=1, sql=condition)
 
   # Calculate distance to nearest airport and overwrite outfile
-  out <- terra::distance(terra::rast(f), doEdge=TRUE)/1000
+  out <- terra::distance(terra::rast(f))/1000
   out <- terra::mask(out, template_raster)
   terra::writeRaster(out, filename=outfile, overwrite=overwrite)
 
