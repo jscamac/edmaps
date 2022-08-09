@@ -2,10 +2,11 @@
 #'
 #' Produce an interactive html map.
 #'
-#' @param ras A `RasterLayer` or file path to a raster file.
+#' @param ras A `RasterLayer`, single-layer [`SpatRaster`], or file path to a
+#'   raster file.
 #' @param layer_name Character. An optional name to assign to `ras`.
-#' @param palette Either a vector of 2 or more colours (e.g. as hex codes or
-#'   colour names) or the name of a palette function supported by `tmap`
+#' @param palette A vector of 2 or more colours (e.g. as hex codes or
+#'   colour names), or the name of a palette function supported by `tmap`
 #'   (see [tmaptools::palette_explorer()] and [tmap::tm_raster()]).
 #' @param transparency Numeric. Value between 0 and 1 defining the opacity of
 #'   the plotted raster data (1 = fully opaque; 0 = fully transparent).
@@ -13,31 +14,29 @@
 #' @param set_value_range A numeric vector giving upper and lower limits for
 #'   raster values. Values outside this range (including the limits) will be
 #'   set to NA.
-#' @param discrete Logical. Are the values of `ras` discrete
-#'   (categorical)?
+#' @param discrete Logical. Are the values of `ras` discrete (categorical)?
 #' @param scale_type Character. Can be one of: `"none"` (raw data, no
-#'   rescaling), `"log10"`, `"max normalize"` (proportional to
-#'   maximum value), `"minmax normalize"` (rescale values to be between 0
-#'   and 1 based on min and max) or `"logit"`. Note that if
-#'   `"log10"` or `"logit"` is used, 0 or 1 values must be masked (
-#'   using `set_value_range`) or rescaled before passing to this
-#'   function. `scale_type` is ignored if `discrete` is `TRUE`.
-#' @param outfile Character. If `NULL`, map will be returned to R and not
-#'   saved. Otherwise, map will be exported as a html file. Full path address
-#'   must be used. If pandoc is available, a standalone html file is created
-#'   (see details).
-#' @param surveillance_locs A spatial object or a path to a .csv file
-#'   containing columns named "Latitude" and "Longitude".
+#'   rescaling), `"log10"`, `"max normalize"` (proportional to maximum value),
+#'   `"minmax normalize"` (rescale values to be between 0 and 1 based on min and
+#'   max) or `"logit"`. Note that if `"log10"` or `"logit"` is used, 0 or 1
+#'   values must be masked ( using `set_value_range`) or rescaled before passing
+#'   to this function. `scale_type` is ignored if `discrete` is `TRUE`.
+#' @param outfile Character. If `NULL`, map will be returned to R and not saved.
+#'   Otherwise, map will be exported as a html file. Full path address must be
+#'   used. If pandoc is available, a standalone html file is created (see
+#'   details).
+#' @param surveillance_locs A spatial object or a path to a .csv file containing
+#'   columns named "Latitude" and "Longitude".
 #' @param pt_col Character. The plotting colour for surveillance points.
 #' @param cleanup Logical. If a standalone html file is created, should
 #'   accessory files be removed after the standalone file is generated? This
 #'   will be a folder created within `tempdir()`.
 #' @return A html map.
 #' @details To create a standalone html file, the
-#'   [pandoc](https://pandoc.org/installing.html) software must be
-#'   installed and available to R. If pandoc is unavailable, the html file
-#'   will be accompanied by a folder of accessory files.
-#' @importFrom raster extent getValues maxValue minValue ncell projection projectRaster raster setMinMax setValues writeRaster
+#'   [pandoc](https://pandoc.org/installing.html) software must be installed and
+#'   available to R. If pandoc is unavailable, the html file will be accompanied
+#'   by a folder of accessory files.
+#' @importFrom terra ext values minmax ncell crs project rast setMinMax setValues writeRaster
 #' @importFrom gdalUtilities gdalwarp
 #' @importFrom methods is slot "slot<-"
 #' @importFrom utils read.csv
@@ -71,40 +70,42 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   }
 
   # Must be a path to a raster file, or a RasterLayer
-  if(is.character(ras)) ras <- raster::raster(ras)
-  ras <- raster::setMinMax(ras)
+  if(is.character(ras) || is(ras, 'RasterLayer')) {
+    ras <- terra::rast(ras)
+  } else if(!is(ras, 'SpatRaster') || dim(ras)[3] > 1) {
+    stop('ras must be a single-layer SpatRaster, RasterLayer, or path to a ',
+         'raster file.')
+  }
+  terra::setMinMax(ras)
 
 
   # If projection is missing, assume WGS84
-  if(is.na(raster::projection(ras))) {
+  if(terra::crs(ras) == '') {
     warning('ras assumed to have WGS84 coordinate system (EPSG:4326)')
-    raster::projection(ras) <- '+init=epsg:4326'
+    terra::crs(ras) <- '+init=epsg:4326'
   }
 
   # if palette has length = 1, it must be a supported palette name.
   if(length(palette) == 1) palette <-
     match.arg(palette, rownames(tmaptools::tmap.pal.info))
 
-
   # Restrict Raster value range?
   if(!is.null(set_value_range)) {
     ras[ras <= min(set_value_range) | ras >= max(set_value_range)] <- NA
   }
 
-  minval <- raster::minValue(ras)
+  rng <- terra::minmax(ras)
 
-  if(!is.na(minval)) {
-
-    maxval <- raster::maxValue(ras)
+  if(!is.na(rng[1])) {
 
     # if the raster contains non-zero values...
     if(!isTRUE(discrete)) {
       # Convert to log10 scale
       if(scale_type == "log10") {
-        if(minval <= 0) {
+        if(rng[1] <= 0) {
           stop('Cannot log transform raster containing zero or negative values.')
         } else {
-          ras <- raster::setValues(ras, log10(raster::getValues(ras)))
+          ras <- terra::setValues(ras, log10(terra::values(ras)))
         }
       }
 
@@ -119,21 +120,21 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
 
       # Convert to logit scale
       if(scale_type == "logit") {
-        if(minval <= 0 | maxval >= 1) {
+        if(rng[1] <= 0 || rng[2] >= 1) {
           stop('Cannot logit transform raster containing values less than or',
                ' equal to 0 or values greater than or equal to 1.')
         } else {
-          ras <- raster::setValues(ras, stats::qlogis(raster::getValues(ras)))
+          ras <- terra::setValues(ras, stats::qlogis(terra::values(ras)))
         }
       }
 
       # Convert to percent scale
       if(scale_type == "percent") {
-        if(minval < 0 | maxval > 1) {
+        if(rng[1] < 0 || rng[2] > 1) {
           stop('Cannot convert to percentage raster because there are values',
                ' less than 0 or values greater 1.')
         } else {
-          ras <- raster::setValues(ras, raster::getValues(ras)*100)
+          ras <- terra::setValues(ras, terra::values(ras)*100)
         }
       }
     }
@@ -176,8 +177,8 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
 
   # Initialise interactive map
   opts <- tmap::tmap_options(
-    max.raster=c(plot=raster::ncell(ras),
-                 view=raster::ncell(ras)),
+    max.raster=c(plot=terra::ncell(ras),
+                 view=terra::ncell(ras)),
     basemaps = c(OpenStreetMap="OpenStreetMap", Canvas = "Esri.WorldGrayCanvas",
                  Topo="Esri.WorldTopoMap", Imagery = "Esri.WorldImagery"),
     overlays = c(Labels = paste0(
@@ -190,22 +191,20 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     suppressMessages(tmap::tmap_mode(tmode))
   })
 
-  if(is.na(minval)) {
+  if(is.na(rng[1])) {
     # If raster is entirely NA, tmap throws an error if palette is specified.
     # Can't just `return` early, since file_out needs to be fulfilled.
     # Workaround is to set a colour, but set transparency to a small number.
-    ras <- raster::projectRaster(raster::raster(ras), crs = "+init=epsg:3857",
-                                 method = "ngb")
+    ras <- terra::project(terra::rast(ras), y="+init=epsg:3857", method="near")
     m <- tmap::tm_shape(ras, name=layer_name) +
-      tmap::tm_raster(col='white', style='cat', title=layer_name,
-                      alpha=0.01)
+      tmap::tm_raster(col='white', style='cat', title=layer_name, alpha=0.01)
   } else if(isTRUE(discrete)) {
-    ras <- raster::projectRaster(ras, crs = "+init=epsg:3857", method = "ngb")
+    ras <- terra::project(ras, y="+init=epsg:3857", method="near")
     m <- tmap::tm_shape(ras, name=layer_name) +
       tmap::tm_raster(palette=palette, style='cat', title=layer_name,
                       alpha=transparency)
   } else {
-    raster::writeRaster(ras, f <- tempfile(fileext='.tif'))
+    terra::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'),
                             t_srs = "+init=epsg:3857", r = "bilinear")
     ras <- stars::read_stars(f2)
@@ -231,7 +230,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
       sf::st_as_sf(surveillance_locs, coords = c("Longitude","Latitude"),
                    crs = 4326) %>%
         sf::st_transform(crs = sf::st_crs(ras)) %>%
-        sf::st_crop(y = raster::extent(ras))
+        sf::st_crop(y = terra::ext(ras))
     )
 
     pts <- tmap::tm_shape(locs) +
@@ -244,7 +243,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
   l <- (m + tmap::tm_scale_bar()) %>%
     tmap::tmap_leaflet()
 
-  if(!is.na(minval)) {
+  if(!is.na(rng[1])) {
     out <- l %>%
       flip_legend %>%
       leaflet::addMiniMap(position='bottomleft', toggleDisplay=TRUE) %>%

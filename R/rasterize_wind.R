@@ -22,6 +22,7 @@
 #' @importFrom stplanr rnet_get_nodes
 #' @importFrom utils tail
 #' @importFrom magrittr '%>%'
+#' @importFrom methods is
 #' @export
 rasterize_wind <- function(data, wind_column, template, width, outfile) {
 

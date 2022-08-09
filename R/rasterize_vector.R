@@ -5,24 +5,22 @@
 #' @param vector_data Character. File path to vector spatial data.
 #' @param outfile Raster output file path. Parent directory will be created
 #'   recursively if required.
-#' @param template_raster Optional. `Raster*` object or a file path to
-#'   template raster. If this is provided, `extent`, `res`, and
-#'   `crs` will be taken from this raster unless they are also passed to
-#'   this function. If `x` is not provided, then `extent` and
-#'   `res` must be provided.
+#' @param template_raster Optional. `Raster*`, [`SpatRaster`], or a file path to
+#'   template raster. If this is provided, `extent`, `res`, and `crs` will be
+#'   taken from this raster unless they are also passed to this function. If `x`
+#'   is not provided, then `extent` and `res` must be provided.
 #' @param extent Either a character path to a raster file, an
-#'   [Extent][raster::extent()] object (or an object from which such
-#'   an extent can be extracted), or a numeric vector with four elements
-#'   giving xmin, xmax, ymin, ymax.
+#'   [SpatExtent][terra::SpatExtent] object (or an object from which such an
+#'   extent can be extracted), or a numeric vector with four elements giving
+#'   xmin, xmax, ymin, ymax.
 #' @param res Numeric or integer vector giving the horizontal and vertical
-#'   spatial resolution of the target raster, in units of `crs`. If a
-#'   single value is given, it will be used for both horizontal and vertical
+#'   spatial resolution of the target raster, in units of `crs`. If a single
+#'   value is given, it will be used for both horizontal and vertical
 #'   resolution.
-#' @param crs Target coordinate reference system as a PROJ string (character)
-#'   an object of class CRS. If missing and `template_raster` is
-#'   supplied, the crs of `template_raster` will be used. If
-#'   `template_raster` is also not supplied, the CRS of
-#'   `vector_data` will be used.
+#' @param crs Target coordinate reference system as a PROJ string (character) an
+#'   object of class CRS. If missing and `template_raster` is supplied, the crs
+#'   of `template_raster` will be used. If `template_raster` is also not
+#'   supplied, the CRS of `vector_data` will be used.
 #' @param field Character. Name of attribute to be burned into raster.
 #' @param burn_value Numeric. A constant value to burn into raster.
 #' @param datatype Character. Output data type (see
@@ -30,9 +28,9 @@
 #'   documentation).
 #' @param overwrite Logical. Should outfile be overwritten if it exists?
 #' @param return_rast Logical. Return object to R?
-#' @return A binarized raster is written to `outfile`, and returned to R
-#'   as a `RasterLayer` if `return_rast` is `TRUE`.
-#' @importFrom raster raster extent crs res
+#' @return A binarized raster is written to `outfile`, and returned to R as a
+#'   [`SpatRaster`] if `return_rast` is `TRUE`.
+#' @importFrom terra rast ext crs res SpatExtent
 #' @importFrom gdalUtilities gdal_rasterize
 #' @importFrom methods is
 #' @export
@@ -56,19 +54,19 @@ rasterize_vector <- function(vector_data, outfile, template_raster, extent,
   if(missing(outfile)) outfile <- tempfile(fileext = '.tif')
 
   if(!missing(template_raster)) {
-    template <- raster::raster(template_raster)
-    if(missing(extent)) extent <- raster::extent(template)
-    if(missing(res)) res <- raster::res(template)
-    if(missing(crs)) crs <- raster::crs(template)
+    template <- terra::rast(template_raster)
+    if(missing(extent)) extent <- terra::ext(template)
+    if(missing(res)) res <- terra::res(template)
+    if(missing(crs)) crs <- terra::crs(template)
   } else {
     if(missing(extent) || missing(res)) {
       stop('If x is not supplied, both extent and res must be supplied.')
     }
     if(missing(crs)) crs <- NA
     # extract extent from raster provided as file path
-    if(is.character(extent)) extent <- raster::extent(raster::raster(extent))
+    if(is.character(extent)) extent <- terra::ext(terra::rast(extent))
     # extract extent from object
-    if(!is(extent, 'Extent')) extent <- raster::extent(extent)
+    if(!is(extent, 'SpatExtent')) extent <- terra::ext(extent)
   }
 
   if(length(res) == 1) res <- c(res, res)
@@ -85,5 +83,5 @@ rasterize_vector <- function(vector_data, outfile, template_raster, extent,
                burn=if(!missing(burn_value)) burn_value else NULL)
   do.call(gdalUtilities::gdal_rasterize, args[!sapply(args, is.null)])
 
-  if(isTRUE(return_rast)) raster::raster(outfile) else invisible(NULL)
+  if(isTRUE(return_rast)) terra::rast(outfile) else invisible(NULL)
 }

@@ -2,36 +2,52 @@
 #'
 #' Extract number of cells required to meet threshold proportion of risk.
 #'
-#' @param risk_rasters Character. File path(s) to rasters to be loaded.
-#' @param names Character. Names corresponding to `infiles`.
+#' @param risk_rasters `Raster*`, [`SpatRaster`], or character vector of one or
+#'   more pathers to raster files.
+#' @param names Character. Optional names corresponding to `risk_rasters`. If
+#'   not provided, layer names are used.
 #' @param proportion_captured Numeric vector. Proportion(s) of risk to be
 #'   captured.
-#' @return A `data.frame` containing the number of cells to be trapped to
-#'   capture given proportion(s) of total risk across multiple input files.
-#' @importFrom raster raster getValues cellStats
-#' @importFrom dplyr bind_cols bind_rows
+#' @return A `tibble` containing the number of cells requiring surveillance in
+#'   order to capture the proportion(s) of total risk given by
+#'   `proportion_captured`.
+#' @importFrom terra rast values global
 #' @importFrom tidyr spread
 #' @export
-ncells_4_threshold <- function(risk_rasters, names,
+ncells_4_threshold <- function(risk_rasters, layer_names,
   proportion_captured = c(0.6, 0.8, 0.9, 0.95)) {
 
-  extract_ncells <- function(infile, proportion_captured) {
-
-    raster <- raster::raster(infile)
-    vals <- raster::getValues(raster)
-    total <- raster::cellStats(raster, sum)
-
-    risk_captured <- cumsum(sort(vals, decreasing=TRUE))
-    cells <- sapply(proportion_captured, function(x) {
-      min(which(round(risk_captured/total, 2) == x))
-    })
-    data.frame(Proportion = proportion_captured, n_cells = cells)
+  if(is.character(risk_rasters) || is(risk_rasters, 'Raster')) {
+    risk_rasters <- terra::rast(risk_rasters)
+  } else if(!is(risk_rasters, 'SpatRaster')) {
+    stop('risk_rasters must be a Raster*, SpatRaster, or character vector ',
+         'of raster file paths.', call.=FALSE)
   }
 
-  dat <- lapply(seq_along(risk_rasters), function(x) {
-    dplyr::bind_cols(data.frame(
-      Map = rep(names[x], length(proportion_captured)), stringsAsFactors=FALSE),
-      extract_ncells(risk_rasters[x], proportion_captured))
+  if(missing(layer_names)) {
+    layer_names <- names(rast)
+  } else if(length(layer_names) != dim(rast)[3]) {
+    stop('length of `names` not equal to the number of raster layers.',
+         call.=FALSE)
+  }
+  if(any(duplicated(layer_names))) stop('names must be unique.', call.=FALSE)
+
+  vals <- terra::values(rast, dataframe=TRUE)
+  total <- terra::global(rast, sum)$sum
+
+  propn <- mapply(function(v, tot) {
+    cumsum(sort(v, decreasing=TRUE))/tot
+  }, vals, total, SIMPLIFY=FALSE)
+
+  cells <- lapply(propn, function(x) {
+    sapply(proportion_captured, function(p) {
+      if(p==0) 0 else which(x >= p)[1]
+    })
   })
-  tidyr::spread(dplyr::bind_rows(dat), Proportion, n_cells)
+
+  dat <- data.frame(Map=rep(layer_names, each=length(proportion_captured)),
+                    Proportion=rep(proportion_captured, length(layer_names)),
+                    n_cells=unlist(cells))
+
+  tidyr::spread(dat, Proportion, n_cells)
 }

@@ -149,7 +149,7 @@
 #'   guide the user with respect to expected/allowable data.
 #' @seealso [excel_to_plan()]
 #' @importFrom glue glue
-#' @importFrom raster extent raster res compareCRS
+#' @importFrom terra ext rast res compareGeom
 #' @importFrom sp CRS
 #' @importFrom drake code_to_plan
 #' @export
@@ -221,16 +221,17 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   }
 
   if(!missing(climate_suitability_path)) {
-    r <- raster::raster(climate_suitability_path)
-    if(any(as.vector(raster::extent(r)) != extent)) {
+    r <- terra::rast(climate_suitability_path)
+    if(any(as.vector(terra::ext(r)) != extent)) {
       stop(species, ': exent of climate suitability raster must be',
            paste0(c("xmin: ", "xmax: ", "ymin: ", "ymax: "),
                   extent, collapse=", "))
     }
-    if(!identical(raster::res(r), c(1000, 1000)))
+    if(!identical(terra::res(r), c(1000, 1000)))
       stop(species, ": resolution of climate_suitability raster must be ",
            "1000 x 1000 m.")
-    if(!raster::compareCRS(r, sp::CRS("+init=epsg:3577")))
+    if(!terra::compareGeom(r, sp::CRS("+init=epsg:3577"), ext=FALSE,
+                           rowcol=FALSE))
       stop(species, ": resolution of climate_suitability raster must be ",
            "Australian Albers (EPSG:3577).")
     rm(r)
@@ -301,12 +302,12 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
       }
 
       binarise_user_host_rast <- {
-        r <- raster::raster(
+        r <- terra::rast(
           drake::file_in(
             "outputs/<<species>>/auxiliary/<<species>>_userHost_raster_<<res[1]>>.tif"
           )
         ) > 0
-        raster::writeRaster(
+        terra::writeRaster(
           r,
           drake::file_out(
             "outputs/<<species>>/auxiliary/<<species>>_userHostBinary_raster_<<res[1]>>.tif"
@@ -325,24 +326,24 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   host_text <- if(length(host_files) == 0) {
     ''
   } else if(length(host_files) == 1) {
-    sprintf('r <- raster::raster(%s)', host_files)
+    sprintf('r <- terra::rast(%s)', host_files)
   } else {
-    sprintf('r <- sum(raster::stack(%s), na.rm=TRUE) > 0',
+    sprintf('r <- sum(terra::rast(%s), na.rm=TRUE) > 0',
             paste(host_files, collapse=',\n    '))
   }
 
   nvis_text <- if(!missing(nvis_classes)) {
     if(length(host_files) > 0) {
-      sprintf('r <- suitability(list(r, raster::raster(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))))', species, res[1])
+      sprintf('r <- suitability(list(r, terra::rast(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))))', species, res[1])
     } else {
-      sprintf('r <- raster::raster(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))', species, res[1])
+      sprintf('r <- terra::rast(drake::file_in("outputs/%1$s/auxiliary/%1$s_nvis_raster_%2$s.tif"))', species, res[1])
     }
   } else ''
 
   cat(sprintf('combined_host <- {
   %1$s
   %2$s
-  raster::writeRaster(r,
+  terra::writeRaster(r,
     drake::file_out("outputs/%3$s/auxiliary/%3$s_host_raster_%4$s.tif"),
     datatype="INT2S", overwrite = %5$s
         )

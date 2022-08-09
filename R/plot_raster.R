@@ -2,29 +2,29 @@
 #'
 #' Plot a raster.
 #'
-#' @param object A `RasterLayer` or file path to raster file.
+#' @param rast A `RasterLayer`, single-layer [`SpatRaster`] or file path to
+#'   raster file.
 #' @param legend_title Character. If missing, the name of the raster layer will
 #'   be used.
-#' @param occurrence_data A `data.frame`, `sf` object,
-#'   `SpatialPointsDataFrame` object, or path to a .csv file containing
-#'   columns named "Latitude" and "Longitude". If `NULL`, no points will
-#'   be plotted.
+#' @param occurrence_data A `data.frame`, `sf` object, `SpatialPointsDataFrame`
+#'   object, or path to a .csv file containing columns named "Latitude" and
+#'   "Longitude". If `NULL`, no points will be plotted.
 #' @param pt_col Character. Colour of points (if plotted).
 #' @param height Height of plot in inches (will be rendered at 300 dpi).
 #'   Required if `outfile` is provided.
 #' @param compass Logical. Should a North arrow be shown?
 #' @param outfile Character. Path to save output.
-#' @return A `tmap` object. If `outfile` is provided, a map will also
-#'   be written to that file.
-#' @importFrom raster raster projection
+#' @return A `tmap` object. If `outfile` is provided, a map will also be written
+#'   to that file.
+#' @importFrom terra rast crs setMinMax minmax
 #' @importFrom rnaturalearth ne_countries
-#' @importFrom sf st_transform st_crop st_as_sf st_buffer sf_use_s2
-#' @importFrom tmap tm_shape tm_raster tm_polygons tm_dots tm_compass tm_layout tmap_save
+#' @importFrom sf st_transform st_crop st_as_sf st_buffer sf_use_s2 st_bbox
+#' @importFrom tmap tm_shape tm_raster tm_polygons tm_dots tm_compass tm_layout tmap_save tm_grid
 #' @importFrom utils read.csv
 #' @importFrom dplyr rename_all
+#' @importFrom methods is
 #' @export
-
-plot_raster <- function(object, legend_title, occurrence_data = NULL,
+plot_raster <- function(rast, legend_title, occurrence_data = NULL,
                         pt_col ="red", height, compass = FALSE, outfile) {
 
   o <- sf::sf_use_s2(FALSE)
@@ -34,25 +34,27 @@ plot_raster <- function(object, legend_title, occurrence_data = NULL,
     stop('If outfile is provided, height must be specified.')
   }
 
-  if(is.character(object)) {
-    ras <- raster::raster(object)
-  } else {
-    ras <- object
+  if(is.character(rast) || is(rast, 'RasterLayer')) {
+    rast <- terra::rast(rast)
+  } else if(!is(rast, 'SpatRaster') || dim(rast)[3] > 1) {
+    stop('rast must be a RasterLayer, single-layer SpatRaster, ',
+         'or a single path to a raster file.', call.=FALSE)
   }
+  terra::setMinMax(rast)
 
   if(missing(legend_title)) {
-    legend_title <- names(ras)
+    legend_title <- names(rast)
   }
 
   world_map <- suppressMessages(suppressWarnings(
     rnaturalearth::ne_countries(scale = 50, returnclass = "sf") %>%
-      sf::st_transform(crs = raster::projection(ras)) %>%
+      sf::st_transform(crs = terra::crs(rast)) %>%
       sf::st_buffer(0) %>% # repair ring self-intersection in India poly
-      sf::st_crop(sf::st_bbox(ras))
+      sf::st_crop(sf::st_bbox(rast))
   ))
 
-  rng <- c(raster::minValue(ras), raster::maxValue(ras))
-  m <- tmap::tm_shape(ras) +
+  rng <- terra::minmax(rast)
+  m <- tmap::tm_shape(rast) +
     tmap::tm_raster(palette='inferno', style='cont', midpoint=NA,
                     title=legend_title,
                     breaks=pretty(x = rng, n = 10, min.n = 5),
@@ -74,23 +76,23 @@ plot_raster <- function(object, legend_title, occurrence_data = NULL,
         utils::read.csv(occurrence_data) %>%
           dplyr::rename_all(tolower) %>%
           sf::st_as_sf(coords = c("longitude","latitude"),
-                       crs = raster::projection(ras))
+                       crs = terra::crs(ras))
       )
     } else if("sf" %in% class(occurrence_data)) {
       occ <- suppressMessages(
-        sf::st_transform(occurrence_data, crs = raster::projection(ras))
+        sf::st_transform(occurrence_data, crs = terra::crs(ras))
       )
     } else if("SpatialPointsDataFrame" %in% class(occurrence_data)) {
       occ <- suppressMessages(
         sf::st_as_sf(occurrence_data) %>%
-          sf::st_transform(., crs = raster::projection(ras))
+          sf::st_transform(., crs = terra::crs(ras))
       )
     } else {
       occ <- suppressMessages(
         occurrence_data %>%
           dplyr::rename_all(tolower) %>%
           sf::st_as_sf(coords = c("longitude","latitude"),
-                       crs = raster::projection(ras))
+                       crs = terra::crs(ras))
       )
     }
 

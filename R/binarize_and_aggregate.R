@@ -132,5 +132,5 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
   terra::writeRaster(r1, outfile, datatype='INT2U', overwrite=overwrite)
 
   if(isTRUE(return_rast) || missing(outfile))
-    terra::raster(outfile) else invisible(NULL)
+    terra::rast(outfile) else invisible(NULL)
 }

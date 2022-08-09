@@ -37,8 +37,7 @@
 #'   Australia_ repository](https://github.com/jscamac/edmaps_data_Australia).
 #' @return A `drake` plan containing targets that generate objects used
 #'   across species.
-#' @importFrom raster extent
-#' @importFrom drake plan file_in file_out
+#' @importFrom drake drake_plan file_in file_out
 #' @importFrom rlang !!
 #' @importFrom tmap tmap_save tmap_arrange
 #' @importFrom stats median

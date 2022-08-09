@@ -2,9 +2,9 @@
 #'
 #' Fit and project range bag model.
 #'
-#' @param occurrence_data `sf` object, `data.frame` or character
-#'   path to a csv file containing occurrence coordinates (must contain
-#'   columns named "Latitude" and "Longitude").
+#' @param occurrence_data `sf` object, `data.frame` or character path to a csv
+#'   file containing occurrence coordinates (must contain columns named
+#'   "Latitude" and "Longitude").
 #' @param bioclim_dir Path. Path to directory containing WorldClim raster data.
 #' @param n_dims Integer. The number of dimensions ranges to bag.
 #' @param n_models Integer. The number of bootstrapped model ensembles to run.
@@ -13,16 +13,15 @@
 #' @param exclude_vars Character vector. A vector of bioclim variables to
 #'   exclude from analysis. Default is `NULL`.
 #' @param outfile Character. Output raster file path. Parent directory will be
-#'   created recursively if required. If `NULL`, the `RasterLayer`
-#'   will be returned in R.
-#' @return A `RasterLayer` of model predictions is written to
-#'   `outfile` if provided, and returned to R otherwise. The raster's
-#'   extent, resolution and CRS are taken from the raster data in
-#'   `bioclim_dir`. Cell values give the fraction of bootstrapped models
-#'   for which the cell's environment fell within the species' modelled
-#'   climate envelope.
-#' @references This function is a modified version of the `rb` function
-#'   provided in Drake, J.M. & Richards, R.L. (2019)
+#'   created recursively if required. If `NULL`, the `RasterLayer` will be
+#'   returned in R.
+#' @return A [`SpatRaster`] of model predictions is written to `outfile` if
+#'   provided, and returned to R otherwise. The raster's extent, resolution and
+#'   CRS are taken from the raster data in `bioclim_dir`. Cell values give the
+#'   fraction of bootstrapped models for which the cell's environment fell
+#'   within the species' modelled climate envelope.
+#' @references This function is a modified version of the `rb` function provided
+#'   in Drake, J.M. & Richards, R.L. (2019)
 #'   [Data from: Estimating environmental suitability.](https://doi.org/10.5061/dryad.g5p7d1c]) Dryad, Dataset, doi:10.5061/dryad.g5p7d1c.
 #'
 #'   See also: Drake, J.M. (2015)
@@ -30,14 +29,14 @@
 #'   _Journal of the Royal Society Interface_, 12(107), 20150086.
 #'   doi:https://doi.org/10.1098/rsif.2015.0086.
 #' @importFrom geometry tsearchn convhulln delaunayn
-#' @importFrom raster stack dropLayer crop rasterFromXYZ writeRaster as.data.frame
+#' @importFrom terra rast crop writeRaster as.data.frame cellFromXy
 #' @importFrom utils read.csv
 #' @importFrom sf as_Spatial st_transform
 #' @importFrom sp coordinates proj4string CRS
 #' @importFrom stats na.omit
 #' @importFrom rnaturalearth ne_countries
 #' @importFrom dplyr filter
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr %>%
 #' @export
 range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
   p = 0.5, exclude_vars = NULL, outfile) {
@@ -100,12 +99,12 @@ range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
                bioclim_vars))
   }
 
-  bioclim_stack <- raster::stack(list.files(bioclim_dir, full.names=TRUE,
-                                            pattern="\\.tif$"))
+  bioclim_stack <- terra::rast(list.files(bioclim_dir, full.names=TRUE,
+                                          pattern="\\.tif$"))
 
   if(!is.null(exclude_vars)) {
     id <- which(bioclim_vars %in% exclude_vars)
-    bioclim_stack <- raster::dropLayer(bioclim_stack, id)
+    bioclim_stack <- bioclim_stack[[-id]]
   }
   if(is.character(occurrence_data)) {
     locs <- utils::read.csv(occurrence_data)
@@ -130,8 +129,8 @@ range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
 
   # Reduces points to 1 per grid cell
   loc_env <- stats::na.omit(
-    raster::as.data.frame(
-      bioclim_stack[unique(raster::cellFromXY(bioclim_stack, locs))]
+    terra::as.data.frame(
+      bioclim_stack[unique(terra::cellFromXY(bioclim_stack, locs))]
     )
   )
   models <- range_bag_fit(loc_env, n_models = n_models, dimensions = n_dims,
@@ -140,22 +139,22 @@ range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
   world_map <- rnaturalearth::ne_countries(returnclass = "sf") %>%
     dplyr::filter(name != "Antarctica")
 
-  pred_data <- stats::na.omit(raster::as.data.frame(
+  pred_data <- stats::na.omit(terra::as.data.frame(
     bioclim_stack %>%
-      raster::crop(., world_map), xy=TRUE))
+      terra::crop(., world_map), xy=TRUE))
 
   out <- suppressWarnings(
-    raster::rasterFromXYZ(
+    terra::rast(
       cbind(pred_data[, 1:2],
             range_bag_pred(models = models, new_data = pred_data[, -(1:2)])),
-      crs = '+init=epsg:4326')
+      type = 'xyz', crs = '+init=epsg:4326')
   )
   if(!missing(outfile)) {
     # Create directory if it does not exist
     if(!dir.exists(dirname(outfile))) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
-    raster::writeRaster(out, outfile, overwrite=TRUE)
+    terra::writeRaster(out, outfile, overwrite=TRUE)
   } else {
     out
   }

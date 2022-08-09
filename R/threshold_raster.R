@@ -2,25 +2,27 @@
 #'
 #' Threshold raster.
 #'
-#' @param rast A file path to a raster file.
+#' @param rast `Raster*`, [`SpatRaster`], or a character vector of one or more
+#'   path to raster files.
 #' @param threshold A named list giving the minimum and/or maximum values
 #'   defining the range of values to retain. Values outside this range will be
-#'   replaced with `value`. Can be `list(min = Y, max = Z)` or
-#'   `list(min = Y)` or `list(max = Z)`.
+#'   replaced with `value`. Can be `list(min = Y, max = Z)` or `list(min = Y)`
+#'   or `list(max = Z)`.
 #' @param value Numeric. The value supplied to cells beyond the threshold(s).
 #' @param outfile Character. Output raster file path. Parent directory will be
 #'   created recursively if required. If `outfile` is not provided, the
-#'   resulting `RasterLayer` will be returned to R.
-#' @return A `RasterLayer` will be written to `outfile` if provided,
-#'   and returned to R otherwise.
-#' @importFrom raster raster writeRaster
+#'   resulting [`SpatRaster`] will be returned to R.
+#' @return A [`SpatRaster`] will be written to `outfile` if provided, and
+#'   returned to R otherwise.
+#' @importFrom terra rast writeRaster
 #' @export
 threshold_raster <- function(rast, threshold, value = 0, outfile) {
-  # Load raster
-  if(is.character(rast)) {
-    out <- raster::raster(rast)
-  } else {
-    out <- rast
+
+  if(is.character(rast) || is(rast, 'Raster')) {
+    rast <- terra::rast(rast)
+  } else if(!is(rast, 'SpatRaster')) {
+    stop('rast must be a Raster* or SpatRaster object, or a character vector ',
+         'of one or more paths to raster files.')
   }
 
   if(length(threshold)==2 && all(c("min", "max") %in% names(threshold))) {
@@ -38,7 +40,7 @@ threshold_raster <- function(rast, threshold, value = 0, outfile) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite=TRUE)
+    terra::writeRaster(out, outfile, overwrite=TRUE)
   } else {
     out
   }
