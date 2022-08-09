@@ -105,7 +105,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
         if(rng[1] <= 0) {
           stop('Cannot log transform raster containing zero or negative values.')
         } else {
-          ras <- terra::setValues(ras, log10(terra::values(ras)))
+          ras <- log10(ras)
         }
       }
 
@@ -134,7 +134,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
           stop('Cannot convert to percentage raster because there are values',
                ' less than 0 or values greater 1.')
         } else {
-          ras <- terra::setValues(ras, terra::values(ras)*100)
+          ras <- ras*100
         }
       }
     }
