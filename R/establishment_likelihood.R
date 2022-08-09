@@ -46,7 +46,7 @@ establishment_likelihood <- function(total_arrivals, suitability, outfile,
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite=TRUE)
+    terra::writeRaster(out, outfile, overwrite=TRUE)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out

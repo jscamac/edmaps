@@ -63,7 +63,7 @@
 #'   errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom terra aggregate minmax ncell setMinMax writeRaster nlyr rast
+#' @importFrom terra aggregate minmax ncell setMinMax writeRaster nlyr rast ext
 #' @importFrom sf st_as_sf st_crop st_crs st_read st_transform
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_compass tm_dots tm_facets tm_layout tm_polygons tm_raster tm_rgb tm_scale_bar tm_shape tmap_mode tmap_options tmap_save
@@ -281,7 +281,7 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
       sf::st_as_sf(surveillance_locs, coords = c("Longitude", "Latitude"),
                    crs = 4326) %>%
         sf::st_transform(crs = sf::st_crs(ras)) %>%
-        sf::st_crop(y = raster::extent(ras)))
+        sf::st_crop(y = terra::ext(ras)))
     )
     # Add surveillance locations to map
     m <- m +

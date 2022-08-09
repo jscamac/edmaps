@@ -17,7 +17,7 @@
 #' @param return_rast Logical. Should the [`SpatRaster`] object be returned to
 #'   R?
 #' @return If `return_rast` is TRUE, or if `outfile` is missing, the resulting
-#'   [`SpatRAster`] object will be returned. Otherwise `NULL` is returned
+#'   [`SpatRaster`] object will be returned. Otherwise `NULL` is returned
 #'   invisibly.
 #' @importFrom terra rast writeRaster
 #' @export
