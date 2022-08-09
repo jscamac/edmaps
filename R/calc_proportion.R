@@ -4,7 +4,7 @@
 #'
 #' @param rast A `SpatRaster` or `Raster*` object.
 #' @return A `SpatRaster` object.
-#' @importFrom terra values rast
+#' @importFrom terra rast global
 #' @importFrom methods is
 #' @export
 calc_proportion <- function(rast) {
@@ -13,6 +13,6 @@ calc_proportion <- function(rast) {
     stop('rast must be a RasterLayer object, or a SpatRaster object with a ',
          'single layer.')
   }
-  total <- sum(terra::values(rast), na.rm=TRUE)
+  total <- terra::global(rast, sum, na.rm=TRUE)$sum
 rast/total
 }
