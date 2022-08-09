@@ -31,7 +31,7 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
                                           Region = "c",
                                           Item = "c",
                                           Estimate ="c"),
-                         skip = 4) %>%
+                         skip = 5) %>%
     dplyr::mutate(Estimate = as.numeric(gsub(",", "", Estimate))) %>%
     dplyr::filter(Item %in% c(
       "Fertiliser - Nitrate slow release fertiliser - Weight applied (t)",
