@@ -18,7 +18,6 @@
 #'   `infile` and all other cells set to 1.
 #' @importFrom terra rast mask ext
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom sf st_bbox
 #' @importFrom methods is
 #' @export
 na_mask <- function(infile, outfile, res, extent) {
