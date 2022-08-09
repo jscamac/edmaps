@@ -2,8 +2,8 @@
 #'
 #' Apply a function to NA cells within a moving window.
 #'
-#' @param x A `Raster*` or [`SpatRaster`] object, or a vector of file paths to
-#'   one or more rasters.
+#' @param x A `RasterLayer` or single-layer [`SpatRaster`] object, or a path to
+#'   a raster file.
 #' @param fun The function (name or symbol) to apply to the moving windows.
 #'   First argument should represent the vector of cells contained in the focal
 #'   window. Only non-NA cell values will be passed to the function.
@@ -28,11 +28,11 @@
 #' @export
 fill_na <- function(x, fun, w, outfile, return_rast=FALSE, overwrite=FALSE) {
   if(missing(outfile)) outfile <- tempfile(fileext='.tif')
-  if(is.character(x) || is(x, 'Raster')) {
+  if(is.character(x) || is(x, 'RasterLayer')) {
     x <- terra::rast(x)
-  } else if(!is(x, 'SpatRaster')) {
-    stop('x must be a Raster* object, SpatRaster object, or a vector of one ',
-         'or more raster file path.')
+  } else if(!is(x, 'SpatRaster') || dim(x)[3] > 1) {
+    stop('x must be a RasterLayer object, single-layer SpatRaster object, ',
+         'or a path to a raster file.', call.=FALSE)
   }
   if(terra::xres(x) != terra::yres(x))
     stop('x must have equal horizontal and vertical resolution.')
