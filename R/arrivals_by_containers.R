@@ -35,7 +35,6 @@
 #' @importFrom utils read.csv
 #' @importFrom dplyr filter mutate
 #' @export
-#'
 arrivals_by_containers <- function(container_weights, port_data,
   template_raster, leakage_rate, establishment_rate, outfile,
   return_rast=FALSE, overwrite=FALSE) {

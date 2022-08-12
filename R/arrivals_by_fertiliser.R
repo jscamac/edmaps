@@ -26,7 +26,6 @@
 #' @importFrom terra rast writeRaster
 #' @importFrom methods is
 #' @export
-#'
 arrivals_by_fertiliser <- function(fertiliser_weight, leakage_rate,
   establishment_rate, outfile, return_rast=FALSE, overwrite=FALSE) {
 

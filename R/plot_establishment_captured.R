@@ -28,7 +28,7 @@
 #'   `ggplot` object is returned.
 #' @importFrom ggplot2 ggplot aes geom_line scale_color_brewer xlab scale_y_continuous ylab theme_classic theme geom_segment ggsave
 #' @importFrom dplyr group_by filter
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr %>%
 #' @export
 plot_establishment_captured <- function(data, xlab = "Number of cells",
   ylab = "Proportion", legend_title = NULL, legend = "right",  prop_line,

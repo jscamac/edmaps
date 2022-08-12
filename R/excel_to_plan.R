@@ -23,7 +23,7 @@
 #' @importFrom drake file_in file_out drake_plan
 #' @importFrom terra rast as.list writeRaster
 #' @importFrom countrycode countrycode
-#' @importFrom magrittr '%>%'
+#' @importFrom magrittr %>%
 #' @export
 excel_to_plan <- function(file) {
   globals <- readxl::read_excel(file, sheet='Global parameters', skip=1,
