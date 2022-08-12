@@ -13,9 +13,8 @@
 #'   "Latitude" with coordinates given in decimal degrees (GDA94).
 #' @return A `data.frame` with the proportion of establishment likelihood
 #'   captured by current surveillance.
-#' @importFrom terra rast extract global
+#' @importFrom terra rast extract global project vect crs
 #' @importFrom dplyr filter bind_rows
-#' @importFrom sp coordinates proj4string CRS spTransform
 #' @export
 surveillance_coverage <- function(ras, layer_names, surveillance_locations) {
 
@@ -28,10 +27,8 @@ surveillance_coverage <- function(ras, layer_names, surveillance_locations) {
 
   locs <- read.csv(surveillance_locations) %>%
     dplyr::filter(!is.na(Latitude) & !is.na(Longitude)) %>%
-    {sp::coordinates(.) <- c("Longitude", "Latitude"); .} %>%
-    {sp::proj4string(.) <- sp::CRS("+init=epsg:4283"); .} %>%
-    # ^ provide lat/long proj string
-    sp::spTransform(sp::CRS(sp::proj4string(ras)))
+    terra::vect(geom=c('Longiture', 'Latitude'), crs='epsg:4283') %>%
+    terra::project(terra::crs(ras))
 
   loc_cells <- unique(terra::extract(ras, locs))
   total <- terra::global(ras, sum)$sum

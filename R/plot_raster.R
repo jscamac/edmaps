@@ -7,8 +7,8 @@
 #' @param legend_title Character. If missing, the name of the raster layer will
 #'   be used.
 #' @param occurrence_data A `data.frame`, `sf` object, `SpatialPointsDataFrame`
-#'   object, or path to a .csv file containing columns named "Latitude" and
-#'   "Longitude". If `NULL`, no points will be plotted.
+#'   object, [`SpatVector`] object, or path to a .csv file containing columns
+#'   named "Latitude" and "Longitude". If `NULL`, no points will be plotted.
 #' @param pt_col Character. Colour of points (if plotted).
 #' @param height Height of plot in inches (will be rendered at 300 dpi).
 #'   Required if `outfile` is provided.
@@ -16,9 +16,8 @@
 #' @param outfile Character. Path to save output.
 #' @return A `tmap` object. If `outfile` is provided, a map will also be written
 #'   to that file.
-#' @importFrom terra rast crs setMinMax minmax
+#' @importFrom terra rast crs setMinMax minmax project crop vect buffer ext
 #' @importFrom rnaturalearth ne_countries
-#' @importFrom sf st_transform st_crop st_as_sf st_buffer sf_use_s2 st_bbox
 #' @importFrom tmap tm_shape tm_raster tm_polygons tm_dots tm_compass tm_layout tmap_save tm_grid
 #' @importFrom utils read.csv
 #' @importFrom dplyr rename_all
@@ -26,9 +25,6 @@
 #' @export
 plot_raster <- function(rast, legend_title, occurrence_data = NULL,
                         pt_col ="red", height, compass = FALSE, outfile) {
-
-  o <- sf::sf_use_s2(FALSE)
-  on.exit(sf::sf_use_s2(o))
 
   if(!missing(outfile) & missing(height)) {
     stop('If outfile is provided, height must be specified.')
@@ -48,9 +44,10 @@ plot_raster <- function(rast, legend_title, occurrence_data = NULL,
 
   world_map <- suppressMessages(suppressWarnings(
     rnaturalearth::ne_countries(scale = 50, returnclass = "sf") %>%
-      sf::st_transform(crs = terra::crs(rast)) %>%
-      sf::st_buffer(0) %>% # repair ring self-intersection in India poly
-      sf::st_crop(sf::st_bbox(rast))
+      terra::vect() %>%
+      terra::project(terra::crs(rast)) %>%
+      terra::buffer(width=0) %>% # repair ring self-intersection in India poly
+      terra::crop(terra::ext(rast))
   ))
 
   rng <- terra::minmax(rast)
@@ -75,24 +72,20 @@ plot_raster <- function(rast, legend_title, occurrence_data = NULL,
       occ <- suppressMessages(
         utils::read.csv(occurrence_data) %>%
           dplyr::rename_all(tolower) %>%
-          sf::st_as_sf(coords = c("longitude","latitude"),
-                       crs = terra::crs(ras))
+          terra::vect(geom=c("longitude","latitude"), crs=terra::crs(rast))
       )
-    } else if("sf" %in% class(occurrence_data)) {
+    } else if(any(c('sf', 'SpatialPointsDataFrame') %in% class(occurrence_data))) {
       occ <- suppressMessages(
-        sf::st_transform(occurrence_data, crs = terra::crs(ras))
+        terra::vect(occurrence_data) %>%
+          terra::project(terra::crs(rast))
       )
-    } else if("SpatialPointsDataFrame" %in% class(occurrence_data)) {
-      occ <- suppressMessages(
-        sf::st_as_sf(occurrence_data) %>%
-          sf::st_transform(., crs = terra::crs(ras))
-      )
+    } else if(is(occurrence_data, 'SpatVector')) {
+      occ <- terra::project(occurrence_data, terra::crs(rast))
     } else {
       occ <- suppressMessages(
         occurrence_data %>%
           dplyr::rename_all(tolower) %>%
-          sf::st_as_sf(coords = c("longitude","latitude"),
-                       crs = terra::crs(ras))
+          terra::vect(geom=c("longitude","latitude"), crs=terra::crs(rast))
       )
     }
 

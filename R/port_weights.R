@@ -19,10 +19,8 @@
 #'   specified the resulting [`SpatRaster`] is returned, otherwise `NULL` is
 #'   returned invisibly.
 #' @importFrom magrittr %>%
-#' @importFrom terra rast crs cellFromXY cells writeRaster xyFromcell
+#' @importFrom terra rast crs cellFromXY cells writeRaster xyFromCell vect project crds distance init
 #' @importFrom utils read.csv
-#' @importFrom sf st_as_sf st_transform as_Spatial
-#' @importFrom sp spDists SpatialPoints
 #' @importFrom methods is
 #' @export
 port_weights <- function(template_raster, port_data, beta, outfile,
@@ -35,32 +33,29 @@ port_weights <- function(template_raster, port_data, beta, outfile,
          'or a single path to a raster file.', call.=FALSE)
   }
 
-  aus_ports <- sf::st_as_sf(utils::read.csv(port_data),
-                            coords = c("Longitude", "Latitude"), crs = 4326) %>%
-    sf::st_transform(crs = terra::crs(template_raster)) %>%
-    sf::as_Spatial()
+  aus_ports <- utils::read.csv(port_data) %>%
+    terra::vect(geom=c("Longitude", "Latitude"), crs='+init=epsg:4326') %>%
+    terra::project(terra::crs(template_raster))
 
-  # Convert raster to points (faster than rasterToPoints - we don't need the
-  # data field)
-  cells <- sp::SpatialPoints(
-    terra::xyFromCell(template_raster,
-                       terra::cells(!is.na(template_raster))),
-    proj4string=terra::crs(template_raster))
+  # Convert raster to points
+  cells <- template_raster %>%
+    terra::xyFromCell(terra::cells(!is.na(template_raster), 1)[[1]]) %>%
+    terra::vect(crs=terra::crs(template_raster))
 
   # Estimate distance from each port, apply distance x container weight &
   # Sum cell values return raster object
   if(interactive()) cat(sprintf('\r%.02f%%', 1/length(aus_ports)*100))
   # ^ progress indicator if interactive
-  d <- sp::spDists(cells, aus_ports[1, ]) # first port, to initialise val vector
-  val <- exp(d/(1000/beta))*aus_ports[["Count"]][1]
+  d <- terra::distance(cells, aus_ports[1, ]) # first port, to initialise val vector
+  val <- exp(d/(1000/beta))*aus_ports$Count[1]
   # replacing rowSums(sapply, ...) with for loop for memory management
   for (i in seq_along(aus_ports)[-1]) { # subsequent ports
     cat(sprintf('\r%.02f%%', i/length(aus_ports)*100)) # progress indicator
-    d <- sp::spDists(cells, aus_ports[i, ])
-    val <- val + exp(d/(1000/beta))*aus_ports[["Count"]][i]
+    d <- terra::distance(cells, aus_ports[i, ])
+    val <- val + exp(d/(1000/beta))*aus_ports$Count[i]
   }
-  out <- terra::rast(template_raster)
-  out[terra::cellFromXY(out, cells)] <- val
+  out <- terra::init(template_raster, NA)
+  out[terra::cellFromXY(out, terra::crds(cells))] <- val
 
   # convert to proportions
   out <- calc_proportion(out)

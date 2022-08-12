@@ -149,8 +149,7 @@
 #'   guide the user with respect to expected/allowable data.
 #' @seealso [excel_to_plan()]
 #' @importFrom glue glue
-#' @importFrom terra ext rast res compareGeom
-#' @importFrom sp CRS
+#' @importFrom terra ext rast res compareGeom vect buffer
 #' @importFrom drake code_to_plan
 #' @export
 species_plan <- function(species, clum_classes, nvis_classes, host_path,
@@ -177,7 +176,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
 
   # prepare extent and resolution
   res <- c(1000, 1000) # enforce 1km for now - memory safe
-  extent <- c(-1888000, 2122000, -4847000, -1010000)
+  extent <- c(-1888000, 2122000, -4847000, -1010000) # xmin, xmax, ymin, ymax
   # ^ hard-code national extent
   if(!is.numeric(aggregated_res))
     stop('res must be a numeric vector with 1 or 2 elements.')
@@ -220,20 +219,11 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
          'to define host distribution.')
   }
 
+  # ensure extent/crs/res of climate suitability data are correct
   if(!missing(climate_suitability_path)) {
+    ref <- terra::rast(terra::ext(extent), crs='epsg:3577', res=1000)
     r <- terra::rast(climate_suitability_path)
-    if(any(as.vector(terra::ext(r)) != extent)) {
-      stop(species, ': exent of climate suitability raster must be',
-           paste0(c("xmin: ", "xmax: ", "ymin: ", "ymax: "),
-                  extent, collapse=", "))
-    }
-    if(!identical(terra::res(r), c(1000, 1000)))
-      stop(species, ": resolution of climate_suitability raster must be ",
-           "1000 x 1000 m.")
-    if(!terra::compareGeom(r, sp::CRS("+init=epsg:3577"), ext=FALSE,
-                           rowcol=FALSE))
-      stop(species, ": resolution of climate_suitability raster must be ",
-           "Australian Albers (EPSG:3577).")
+    terra::compareGeom(r, ref, ext=TRUE, crs=TRUE, res=TRUE, rowcol=FALSE)
     rm(r)
   }
 
@@ -613,17 +603,10 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       cat('
       country_reference <-
         {
-          o <- sf::sf_use_s2(FALSE)
-          out <- sf::as_Spatial(
-            suppressWarnings(
-              sf::st_buffer(
-                rnaturalearth::ne_countries(scale=50, returnclass="sf"),
-                units::set_units(0, "arc_degrees")
-              )
-            )
-          )
-          sf::sf_use_s2(o)
-          out
+          rnaturalearth::ne_countries(scale=50, returnclass="sf") %>%
+            terra::vect() %>%
+            terra::buffer(0) %>%
+            suppressWarnings()
         }
       \n\n', file=f, append=TRUE)
 

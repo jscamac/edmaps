@@ -3,129 +3,141 @@
 #' Process and rasterize wind data, creating raster datasets that describe wind
 #' speed within a specified distance of the coastline.
 #'
-#' @param data Character. A vector polygon dataset (e.g. Shapefile or
-#'   GeoPackage) describing onshore winds, or a file path to such a file.
+#' @param data One of: A `SpatVector` object with polygon geometry, an `sf`
+#'   object with polygon geometry, a `SpatialPolygons` object, or a file path to
+#'   such a file. This object should describe onshore winds.
 #' @param wind_column Character. The column name for the column of the object
 #'   defined by `data` that contains wind speed data.
-#' @param template A `RasterLayer` or `stars` object, or a character
+#' @param template A `RasterLayer` or `SpatRaster` object, or a character
 #'   file path to a file that can be read by GDAL, defining the extent and
 #'   resolution of analysis, and defining the coastline (edge of non-NA values).
-#'   If a `stars` object, the first attribute will be used. Must have a
-#'   valid coordinate system. CRS is assumed to be Australian Albers (3577).
+#'   Must have a valid coordinate system. If missing, CRS is assumed to be
+#'   Australian Albers (3577).
 #' @param width Numeric. The width of the coastal buffer (in metres), defining
 #'   how far inland the wind has an effect. E.g. if the pest is thought to be
 #'   carried up to 50km inland by the wind, set this value to `50000`.
 #' @param outfile Character. The target file path for the wind raster.
-#' @importFrom dplyr filter group_by left_join mutate select summarise
-#' @importFrom sf st_as_sf st_boundary st_buffer st_cast st_collection_extract st_coordinates st_geometry_type st_intersection st_join st_make_valid st_nearest_feature st_set_crs st_sf st_union st_voronoi st_drop_geometry
-#' @importFrom stars read_stars st_rasterize write_stars st_as_stars
-#' @importFrom stplanr rnet_get_nodes
+#' @importFrom terra aggregate as.lines as.points as.polygons buffer crs densify
+#'   init intersect makeValid mask merge nearest rast rasterize subset union
+#'   values vect voronoi writeRaster
 #' @importFrom utils tail
-#' @importFrom magrittr '%>%'
+#' @importFrom magrittr %>%
 #' @importFrom methods is
 #' @export
 rasterize_wind <- function(data, wind_column, template, width, outfile) {
 
-  if(is.character(data)) {
-    data <- sf::read_sf(data)
+  if(is.character(data) || is(data, 'SpatialPolygons') || is(data, 'sf')) {
+    data <- terra::vect(data)
   } else {
-    if(!is(data, 'sf')) {
-      stop('sf must be a vector polygon dataset, or a file path to such a',
-           ' dataset.')
+    if(!is(data, 'SpatVector')) {
+      stop('data must be a `SpatVector`, `sf`, or `sp` object, or a file ',
+           'path to such a dataset.', call.=FALSE)
     }
   }
 
-  if(!wind_column %in% colnames(data))
+  if(!wind_column %in% names(data)) {
     stop(sprintf('Column %s not found', wind_column))
+  }
 
   # Read in JW's wind data, and resolve polygon overlap: for each wind
   # component, assign maximum of overlapping polygons in areas of overlap
-  wind <- data %>%
-    sf::st_intersection() %>%
-    dplyr::mutate(
-      segment_id=sapply(origins, function(o) {
-        i <- o[which.max(data[[wind_column]][o])]
-        data[['id']][i]
-      }),
-      wind=data[[wind_column]][match(segment_id, data[['id']])]
-    ) %>%
-    dplyr::select(segment_id, wind) %>%
-    dplyr::filter(wind > 0)
-
+  wind <- terra::union(data) # shows which polygon segments overlap
+  # Where wind polygons overlap, choose the one with the highest wind for the
+  # chosen wind vector.
+  wind$segment_id <- sapply(seq_along(wind), function(i) {
+    origins <- which(terra::values(wind)[i, ]==1)
+    j <- origins[which.max(data[[wind_column]][, 1][origins])]
+    data$id[j]
+  })
+  # Merge in wind data
+  wind <- terra::merge(wind[, 'segment_id'], data, by.x='segment_id', by.y='id')
+  # Copy wind[[wind_column]] to wind$wind for convenience
+  wind$wind <- wind[[wind_column]][, 1]
+  wind <- terra::subset(wind, wind$wind > 0, select=c('segment_id', 'wind'))
+  wind <- wind[order(wind$segment_id), ]
+  wind <- terra::aggregate(wind, 'segment_id', count=FALSE) %>%
+    setNames(c('segment_id', 'wind'))
 
   # Buffer JW's wind polygons to identify corresponding segments of coastline.
   # We buffer the first and last polygon, as well as polygon O, using a smaller
   # width to avoid including unwanted regions of coastline.
   wind_buffer <- rbind(
-    sf::st_buffer(dplyr::filter(
-      wind, segment_id %in% c(segment_id[1], 'O', utils::tail(segment_id, 1))), 50000),
-    sf::st_buffer(dplyr::filter(
-      wind, !segment_id %in% c(segment_id[1], 'O', utils::tail(segment_id, 1))), 200000)
-  ) %>% sf::st_union()
+    terra::buffer(terra::subset(
+      wind, wind$segment_id %in% c(wind$segment_id[1], 'O', tail(wind$segment_id, 1))),
+      50000
+    ),
+    terra::buffer(terra::subset(
+      wind, !wind$segment_id %in% c(wind$segment_id[1], 'O', tail(wind$segment_id, 1))),
+      200000
+    )
+  ) %>% terra::aggregate()
 
   # Create 1000 x 1000m template raster and convert to polygons
-  if(is.character(template)) {
-    template <- stars::read_stars(template)[1]
-  } else if(is(template, 'RasterLayer')) {
-    template <- stars::st_as_stars(template)[1]
-  } else if(!is(template, 'stars')) {
-    stop('template must be a stars object, a RasterLayer, or a file path to a',
-         ' raster file.')
+  if(is.character(template) || is(template, 'Raster')) {
+    template <- terra::rast(template)
+  } else if(!is(template, 'SpatRaster')) {
+    stop('template must be a Raster* object, a SpatRaster object, ',
+         'or a file path to a raster file.')
   }
 
+  template <- template[[1]] # select first layer in case is multilayer
+
   # Assume 3577
-  template <- sf::st_set_crs(template, 3577)
+  terra::crs(template) <- 'epsg:3577'
   names(template) <- 'template'
 
   # Derive vector shapes from template
-  aus <- template %>%
-    dplyr::mutate(template=ifelse(is.na(template), NA, 1)) %>%
-    sf::st_as_sf(merge=TRUE, connect8=F) %>%
-    sf::st_make_valid() %>%
-    dplyr::summarise(.groups='drop')
-  aus_boundary <- sf::st_boundary(aus)
-  aus_subset_boundary <- sf::st_intersection(aus_boundary, wind_buffer) %>%
-    sf::st_cast('LINESTRING')
+  #template[] <- ifelse(is.na(terra::values(template)), NA, 1) #
+  aus <- terra::mask(terra::init(template, 1), template) %>%
+    terra::as.polygons(values=FALSE) %>%
+    terra::makeValid() %>%
+    terra::aggregate() # TODO: test, may not be necessary
+
+  aus_boundary <- terra::as.lines(aus)
+  aus_subset_boundary <- terra::intersect(aus_boundary, wind_buffer)
 
   ###  Find closest wind poly id for each segment
   # https://gis.stackexchange.com/a/358217/1249
-  p <- sf::st_cast(aus_subset_boundary, "POINT") %>%
-    dplyr::mutate(segment_id=wind$segment_id[sf::st_nearest_feature(., wind)])
-  b <- sf::st_buffer(aus_subset_boundary, dist=width) %>%
-    sf::st_union() %>%
-    sf::st_intersection(aus) %>%
-    sf::st_intersection(wind_buffer)
-  junctions <- stplanr::rnet_get_nodes(aus_subset_boundary)
-  sel_in_junctions <- paste(sf::st_coordinates(p$geometry)[, 1],
-                            sf::st_coordinates(p$geometry)[, 2]) %in%
-    paste(sf::st_coordinates(junctions)[, 1], sf::st_coordinates(junctions)[, 2])
-  p_not_junctions <- p[!sel_in_junctions, ]
-  v <- sf::st_voronoi(do.call("c", p_not_junctions$geometry), envelope=b) %>%
-    sf::st_collection_extract('POLYGON')
-  v_joined <- sf::st_join(sf::st_set_crs(sf::st_sf(v), 3577), p_not_junctions) %>%
-    dplyr::group_by(segment_id) %>%
-    dplyr::summarise(.groups='drop')
-  v_intersection <- sf::st_intersection(v_joined, b)
+  aus_subset_boundary_pts <- aus_subset_boundary %>%
+    # increase line nodes so minimum dist b/w nodes is no greater then 10km
+    terra::densify(interval=10000) %>%
+    terra::as.points()
+  aus_subset_boundary_pts$id <- seq_along(aus_subset_boundary_pts)
 
-  wind_matched <- v_intersection %>%
-    dplyr::left_join(sf::st_drop_geometry(wind), by='segment_id') %>%
-    dplyr::select(segment_id, wind) %>%
-    dplyr::group_by(segment_id, wind) %>%
-    dplyr::summarise(.groups='drop') %>%
-    dplyr::filter(wind > 0)
+  p <- aus_subset_boundary_pts %>%
+    terra::merge(
+      terra::values(terra::nearest(aus_subset_boundary_pts, wind)),
+      by.x='id', by.y='from_id'
+    )
+  p$segment_id <- wind$segment_id[p$to_id]
 
-  if(any(!sf::st_geometry_type(wind_matched) %in%
-         c('POLYGON', 'MULTIPOLYGON'))) {
-    wind_matched <- sf::st_collection_extract(wind_matched, 'POLYGON')
-  }
+  b <- terra::buffer(aus_subset_boundary, width=width) %>%
+    terra::aggregate() %>%
+    terra::intersect(aus) %>%
+    terra::intersect(wind_buffer)
 
-  # Rasterize
-  template_empty <- dplyr::mutate(template, template=NA)
-  r <- stars::st_rasterize(wind_matched[, 'wind'], template_empty)
+  # Convert polygons to grids of points. Note that simply converting the
+  # boundary lines to points with as.points can lead to problems (esp. where
+  # wind polygons overlap).
+  wind2 <- terra::rasterize(wind, terra::rast(wind, res=5000)) %>%
+    terra::as.points() %>%
+    terra::intersect(wind) %>%
+    .[, c('segment_id', 'wind')]
+
+  # Voronoi tessellation to find nearest wind poly for all areas of coastal
+  # buffer.
+  v <- terra::aggregate(terra::voronoi(wind2), 'segment_id', count=FALSE) %>%
+    setNames(c('segment_id', 'wind'))
+
+  wind_matched <- terra::intersect(v, b) %>%
+    terra::subset(wind > 0, NSE=TRUE)
+
+  # Rasterise result
+  r <- terra::rasterize(wind_matched, init(template, NA), field='wind')
 
   # Write to raster file
   if(!missing(outfile)) {
-    stars::write_stars(r, outfile)
+    terra::writeRaster(r, outfile)
   }
 
   r

@@ -4,44 +4,30 @@
 #'
 #' @param xy A two-column matrix of x, y coordinates.
 #' @param alpha Alpha parameter for calculating the hull.
-#' @param buffer_width The width (in xy CRS) to buffer intermediate polylines
-#'   such that they combine into closed polygons.
-#' @return An [`sf`] object.
+#' @return A [`SpatVector`] object.
 #' @references Adapted from ConR:::.alpha.hull.poly and ConR:::.alpha.hull.poly.
 #' @importFrom alphahull ahull anglesArc
-#' @importFrom methods slot
-#' @importFrom raster buffer
-#' @importFrom sf st_as_sf
-#' @importFrom sp CRS Line Lines Polygons proj4string SpatialLines SpatialLinesDataFrame SpatialPolygons
+#' @importFrom terra vect aggregate buffer fillHoles set.crs
 #' @keywords internal
-alphahull_sf <- function(xy, alpha, buffer_width) {
+#' @examples
+#' h <- alphahull(matrix(runif(100), ncol=2), 0.5)
+#' plot(h, col=2)
+alphahull <- function(xy, alpha) {
   ah <- alphahull::ahull(xy, alpha = alpha)
   arcs <- as.data.frame(ah$arcs)
 
-  ah_spldf <- mapply(function(v.x, v.y, theta, r, c1, c2) {
+  ah_poly <- mapply(function(v.x, v.y, theta, r, c1, c2) {
     angles <- alphahull::anglesArc(c(v.x, v.y), theta)
     seqang <- seq(angles[1], angles[2], length=1000)
-    sp::Line(cbind(c1 + r*cos(seqang), c2 + r*sin(seqang)))
+    terra::vect(cbind(c1 + r*cos(seqang), c2 + r*sin(seqang)), 'lines',
+                crs='+init=epsg:4326')
+    # ^ crs temporarily assigned to permit buffering
   }, arcs$v.x, arcs$v.y, arcs$theta, arcs$r, arcs$c1, arcs$c2,
   SIMPLIFY=FALSE) %>%
-    sp::Lines(ID=1) %>%
-    list %>%
-    sp::SpatialLines(
-      proj4string=sp::CRS(as.character(NA), doCheckCRSArgs=TRUE)
-    ) %>%
-    sp::SpatialLinesDataFrame(data.frame(id=1), match.ID=FALSE)
+    terra::vect() %>% # combine individual arcs into single SpatVector
+    terra::aggregate() %>% # aggregate to a single feature
+    terra::buffer(width=0.1) # convert lines to polys
 
-  ah_poly <- raster::buffer(ah_spldf, width = buffer_width)
-  # ^ required to convert lines to polys
-
-  pols <- methods::slot(ah_poly, "polygons")
-  holes <- lapply(pols, function(x)
-    sapply(methods::slot(x, "Polygons"), slot, "hole"))
-  not_holes <- lapply(1:length(pols), function(i)
-    methods::slot(pols[[i]], "Polygons")[!holes[[i]]])
-  IDs <- row.names(ah_poly)
-  ah_poly_not_holes <- sp::SpatialPolygons(lapply(1:length(not_holes), function(i)
-    sp::Polygons(not_holes[[i]], ID = IDs[i])),
-    proj4string = sp::CRS(sp::proj4string(ah_poly), doCheckCRSArgs = TRUE))
-  return(sf::st_as_sf(ah_poly_not_holes))
+  out <- terra::fillHoles(ah_poly) # fill the hole created by buffering
+  terra::set.crs(out, '') # remove the temporary crs (in-place modification)
 }

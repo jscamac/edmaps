@@ -36,19 +36,17 @@
 #'   [pandoc](https://pandoc.org/installing.html) software must be installed and
 #'   available to R. If pandoc is unavailable, the html file will be accompanied
 #'   by a folder of accessory files.
-#' @importFrom terra ext values minmax ncell crs project rast setMinMax setValues writeRaster
+#' @importFrom terra ext values minmax ncell crs project rast setMinMax setValues writeRaster vect crop
 #' @importFrom gdalUtilities gdalwarp
 #' @importFrom methods is slot "slot<-"
 #' @importFrom utils read.csv
 #' @importFrom dplyr filter
-#' @importFrom sf st_as_sf st_crs st_crop st_transform
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_dots tm_facets tm_raster tm_scale_bar tm_shape tmap_leaflet tmap_mode tmap_options
 #' @importFrom tmaptools tmap.pal.info
 #' @importFrom leafem addMouseCoordinates
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom leaflet addMiniMap
-#' @importFrom stars read_stars
 #' @export
 interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
                             transparency = 0.8, legend = TRUE, set_value_range = NULL,  discrete = FALSE,
@@ -207,7 +205,7 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
     terra::writeRaster(ras, f <- tempfile(fileext='.tif'))
     gdalUtilities::gdalwarp(f, f2 <- tempfile(fileext='.tif'),
                             t_srs = "+init=epsg:3857", r = "bilinear")
-    ras <- stars::read_stars(f2)
+    ras <- terra::rast(f2)
     m <- tmap::tm_shape(ras, name = layer_name) +
       tmap::tm_raster(palette = palette,
                       style = "cont", midpoint = NA, alpha = transparency,
@@ -218,19 +216,17 @@ interactive_map <- function(ras, layer_name = NULL, palette = 'inferno',
       tmap::tm_facets(as.layers=TRUE)
   }
 
-
   # Add trap locations (if required)
   if(!is.null(surveillance_locs)) {
     if(is.character(surveillance_locs)) {
       surveillance_locs <- utils::read.csv(surveillance_locs) %>%
-        dplyr::filter(!is.na(Longitude),
-                      !is.na(Latitude))
+        dplyr::filter(!is.na(Longitude), !is.na(Latitude))
     }
     locs <- suppressWarnings(
-      sf::st_as_sf(surveillance_locs, coords = c("Longitude","Latitude"),
-                   crs = 4326) %>%
-        sf::st_transform(crs = sf::st_crs(ras)) %>%
-        sf::st_crop(y = terra::ext(ras))
+      terra::vect(surveillance_locs, geom=c("Longitude","Latitude"),
+                  crs = 4326) %>%
+        terra::project(terra::crs(ras)) %>%
+        terra::crop(y=terra::ext(ras))
     )
 
     pts <- tmap::tm_shape(locs) +

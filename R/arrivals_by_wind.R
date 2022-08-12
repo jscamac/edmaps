@@ -2,8 +2,8 @@
 #'
 #' Estimates pest arrivals via coastal onshore winds.
 #'
-#' @param wind_speed A `RasterLayer` or file path to a raster file
-#'   containing wind speed.
+#' @param wind_speed A `RasterLayer`, [`SpatRaster`], or file path to a raster
+#'   file containing wind speed.
 #' @param leakage_rate Numeric vector of 2 values, giving the lower and upper
 #'   bounds of a 95% CI for leakage rate (the number of pest leakage events in
 #'   a random year).
@@ -19,11 +19,10 @@
 #'   exists.
 #' @return If `outfile` is specified, the resulting raster (multiband if
 #'   `probability` has length > 1) is saved as a tiff at that path. If
-#'   `return_rast` is `TRUE` or `outfile` is not specified the
-#'   resulting raster object is returned, otherwise `NULL` is returned
-#'   invisibly.
+#'   `return_rast` is `TRUE` or `outfile` is not specified the resulting raster
+#'   object is returned, otherwise `NULL` is returned invisibly.
 #' @family functions estimating arrivals
-#' @importFrom raster raster writeRaster stack
+#' @importFrom terra rast writeRaster
 #' @export
 arrivals_by_wind <- function(wind_speed, leakage_rate, establishment_rate,
   outfile, return_rast=FALSE, overwrite=FALSE) {
@@ -36,10 +35,11 @@ arrivals_by_wind <- function(wind_speed, leakage_rate, establishment_rate,
   }
 
   # Load raster
-  if(is.character(wind_speed)) {
-    wind_speed <- raster::raster(wind_speed)
-  } else if(!is(wind_speed, 'RasterLayer')) {
-    stop('wind_speed must be a RasterLayer or a file path to a raster file.')
+  if(is.character(wind_speed) || is(wind_speed, 'RasterLayer')) {
+    wind_speed <- terra::rast(wind_speed)
+  } else if(!is(wind_speed, 'SpatRaster') || dim(wind_speed)[3] > 1) {
+    stop('wind_speed must be a RasterLayer, single-layer SpatRaster, ',
+         'or a file path to a raster file.', call.=FALSE)
   }
   # Calculate proportion of population density
   prop_wind <- calc_proportion(wind_speed)
@@ -54,7 +54,7 @@ arrivals_by_wind <- function(wind_speed, leakage_rate, establishment_rate,
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out raster
-    raster::writeRaster(out, outfile, overwrite = overwrite)
+    terra::writeRaster(out, outfile, overwrite = overwrite)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out

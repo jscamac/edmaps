@@ -2,34 +2,36 @@
 #'
 #' Creates a weight by postcode for each major port.
 #'
-#' @param path Character. File path to xls file containing containers by
-#'   postcode for each port.
-#' @param sheet_nums Integer. Vector of integers signifying the sheet numbers
-#'   to read in.
+#' @param path Character. File path to Microsoft Excel .xls file containing
+#'   containers by postcode for each port.
+#' @param sheet_nums Integer. Vector of integers signifying the sheet numbers to
+#'   read in.
 #' @param range A cell range to read from, as described in cell-specification.
 #'   Includes typical _Excel_ ranges such as `"B3:D87"`, possibly including the
 #'   sheet name like `"Budget!B2:G14"`, and more. Interpreted strictly, even if
 #'   the range forces the inclusion of leading or trailing empty rows or
 #'   columns.
-#' @param postcode_shp Character. File path to postcode shape file.
+#' @param postcode_poly Character. File path to postcode vector dataset (e.g.
+#'   ESRI Shapefile).
 #' @param na Character vector of strings to interpret as missing values. By
 #'   default, `readxl` treats blank cells as missing data.
 #' @param outfile Character. Name of shapefile where output will be saved. If
-#'   not provided, `sf` object will be returned to R.
-#' @param return_sf Logical. Should the `sf` object be returned to R?
-#'   Ignored if `outfile` is not provided.
+#'   not provided, [`SpatVector`] object will be returned to R.
+#' @param return_vect Logical. Should the [`SpatVector`] object be returned to
+#'   R? Ignored if `outfile` is not provided.
 #' @details For the purposes of this analysis missing data (i.e. NAs) will be
 #'   treated as zeroes.
-#' @return An `sf` object if `return_sf` is `TRUE` if if `outfile` is missing;
-#'   `NULL` otherwise.
+#' @return A [`SpatVector`] object if `return_vect` is `TRUE` or if `outfile` is
+#'   missing; `NULL` otherwise.
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom purrr set_names map_df
-#' @importFrom dplyr rename mutate group_by summarise ungroup left_join filter mutate_all across
+#' @importFrom dplyr rename mutate group_by summarise ungroup left_join across
 #' @importFrom tidyr spread replace_na gather
-#' @importFrom sf read_sf st_transform st_write
+#' @importFrom terra vect project writeVector subset
 #' @export
 container_weights <- function(path, sheet_nums, range = "A7:M2217",
-                              postcode_shp, na = c("", "-", "np"), outfile, return_sf=FALSE) {
+                              postcode_poly, na = c("", "-", "np"), outfile,
+                              return_vect=FALSE) {
 
   x <- suppressMessages(
     readxl::excel_sheets(path) %>%
@@ -55,23 +57,28 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
     dplyr::ungroup() %>%
     tidyr::spread(Port, Containers)
 
-  out <- sf::read_sf(postcode_shp) %>%
-    dplyr::left_join(x, by = c(POA_CODE = "Postcode")) %>%
-    dplyr::filter(SQKM > 0) %>%
+  pc <- terra::vect(postcode_poly)
+  # terra doesn't play nicely with dplyr, so we pull out the attributes and
+  # modify them, and then reassociate them with the spatial geoms.
+  pc_dat <- as.data.frame(pc) %>%
+    dplyr::left_join(x, by=c('POA_CODE' = 'Postcode')) %>%
     mutate(
       dplyr::across(where(is.numeric), ~tidyr::replace_na(.x, 0))
-    ) %>%
-    sf::st_transform(crs = "+init=epsg:3577")
+    )
+  values(pc) <- pc_dat # assign attributes back to the geoms
+
+  out <- terra::subset(pc, pc$SQKM > 0) %>%
+    terra::project('+init=epsg:3577')
 
   if(!missing(outfile)) {
     # Create directory if it does not exist
     if(!dir.exists(dirname(outfile))) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
-    # write out shape file
-    sf::st_write(out, outfile,  quiet = TRUE)
+    # write out vector dataset
+    terra::writeVector(out, outfile)
   }
-  if(isTRUE(return_sf) || missing(outfile)) {
+  if(isTRUE(return_vect) || missing(outfile)) {
     out
   } else {
     invisible(NULL)

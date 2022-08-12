@@ -5,18 +5,20 @@
 #' @param abs_data Character. File path to ABS .csv file.
 #' @param nrm_shapefile Character. File path to NRM shapefile.
 #' @param outfile Character. Name of shapefile (or other vector data format
-#'   supported by OGR) where output will be saved. If not provided, `sf`
-#'   object will be returned to R.
-#' @param return_sf Logical. Should the `sf` object be returned to R?
-#'   Ignored if `outfile` is not provided.
-#' @return An `sf` object or vector data export.
+#'   supported by OGR) where output will be saved. If not provided, `sf` object
+#'   will be returned to R.
+#' @param return_vect Logical. Should the [`SpatVector`] object be returned to
+#'   R? Ignored if `outfile` is not provided.
+#' @return If `return_vect` is `TRUE` or `outfile` is missing, a [`SpatVector`]
+#'   object will be returned. Otherwise, the vector dataset is written to
+#'   `outfile` and NULL is returned invisibly.
 #' @importFrom readr read_csv cols_only
-#' @importFrom dplyr mutate filter group_by summarise ungroup select left_join
-#' @importFrom sf read_sf st_transform st_write
+#' @importFrom dplyr mutate filter group_by summarise ungroup select
+#' @importFrom terra vect project writeVector
 #' @export
-
 fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
-  return_sf=FALSE) {
+  return_vect=FALSE) {
+
   fert <- readr::read_csv(abs_data,
                          col_names = c("NRM_ID",
                                        "Region",
@@ -54,14 +56,14 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
     dplyr::select(NRM_ID, Fert_t)
 
   # ABS lumped some NRMs so need to account for that
-  nrm <- sf::read_sf(nrm_shapefile) %>%
-    dplyr::mutate(NRM_ID=ifelse(
-      NRM_CODE16 %in% c(402, 406), 402406,
-      ifelse(NRM_CODE16 %in% c(801, 110), 110801, NRM_CODE16)))
+  nrm <- terra::vect(nrm_shapefile)
+  nrm$NRM_ID <- ifelse(
+    nrm$NRM_CODE16 %in% c(402, 406), 402406,
+    ifelse(nrm$NRM_CODE16 %in% c(801, 110), 110801, nrm$NRM_CODE16))
 
-  out <- dplyr::left_join(nrm, fert, by = "NRM_ID") %>%
-    dplyr::filter(!is.na(Fert_t)) %>%
-    sf::st_transform(crs = '+init=epsg:3577')
+  out <- nrm %>%
+    merge(fert, by="NRM_ID", all.x=TRUE) %>%
+    terra::project('+init=epsg:3577')
 
   if(!missing(outfile)) {
     # Create directory if it does not exist
@@ -69,9 +71,9 @@ fertiliser_by_nrm <- function(abs_data, nrm_shapefile, outfile,
       dir.create(dirname(outfile), recursive = TRUE)
     }
     # write out shape file
-    sf::st_write(out, outfile, quiet = TRUE)
+    terra::writeVector(out, outfile, quiet = TRUE)
   }
 
-  if(isTRUE(return_sf) || missing(outfile)) out else invisible(NULL)
+  if(isTRUE(return_vect) || missing(outfile)) out else invisible(NULL)
 
 }

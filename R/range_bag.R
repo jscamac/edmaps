@@ -2,9 +2,11 @@
 #'
 #' Fit and project range bag model.
 #'
-#' @param occurrence_data `sf` object, `data.frame` or character path to a csv
-#'   file containing occurrence coordinates (must contain columns named
-#'   "Latitude" and "Longitude").
+#' @param occurrence_data `sf` points object, `SpatialPoints` object,
+#'   `SpatVector` points object, `data.frame` or character path to a csv file
+#'   containing occurrence coordinates (must contain columns named "Latitude"
+#'   and "Longitude"). Note that CRS is assumed to be WGS84 if `occurrence_data`
+#'   is a file path or a `data.frame`.
 #' @param bioclim_dir Path. Path to directory containing WorldClim raster data.
 #' @param n_dims Integer. The number of dimensions ranges to bag.
 #' @param n_models Integer. The number of bootstrapped model ensembles to run.
@@ -29,13 +31,10 @@
 #'   _Journal of the Royal Society Interface_, 12(107), 20150086.
 #'   doi:https://doi.org/10.1098/rsif.2015.0086.
 #' @importFrom geometry tsearchn convhulln delaunayn
-#' @importFrom terra rast crop writeRaster as.data.frame cellFromXy
+#' @importFrom terra rast crop writeRaster as.data.frame cellFromXY vect subset
 #' @importFrom utils read.csv
-#' @importFrom sf as_Spatial st_transform
-#' @importFrom sp coordinates proj4string CRS
 #' @importFrom stats na.omit
 #' @importFrom rnaturalearth ne_countries
-#' @importFrom dplyr filter
 #' @importFrom magrittr %>%
 #' @export
 range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
@@ -106,49 +105,48 @@ range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
     id <- which(bioclim_vars %in% exclude_vars)
     bioclim_stack <- bioclim_stack[[-id]]
   }
+
   if(is.character(occurrence_data)) {
-    locs <- utils::read.csv(occurrence_data)
-  } else {
-    locs <- occurrence_data
+    occurrence_data <- utils::read.csv(occurrence_data)
   }
 
-  if(any(("sf") %in% class(locs))) {
-    locs <- suppressMessages(
-      sf::st_transform(
-        locs, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
-    ) %>%
-      sf::as_Spatial(.)
-  } else {
-    locs <- locs %>%
-      {names(.) <- tolower(names(.)); .} %>%
-      {sp::coordinates(.) <- c("longitude", "latitude"); .} %>%
-      {sp::proj4string(.) <-
-        sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"); .}
+  if(is(occurrence_data, 'sf') || is(occurrence_data, "Spatial")) {
+    occurrence_data <- occurrence_data %>%
+      terra::vect("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+  } else if(is.data.frame(occurrence_data)) {
+    occurrence_data <- occurrence_data %>%
+      setNames(tolower(names(.))) %>%
+      terra::vect(geom=c('longitude', 'latitude'),
+                  crs='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs')
+  } else if(!is(occurrence_data, 'SpatVector')) {
+    stop('occurrence_data must be a file path to tabular occurrence data, ',
+         'a data.frame of such data, an `sf` points object, a `SpatialPoints` ',
+         'object, or a `SpatVector` points object.', call.=FALSE)
   }
-
 
   # Reduces points to 1 per grid cell
   loc_env <- stats::na.omit(
     terra::as.data.frame(
-      bioclim_stack[unique(terra::cellFromXY(bioclim_stack, locs))]
+      bioclim_stack[unique(terra::cellFromXY(bioclim_stack, occurrence_data))]
     )
   )
   models <- range_bag_fit(loc_env, n_models = n_models, dimensions = n_dims,
                           p = p)
 
   world_map <- rnaturalearth::ne_countries(returnclass = "sf") %>%
-    dplyr::filter(name != "Antarctica")
+    terra::vect() %>%
+    terra::subset(.[['name']] != "Antarctica")
 
-  pred_data <- stats::na.omit(terra::as.data.frame(
-    bioclim_stack %>%
-      terra::crop(., world_map), xy=TRUE))
+  pred_data <- bioclim_stack %>%
+    terra::crop(world_map) %>%
+    terra::as.data.frame(xy=TRUE) %>%
+    stats::na.omit()
 
-  out <- suppressWarnings(
-    terra::rast(
-      cbind(pred_data[, 1:2],
-            range_bag_pred(models = models, new_data = pred_data[, -(1:2)])),
-      type = 'xyz', crs = '+init=epsg:4326')
-  )
+  out <- range_bag_pred(models=models, new_data=pred_data[, -(1:2)]) %>%
+    cbind(pred_data[, 1:2], .) %>%
+    terra::rast(type='xyz', crs='+init=epsg:4326') %>%
+    suppressWarnings()
+
   if(!missing(outfile)) {
     # Create directory if it does not exist
     if(!dir.exists(dirname(outfile))) {

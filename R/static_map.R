@@ -63,8 +63,7 @@
 #'   errors arise when using RStudio but not when using R.
 #' @importFrom dplyr filter
 #' @importFrom gdalUtilities gdalwarp
-#' @importFrom terra aggregate minmax ncell setMinMax writeRaster nlyr rast ext
-#' @importFrom sf st_as_sf st_crop st_crs st_read st_transform
+#' @importFrom terra aggregate minmax ncell setMinMax writeRaster nlyr rast ext vect crop crs project
 #' @importFrom stats qlogis
 #' @importFrom tmap tm_compass tm_dots tm_facets tm_layout tm_polygons tm_raster tm_rgb tm_scale_bar tm_shape tmap_mode tmap_options tmap_save
 #' @importFrom tmaptools bb read_osm
@@ -119,16 +118,16 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
   terra::setMinMax(ras)
 
   # Set bounded box based on xlim and ylim
-  e <- tmaptools::bb(xlim=xlim, ylim=ylim)
+  e <- terra::ext(c(xlim, ylim))
 
   if(basemap_mode=='osm') {
     basemap <- tmaptools::read_osm(e, zoom=NULL)
     basemap_res <- c(abs(attr(basemap, 'dimensions')$x$delta),
                      abs(attr(basemap, 'dimensions')$y$delta))
   } else {
-    basemap <- sf::st_read(system.file('extdata/ne_australia_states.gpkg',
+    basemap <- terra::vect(system.file('extdata/ne_australia_states.gpkg',
                                        package='edmaps')) %>%
-      sf::st_crop(e)
+      terra::crop(e)
   }
 
   # Aggregate raster (if required)
@@ -278,10 +277,10 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
     }
 
     locs <- suppressWarnings(suppressMessages(
-      sf::st_as_sf(surveillance_locs, coords = c("Longitude", "Latitude"),
-                   crs = 4326) %>%
-        sf::st_transform(crs = sf::st_crs(ras)) %>%
-        sf::st_crop(y = terra::ext(ras)))
+      terra::vect(surveillance_locs, geom=c("Longitude", "Latitude"),
+                  crs='epsg:4326') %>%
+        terra::project(crs=terra::crs(ras)) %>%
+        terra::crop(y=terra::ext(ras)))
     )
     # Add surveillance locations to map
     m <- m +
