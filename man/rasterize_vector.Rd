@@ -24,27 +24,25 @@ rasterize_vector(
 \item{outfile}{Raster output file path. Parent directory will be created
 recursively if required.}
 
-\item{template_raster}{Optional. \verb{Raster*} object or a file path to
-template raster. If this is provided, \code{extent}, \code{res}, and
-\code{crs} will be taken from this raster unless they are also passed to
-this function. If \code{x} is not provided, then \code{extent} and
-\code{res} must be provided.}
+\item{template_raster}{Optional. \verb{Raster*}, \code{\link{SpatRaster}}, or a file path to
+template raster. If this is provided, \code{extent}, \code{res}, and \code{crs} will be
+taken from this raster unless they are also passed to this function. If \code{x}
+is not provided, then \code{extent} and \code{res} must be provided.}
 
 \item{extent}{Either a character path to a raster file, an
-\link[raster:extent]{Extent} object (or an object from which such
-an extent can be extracted), or a numeric vector with four elements
-giving xmin, xmax, ymin, ymax.}
+\link[terra:SpatExtent-class]{SpatExtent} object (or an object from which such an
+extent can be extracted), or a numeric vector with four elements giving
+xmin, xmax, ymin, ymax.}
 
 \item{res}{Numeric or integer vector giving the horizontal and vertical
-spatial resolution of the target raster, in units of \code{crs}. If a
-single value is given, it will be used for both horizontal and vertical
+spatial resolution of the target raster, in units of \code{crs}. If a single
+value is given, it will be used for both horizontal and vertical
 resolution.}
 
-\item{crs}{Target coordinate reference system as a PROJ string (character)
-an object of class CRS. If missing and \code{template_raster} is
-supplied, the crs of \code{template_raster} will be used. If
-\code{template_raster} is also not supplied, the CRS of
-\code{vector_data} will be used.}
+\item{crs}{Target coordinate reference system as a PROJ string (character) an
+object of class CRS. If missing and \code{template_raster} is supplied, the crs
+of \code{template_raster} will be used. If \code{template_raster} is also not
+supplied, the CRS of \code{vector_data} will be used.}
 
 \item{field}{Character. Name of attribute to be burned into raster.}
 
@@ -59,8 +57,8 @@ documentation).}
 \item{return_rast}{Logical. Return object to R?}
 }
 \value{
-A binarized raster is written to \code{outfile}, and returned to R
-as a \code{RasterLayer} if \code{return_rast} is \code{TRUE}.
+A binarized raster is written to \code{outfile}, and returned to R as a
+\code{\link{SpatRaster}} if \code{return_rast} is \code{TRUE}.
 }
 \description{
 Converts vector object to a raster with specified extent and resolution.

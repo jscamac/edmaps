@@ -5,25 +5,25 @@
 \title{Returns a raster with values for the n cells with highest establishment
 likelihood}
 \usage{
-extract_highest_ncells(infile, n_cells, outfile, return_rast = FALSE)
+extract_highest_ncells(x, n_cells, outfile, return_rast = FALSE)
 }
 \arguments{
-\item{infile}{File path to a raster containing estimated likelihoods of
-establishment or arrival.}
+\item{x}{\code{RasterLayer}, \code{\link{SpatRaster}}, or file path to a raster file
+containing estimated likelihoods of establishment or arrival.}
 
 \item{n_cells}{Integer. The number of cells to return.}
 
 \item{outfile}{Character. Output raster file path. If not provided, the
-\code{RasterLayer} will be returned to R.}
+resulting \code{\link{SpatRaster}} will be returned to R.}
 
-\item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is
-saved as to that path. If \code{return_rast} is \code{TRUE} or
-\code{outfile} is not specified, the resulting \code{RasterLayer} is
-returned, otherwise \code{NULL} is returned invisibly.
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved as
+to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not specified, the
+resulting \code{\link{SpatRaster}} is returned, otherwise \code{NULL} is returned
+invisibly.
 }
 \description{
 Returns a raster with values only for the n cells with highest establishment

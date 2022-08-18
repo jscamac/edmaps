@@ -48,28 +48,26 @@ inherit the coordinate system of \code{infile}.}
 Default is \code{"near"}.}
 
 \item{tgt_extent}{Numeric vector containing corner coordinates specified as
-\code{c(xmin, ymin, xmax, ymax)}. Must be specified in the units of
-\code{tgt_proj}.}
+\code{c(xmin, ymin, xmax, ymax)}. Must be specified in the units of \code{tgt_proj}.}
 
-\item{buffer}{Numeric. Add buffer (specified in units of \code{tgt_proj}).
-Useful for adding buffers around coasts, and for filling in small gaps
-within raster specified by \code{infile}.}
+\item{buffer}{Numeric. Add buffer (specified in units of \code{tgt_proj}). Useful
+for adding buffers around coasts, and for filling in small gaps within
+raster specified by \code{infile}.}
 
 \item{src_nodata}{Integer. The nodata value for an input file.}
 
 \item{datatype}{A character string indicating the output data type. See the
-\href{https://gdal.org/programs/gdalwarp.html}{gdalwarp docs}
-for more information.}
+\href{https://gdal.org/programs/gdalwarp.html}{gdalwarp docs} for more
+information.}
 
-\item{return_rast}{Logical. Return \code{RaserLayer} to R?}
+\item{return_rast}{Logical. Return \code{\link{SpatRaster}} to R?}
 
 \item{overwrite}{Logical. Should \code{outfile} be overwritten if it already
 exists?}
 }
 \value{
 _rast A raster file is produced on disk. Additionally, if
-\code{return_rast} is \code{TRUE} a \code{RasterLayer} object is returned
-to R.
+\code{return_rast} is \code{TRUE} a \code{\link{SpatRaster}} object is returned to R.
 }
 \description{
 This function can be used to change resolution, projection and extent of a
@@ -78,25 +76,25 @@ raster.
 \details{
 The resampling methods available are as follows:
 \itemize{
-\item{near: nearest neighbour resampling (default, fastest algorithm, worst
-interpolation quality).}
-\item{bilinear: bilinear resampling.}
-\item{cubic: cubic resampling.}
-\item{cubicspline: cubic spline resampling.}
-\item{lanczos: Lanczos windowed sinc resampling.}
-\item{average: average resampling, computes the average of all non-NODATA
-contributing pixels. (GDAL >= 1.10.0).}
-\item{mode: mode resampling, selects the value which appears most often of
-all the sampled points. (GDAL >= 1.10.0).}
-\item{max: maximum resampling, selects the maximum value from all non-NODATA
-contributing pixels. (GDAL >= 2.0.0).}
-\item{min: minimum resampling, selects the minimum value from all non-NODATA
-contributing pixels. (GDAL >= 2.0.0).}
-\item{med: median resampling, selects the median value of all non-NODATA
-contributing pixels. (GDAL >= 2.0.0).}
-\item{q1: first quartile resampling, selects the first quartile value of all
-non-NODATA contributing pixels. (GDAL >= 2.0.0).}
-\item{q3: third quartile resampling, selects the third quartile value of all
-non-NODATA contributing pixels. (GDAL >= 2.0.0).}
+\item near: nearest neighbour resampling (default, fastest algorithm, worst
+interpolation quality).
+\item bilinear: bilinear resampling.
+\item cubic: cubic resampling.
+\item cubicspline: cubic spline resampling.
+\item lanczos: Lanczos windowed sinc resampling.
+\item average: average resampling, computes the average of all non-NODATA
+contributing pixels. (GDAL >= 1.10.0).
+\item mode: mode resampling, selects the value which appears most often of
+all the sampled points. (GDAL >= 1.10.0).
+\item max: maximum resampling, selects the maximum value from all non-NODATA
+contributing pixels. (GDAL >= 2.0.0).
+\item min: minimum resampling, selects the minimum value from all non-NODATA
+contributing pixels. (GDAL >= 2.0.0).
+\item med: median resampling, selects the median value of all non-NODATA
+contributing pixels. (GDAL >= 2.0.0).
+\item q1: first quartile resampling, selects the first quartile value of all
+non-NODATA contributing pixels. (GDAL >= 2.0.0).
+\item q3: third quartile resampling, selects the third quartile value of all
+non-NODATA contributing pixels. (GDAL >= 2.0.0).
 }
 }

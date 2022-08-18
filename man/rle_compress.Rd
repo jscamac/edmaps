@@ -4,30 +4,26 @@
 \alias{rle_compress}
 \title{Compress raster data using run length encoding}
 \usage{
-rle_compress(x, outfile, quiet = FALSE)
+rle_compress(x, outfile, quiet = FALSE, overwrite = FALSE)
 }
 \arguments{
-\item{x}{File path to the categorical raster to be compressed, or a
-\verb{Raster*} object.}
+\item{x}{Either a \code{RasterLayer} object, single-layer \code{\link{SpatRaster}} object,
+or file path to a categorical raster to be compressed.}
 
 \item{outfile}{Character (optional). Path to target .rds file that will
-store RLE results. Directory will be created recursively if it doesn't
-exist.}
+store run-length encoded results. Directory will be created recursively if
+it doesn't exist.}
 
 \item{quiet}{Logical. Should progress messages be suppressed?}
+
+\item{overwrite}{Logical. Should \code{outfile} be overwritten if it already
+exists? Ignored if \code{outfile} is not provided.}
 }
 \value{
-A list with five elements:
-\itemize{
-\item \code{starts}: Cell numbers corresponding to run starts
-\item \code{lengths}: Run lengths
-\item \code{values}: Run values
-\item \code{extent}: Raster extent
-\item \code{res}: Raster resolution
-}
-
-This object is additionally saved in rds format to \code{outfile}, if
-provided.
+A \code{raster_rle} object (extending \code{tibble}) with three columns
+(\code{lengths}, \code{values}, and \code{starts}) and attributes (\code{extent}, a
+\code{\link{SpatExtent}} object, \code{res}, and \code{crs}). This object is additionally saved
+in rds format to \code{outfile}, if provided.
 }
 \description{
 Compress categorical raster data using run length encoding.

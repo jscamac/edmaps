@@ -18,44 +18,40 @@ rasterize_range(
 \arguments{
 \item{xy}{Coordinates to define host/species' range. This must be one of: a
 matrix with two columns giving longitude and latitude (in that order); a
-file path to a csv file that contains columns "Longitude" and "Latitude";
-a \code{SpatialPoints} object; or a \code{sf} multipoints object. Points
-will be reduced to the subset that falls within the \code{template} extent.}
+file path to a csv file that contains columns "Longitude" and "Latitude"; a
+\code{SpatVector} with points geom, a SpatialPoints\verb{object; or a}sf\verb{multipoints object. Points will be reduced to the subset that falls within the}template` extent.}
 
-\item{method}{Either \code{points} to burn \code{xy} points into raster, or
-\code{alphahull} to calculate the alpha hull of \code{xy}, and burn those
-polygons into raster.}
+\item{method}{Either \code{points} to burn \code{xy} points into raster, or \code{alphahull}
+to calculate the alpha hull of \code{xy}, and burn those polygons into raster.}
 
-\item{alpha}{Alpha parameter for alpha hull calculation. Ignored if
-\code{method} is \code{'points'}.}
+\item{alpha}{Alpha parameter for alpha hull calculation. Ignored if \code{method}
+is \code{'points'}.}
 
 \item{point_buffer}{When \code{method = "points"}, the width of a buffer to
-generate around \code{xy} points before burning into the raster. Expected
-to be in the CRS of \code{template}. Ignored if \code{method} is
-\code{'alphahull'}.}
+generate around \code{xy} points before burning into the raster. Expected to be
+in the CRS of \code{template}. Ignored if \code{method} is \code{'alphahull'}.}
 
-\item{template}{\code{RasterLayer} or file path to raster file. The host
-raster resulting from this function will use the extent and resolution of
-this template.}
+\item{template}{\verb{Raster*}, \code{\link{SpatRaster}}, or file path to a raster file. The
+host raster resulting from this function will use the extent and resolution
+of this template.}
 
 \item{outfile}{Optional file path to write out resulting host raster.}
 
-\item{xy_crs}{Coordinate reference system of \code{xy}, passed as numeric
-EPSG code, or any other format accepted by \code{\link[sf:st_crs]{sf::st_set_crs()}}. If
-missing and \code{xy} is an \code{sp} or \code{sf} object, the CRS is
-defined by the object. If the latter is undefined, or if \code{xy_crs} is
-missing and \code{xy} is a matrix or path to a csv file, \code{xy} will
-inherit the CRS of \code{template}, and if that is undefined, EPSG:4326
-(WGS84) will be assumed. If \code{xy_crs} is provided and \code{xy} is an
-\code{sf} or \code{sp} object with a defined CRS, \code{xy_crs} will be
-ignored.}
+\item{xy_crs}{Coordinate reference system of \code{xy}, passed as
+\url{authority:number} (e.g. \code{"EPSG:4326"}), or any other format accepted by
+\code{\link[terra:crs]{terra::crs()}}. If missing and \code{xy} is an \code{sp}, \code{sf}, or \code{SpatVector}
+object, the CRS is defined by the object. If the latter is undefined, or if
+\code{xy_crs} is missing and \code{xy} is a matrix or path to a csv file, \code{xy} will
+inherit the CRS of \code{template}, and if that is undefined, EPSG:4326 (WGS84)
+will be assumed. If \code{xy_crs} is provided and \code{xy} is an \code{sf}, \code{sp}, or
+\code{SpatVector} object with a defined CRS, \code{xy_crs} will be ignored.}
 
 \item{plot}{Logical. Plot the resulting raster? Default = \code{TRUE}.}
 }
 \value{
-A \code{RasterLayer} with the resulting range burnt into it.
-Additionally, if \code{outfile} is not missing, the raster is written to
-that file.
+A \code{\link{Spatraster}} with the resulting range burnt into it.
+Additionally, if \code{outfile} is not missing, the raster is written to that
+file.
 }
 \description{
 Rasterize a species' range, either by burning points directly into raster, or

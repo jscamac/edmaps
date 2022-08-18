@@ -26,8 +26,8 @@ static_map(
 )
 }
 \arguments{
-\item{ras}{A \verb{Raster*} object or file path to a (potentially multiband)
-raster file.}
+\item{ras}{A \verb{Raster*}, \code{\link{SpatRaster}}, or file paths to one or more raster
+files.}
 
 \item{xlim}{Numeric vector. The longitudinal extent of the area to plot, in
 WGS84 coordinates.}
@@ -35,11 +35,14 @@ WGS84 coordinates.}
 \item{ylim}{Numeric vector. The latitudinal extent of the area to plot, in
 WGS84 coordinates.}
 
-\item{subset_layers}{Vector. A vector of layer names or numeric positions to be included in plot. Only relevant if loading
-a \code{RasterStack} or \code{RasterBrick}. If missing all layers are included.}
+\item{subset_layers}{Vector. A vector of layer names or numeric positions to
+be included in plot. Only relevant if \code{ras} has multiple layers/bands. If
+missing all layers are included.}
 
-\item{layer_names}{Character vector. A vector of panel titles (only relevant if ras is a stack). If not
-provided, names from ras will be used. If provided, length must equal \code{raster::nlayers(ras)}, or match \code{length(subset_layers)}.}
+\item{layer_names}{Character vector. A vector of panel titles (only relevant
+if ras is a stack). If not provided, names from ras will be used. If
+provided, length must equal \code{terra::nlyr(ras)}, or match
+\code{length(subset_layers)}.}
 
 \item{legend_title}{Character. Legend title.}
 
@@ -69,18 +72,19 @@ basemaps, or simple administrative boundaries. Default is \code{'osm'}.}
 on national risk range (\code{TRUE}) or by risk range present in region
 specified by \code{xlim} and \code{ylim}.}
 
-\item{surveillance_locs}{A spatial object or a path to a .csv file
-containing columns named "Latitude" and "Longitude".}
+\item{surveillance_locs}{A spatial object or a path to a .csv file containing
+columns named "Latitude" and "Longitude".}
 
-\item{shape}{shape(s) to use for surveillance locations. Default is 21. If you have
-multiple bands, and you'd like to use different symbols on each panel, specify a vector of shapes.
-(e.g. c(NA, 21,21,21) will not include shapes on the first panel, but will on the rest}
+\item{shape}{shape(s) to use for surveillance locations. Default is 21. If
+you have multiple bands, and you'd like to use different symbols on each
+panel, specify a vector of shapes. (e.g. c(NA, 21,21,21) will not include
+shapes on the first panel, but will on the rest}
 
 \item{pt_col}{Character. The plotting colour for surveillance points.}
 
-\item{aggregate_raster}{\code{NULL} or a list containing the aggregation
-factor (i.e. number of raster cells to aggregate) and the aggregation
-function e.g. \code{list(10, sum)}.}
+\item{aggregate_raster}{\code{NULL} or a list containing the aggregation factor
+(i.e. number of raster cells to aggregate) and the aggregation function
+e.g. \code{list(10, sum)}.}
 
 \item{nrow}{For multipanel plots, an optional  numeric value defining the
 number of rows of panels.}
@@ -92,19 +96,19 @@ automatically, based on the aspect ratio given by the plotting extent.}
 \item{outfile}{Character. File path to save map.}
 }
 \value{
-If \code{outfile} is provided, a map is saved to that file.
-Otherwise, a \code{tmap} object is returned to R.
+If \code{outfile} is provided, a map is saved to that file. Otherwise, a
+\code{tmap} object is returned to R.
 }
 \description{
 Produce a static map of establishment likelihood, with OpenStreetMap base
 layer.
 }
 \details{
-This function relies on the \code{OpenStreetMap} package to obtain
-base layer tiles. This in turn requires Java to be installed, and linking
-R with Java can sometimes prove challenging. On macOS, Java errors can
-often be resolved by entering \verb{sudo R CMD javareconf} in a terminal (
-which updates R's Java configuration variables). On Windows, ensure that
-the Java architecture (32-bit/64-bit) matches that of R. Additionally,
-some Java errors arise when using RStudio but not when using R.
+This function relies on the \code{OpenStreetMap} package to obtain base
+layer tiles. This in turn requires Java to be installed, and linking R with
+Java can sometimes prove challenging. On macOS, Java errors can often be
+resolved by entering \verb{sudo R CMD javareconf} in a terminal ( which updates
+R's Java configuration variables). On Windows, ensure that the Java
+architecture (32-bit/64-bit) matches that of R. Additionally, some Java
+errors arise when using RStudio but not when using R.
 }

@@ -9,11 +9,12 @@ aggregate_raster(
   outfile,
   aggregate_factor,
   fun = sum,
-  return_rast = FALSE
+  return_rast = FALSE,
+  overwrite = TRUE
 )
 }
 \arguments{
-\item{rast}{Raster* object or file path to a raster file.}
+\item{rast}{\code{SpatRaster} or \verb{Raster*} object, or file path to a raster file.}
 
 \item{outfile}{Character. Output raster file path. If not provided, object
 will be returned to R. Directory will be created  recursively if it does
@@ -25,16 +26,20 @@ integers (horizontal and vertical aggregation factors) or three integers
 (when also aggregating over layers).}
 
 \item{fun}{Function. Function used to aggregate values. Default is
-\code{sum}.}
+\code{sum}. The function should accept a \code{na.rm} argument, or ignore it as a
+\code{...} argument.}
 
-\item{return_rast}{Logical. Should the resulting raster be returned to R?
-Ignored if \code{outfile} is not provided.}
+\item{return_rast}{Logical. Should the resulting \code{SpatRaster} object be
+returned to R? Ignored if \code{outfile} is not provided.}
+
+\item{overwrite}{Should \code{outfile} be overwritten if it exists? Default is
+\code{TRUE}.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster is saved as a
-geotiff to that path. If \code{return_rast} is \code{TRUE} or
-\code{outfile} is not specified the resulting raster is returned,
-otherwise \code{NULL} is returned invisibly.
+If \code{outfile} is specified, the resulting \code{SpatRaster} object is saved
+as a geotiff to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not
+specified the resulting \code{SpatRaster} object is returned, otherwise \code{NULL}
+is returned invisibly.
 }
 \description{
 Aggregate raster cells (and optionally layers) to coarser resolution.

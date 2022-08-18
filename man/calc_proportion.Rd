@@ -7,10 +7,10 @@
 calc_proportion(rast)
 }
 \arguments{
-\item{rast}{Raster object.}
+\item{rast}{A \code{SpatRaster} or \verb{Raster*} object.}
 }
 \value{
-A \code{RasterLayer}.
+A \code{SpatRaster} object.
 }
 \description{
 Calculates raster cell values as a proportion of the sum of all cells' values.

@@ -7,12 +7,12 @@
 exp_function(rast, beta)
 }
 \arguments{
-\item{rast}{Raster object.}
+\item{rast}{\code{\link{SpatRaster}} object.}
 
 \item{beta}{Numeric. The beta coefficient of a standard exponential function.}
 }
 \value{
-A Raster object.
+A \code{\link{SpatRaster}} object.
 }
 \description{
 Apply exponential function to raster values.

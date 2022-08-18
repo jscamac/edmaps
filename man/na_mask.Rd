@@ -9,8 +9,8 @@ na_mask(infile, outfile, res, extent)
 \arguments{
 \item{infile}{Character. File path to input raster file.}
 
-\item{outfile}{Character. Output raster file path. Directory will be
-created (recursively) if it doesn't exist.}
+\item{outfile}{Character. Output raster file path. Directory will be created
+(recursively) if it doesn't exist.}
 
 \item{res}{Numeric. A vector of one or two numbers giving the desired output
 resolution. If missing, the input resolution will be used. If a single
@@ -18,12 +18,12 @@ number is provided, it will be used for both horizontal and vertical
 resolution.}
 
 \item{extent}{One of of: a numeric vector giving the desired extent of the
-output raster as \code{c(xmin, xmax, ymin, ymax)}; an \link[raster:extent]{Extent}
-object; or an object from which such an \code{Extent} object can be extracted.}
+output raster as \code{c(xmin, xmax, ymin, ymax)}; a \code{\link{SpatExtent}} object; or
+an object from which such an object can be extracted.}
 }
 \value{
-A raster is written to \code{outfile}, with NA cells transferred
-from \code{infile} and all other cells set to 1.
+A raster is written to \code{outfile}, with NA cells transferred from
+\code{infile} and all other cells set to 1.
 }
 \description{
 Create a mask raster, retaining NA and setting all non-NA cells to 1. Input

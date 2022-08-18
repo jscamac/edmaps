@@ -7,24 +7,24 @@
 pr_establishment(rast, suitability, outfile, return_rast)
 }
 \arguments{
-\item{rast}{Raster object or path to file containing pathway probability of
-pest arrival.}
+\item{rast}{\code{RasterLayer}, single-layer \code{\link{SpatRaster}}, or path to a raster
+file containing pathway probability of pest arrival.}
 
-\item{suitability}{Raster object or path to file containing a suitability
-raster. Cell values must be between 0 (not suitable) and 1 (ideal
-suitability).}
+\item{suitability}{\code{RasterLayer}, single-layer \code{\link{SpatRaster}}, or path to a
+raster file containing a suitability raster. Cell values must be between 0
+(not suitable) and 1 (ideal suitability).}
 
 \item{outfile}{Character. Output raster file path. If not provided, the
-\code{RasterLayer} will be returned to R.}
+\code{\link{SpatRaster}} will be returned to R.}
 
-\item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is
-saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
-\code{outfile} is not specified, the resulting \code{RasterLayer} is
-returned, otherwise \code{NULL} is returned invisibly.
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved to
+\code{outfile}. If \code{return_rast} is \code{TRUE} or \code{outfile} is not specified, the
+resulting \code{\link{SpatRaster}} is returned, otherwise \code{NULL} is returned
+invisibly.
 }
 \description{
 Calculate probability of establishment for each raster cell as a function of

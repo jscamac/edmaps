@@ -16,16 +16,17 @@ arrivals_by_containers(
 )
 }
 \arguments{
-\item{container_weights}{An \code{\link{sf}} object or file path to a
-shapefile supported by OGR, as produced by \code{\link[=container_weights]{container_weights()}}.}
+\item{container_weights}{A \code{\link{SpatVector}} or \code{\link{sf}} object, or a file path to
+a vector dataset in a format supported by OGR, as produced by
+\code{\link[=container_weights]{container_weights()}}.}
 
 \item{port_data}{Character. Path to csv file containing Port Names, Port
 Codes, Longitude, Latitude and Container volumes. Column names must be (in
 this order): Name, PortCode, Longitude, Latitude, Count.}
 
-\item{template_raster}{\code{RasterLayer} or file path to a raster file.
-This is used to define the extent and resolution of output. Must be in
-CRS EPSG:3577.}
+\item{template_raster}{\code{\link{SpatRaster}} or \code{RasterLayer} object, or a file path
+to a raster file. This is used to define the extent and resolution of
+output. Must be specified in CRS EPSG:3577.}
 
 \item{leakage_rate}{Numeric vector of 2 values, giving the lower and upper
 bounds of a 95\% CI for leakage rate (the number of pest leakage events in
@@ -37,20 +38,19 @@ establishment, for leakage events).}
 
 \item{outfile}{Character. Output raster file path. If \code{probability} has
 length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
-not provided, raster object will be returned to R.}
+not provided, the resulting \code{\link{SpatRaster}} object will be returned to R.}
 
-\item{return_rast}{Logical. Should the raster object be returned to R?
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} object be returned to R?
 Ignored if \code{outfile} is not provided.}
 
-\item{overwrite}{Logical. If \code{TRUE} and \code{outfile} is not missing,
-it will be overwritten if the file specified by \code{outfile} already
-exists.}
+\item{overwrite}{Logical. Should \code{outfile} be overwritten if it exists?
+Default is \code{FALSE}.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster (multiband if
-\code{probability} has length > 1) is saved as a tiff at that path. If
-\code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-resulting raster object is returned, otherwise \code{NULL} is returned
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} object
+(multiband if \code{probability} has length > 1) is saved as a GeoTiff at that
+path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not specified, the
+resulting \code{\link{SpatRaster}} object is returned, otherwise \code{NULL} is returned
 invisibly.
 }
 \description{

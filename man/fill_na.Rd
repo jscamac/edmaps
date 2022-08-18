@@ -4,36 +4,38 @@
 \alias{fill_na}
 \title{Modify NAs within neighbourhood of data cells}
 \usage{
-fill_na(x, fun, w, outfile, return_rast = FALSE, overwrite = FALSE)
+fill_na(x, fun, dist, outfile, return_rast = FALSE, overwrite = FALSE)
 }
 \arguments{
-\item{x}{A \verb{Raster*} object.}
+\item{x}{A \code{RasterLayer} or single-layer \code{\link{SpatRaster}} object, or a path to
+a raster file.}
 
 \item{fun}{The function (name or symbol) to apply to the moving windows.
 First argument should represent the vector of cells contained in the focal
 window. Only non-NA cell values will be passed to the function.}
 
-\item{w}{A weights matrix (see \code{\link[raster:focalWeight]{raster::focalWeight()}} and \code{\link[raster:focal]{raster::focal()}}
-defining the focal window to which fun will be applied. Note that all
-contributing cells will be given equal weight (i.e. varying weights are not
-respected - non-zero & non-NA weights will be replaced by 1).}
+\item{dist}{The distance, in units of the CRS of \code{x}, used as the radius of a
+circle defining the neighbourhood of an NA cell. The median of non-NA cells
+within the neighbourhood is assigned to the NA cell. Cells within the
+neighbourhood contribute equally to the median.}
 
 \item{outfile}{Character. File path to an output raster file. If missing, a
 temporary file will be used.}
 
-\item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?}
+\item{return_rast}{Logical. Should the resulting \code{\link{SpatRaster}} be returned
+to R?}
 
 \item{overwrite}{Logical. Should \code{outfile} be replaced if it already
 exists?}
 }
 \value{
-Returns the resulting \code{RasterLayer} if \code{return_rast} is
-\code{TRUE}. Returns the output file path otherwise.
+Returns the resulting \code{\link{SpatRaster}} if \code{return_rast} is \code{TRUE}.
+Returns the output file path otherwise.
 }
 \description{
-Apply a function to NA cells within a moving window.
+Apply a function to NA cells within a circular moving window.
 }
 \details{
 NA values within focal blocks will be ignored. Raster edges will be
-NA-padded to allow focal computations at the edge (see \code{\link[raster:focal]{raster::focal()}}.
+NA-padded to allow focal computations at the edge (see \code{\link[terra:focal]{terra::focal()}}).
 }

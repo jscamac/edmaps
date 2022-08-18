@@ -25,33 +25,32 @@ to such an object saved as .rds.}
 
 \item{outfile}{Character. The target file path for the binarized raster.}
 
-\item{extent}{Output extent as an \code{Extent} object or an object from
-which an Extent object can be extracted. If not provided, extent will be
-taken from input. If \code{extent} differs from that of \code{infile},
-new cells will be assigned value 1 if any original cells belonging to
+\item{extent}{Output extent as a \code{\link{SpatExtent}} object or an object from
+which a \code{\link{SpatExtent}} object can be extracted. If not provided, extent
+will be taken from input. If \code{extent} differs from that of \code{infile}, new
+cells will be assigned value 1 if any original cells belonging to
 \code{categories} have their centroids within the new cell.}
 
 \item{res}{output resolution as a numeric vector of 1 or 2 elements, or a
-\verb{Raster*} object from which resolution can be extracted. If not
-provided, resolution will be taken from input. If \code{res} differs
-from that of \code{infile}, new cells will be assigned value 1 if any
-original cells belonging to \code{categories} have their centroids within
-the new cell.}
+\code{\link{SpatRaster}} or \verb{Raster*} object from which resolution can be extracted.
+If not provided, resolution will be taken from input. If \code{res} differs from
+that of \code{infile}, new cells will be assigned value 1 if any original cells
+belonging to \code{categories} have their centroids within the new cell.}
 
 \item{categories}{Integer or numeric vector of class values to be laballed as
 1 in the target raster.}
 
 \item{overwrite}{Logical. Should \code{outfile} be overwritten if it exists?}
 
-\item{return_rast}{Logical. Should the target raster be returned to R as a
-\code{Raster} layer (\code{TRUE}) or not returned (\code{FALSE})?}
+\item{return_rast}{Logical. Should the target \code{\link{SpatRaster}} be returned to R
+(\code{TRUE}), or not returned (\code{FALSE})?}
 
 \item{quiet}{Logical. Should progress messages be suppressed?}
 }
 \value{
 A binarized raster layer is written to \code{outfile}, and if
 \code{return_rast} is \code{TRUE}, the raster is additionally returned to R
-as a \code{Raster} layer.
+as a \code{\link{SpatRaster}} layer.
 }
 \description{
 Binarize a categorical raster and optionally aggregate and/or resample.

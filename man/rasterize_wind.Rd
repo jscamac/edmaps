@@ -7,17 +7,18 @@
 rasterize_wind(data, wind_column, template, width, outfile)
 }
 \arguments{
-\item{data}{Character. A vector polygon dataset (e.g. Shapefile or
-GeoPackage) describing onshore winds, or a file path to such a file.}
+\item{data}{One of: A \code{SpatVector} object with polygon geometry, an \code{sf}
+object with polygon geometry, a \code{SpatialPolygons} object, or a file path to
+such a file. This object should describe onshore winds.}
 
 \item{wind_column}{Character. The column name for the column of the object
 defined by \code{data} that contains wind speed data.}
 
-\item{template}{A \code{RasterLayer} or \code{stars} object, or a character
+\item{template}{A \code{RasterLayer} or \code{SpatRaster} object, or a character
 file path to a file that can be read by GDAL, defining the extent and
 resolution of analysis, and defining the coastline (edge of non-NA values).
-If a \code{stars} object, the first attribute will be used. Must have a
-valid coordinate system. CRS is assumed to be Australian Albers (3577).}
+Must have a valid coordinate system. If missing, CRS is assumed to be
+Australian Albers (3577).}
 
 \item{width}{Numeric. The width of the coastal buffer (in metres), defining
 how far inland the wind has an effect. E.g. if the pest is thought to be

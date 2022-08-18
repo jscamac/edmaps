@@ -14,8 +14,8 @@ arrivals_by_wind(
 )
 }
 \arguments{
-\item{wind_speed}{A \code{RasterLayer} or file path to a raster file
-containing wind speed.}
+\item{wind_speed}{A \code{RasterLayer}, \code{\link{SpatRaster}}, or file path to a raster
+file containing wind speed.}
 
 \item{leakage_rate}{Numeric vector of 2 values, giving the lower and upper
 bounds of a 95\% CI for leakage rate (the number of pest leakage events in
@@ -38,9 +38,8 @@ exists.}
 \value{
 If \code{outfile} is specified, the resulting raster (multiband if
 \code{probability} has length > 1) is saved as a tiff at that path. If
-\code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-resulting raster object is returned, otherwise \code{NULL} is returned
-invisibly.
+\code{return_rast} is \code{TRUE} or \code{outfile} is not specified the resulting raster
+object is returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{
 Estimates pest arrivals via coastal onshore winds.

@@ -7,20 +7,20 @@
 suitability(x, outfile, return_rast = FALSE)
 }
 \arguments{
-\item{x}{One of: a \code{RasterStack}; a \code{RasterBrick}; a list of
-\code{RasterLayer} objects, or a vector of file paths to raster files.}
+\item{x}{One of: a \code{\link{SpatRaster}} object; a \code{RasterLayer}, a list of
+\code{\link{SpatRaster}} objects, or a vector of file paths to raster files.}
 
-\item{outfile}{Character. Name of geotiff where output will be saved. If not
-provided, raster object will be returned to R.}
+\item{outfile}{Character. Filename where output will be saved. If not
+provided, \code{\link{SpatRaster}} object will be returned to R.}
 
-\item{return_rast}{Logical. Should the raster object be returned to R?
-Ignored if \code{outfile} is not provided.}
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} object be returned to
+R? Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster is saved as a
-geotiff to that path. If \code{return_rast} is \code{TRUE} or
-\code{outfile} is not specified the resulting raster is returned, otherwise
-\code{NULL} is returned invisibly.
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} object is
+saved as to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not
+specified the resulting \code{\link{SpatRaster}} is returned, otherwise \code{NULL} is
+returned invisibly.
 }
 \description{
 Combine biotic (and abiotic) layers into a single suitability raster to be

@@ -7,22 +7,22 @@
 combine_pathways(x, outfile, return_rast = FALSE)
 }
 \arguments{
-\item{x}{Either a \code{RasterStack} or a character vector giving file
-path(s) to rasters. Each raster should describe a pathway to be included in
-the summation, and cell values give the probability of arrival for the
-corresponding pathway. All rasters must have the same extent and
+\item{x}{A \code{RasterStack}, \code{\link{SpatRaster}}, or a character vector giving file
+path(s) to raster files. Each raster should describe a pathway to be
+included in the summation, and cell values give the probability of arrival
+for the corresponding pathway. All rasters must have the same extent and
 resolution.}
 
 \item{outfile}{Character. Output raster file path. If not provided, the
-\code{RasterLayer} will be returned to R.}
+\code{\link{SpatRaster}} will be returned to R.}
 
-\item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is
 saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
-\code{outfile} is not specified, the resulting \code{RasterLayer} is
+\code{outfile} is not specified, the resulting \code{\link{SpatRaster}} is
 returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{

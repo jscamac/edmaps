@@ -4,20 +4,20 @@
 \alias{calculate_median}
 \title{Calculate median of raster objects}
 \usage{
-calculate_median(files, outfile)
+calculate_median(x, outfile)
 }
 \arguments{
-\item{files}{A vector of file paths to (optionally multiband) raster files.}
+\item{x}{Either a \code{RasterStack}, a multi-layer  \code{\link{SpatRaster}}, or a vector
+of file paths to raster files.}
 
-\item{outfile}{Character. Output raster file path. If not provided, object
-will be returned to R. Directory will be created recursively if it does
-not exist.}
+\item{outfile}{Character. Optional output raster file path. Directory will be
+created recursively if it does not exist.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster is saved as a
-geotiff to that path and NULL is returned. If \code{outfile} is not
-specified the resulting raster is returned.
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved as a
+GeoTiff to that path and NULL is returned. If \code{outfile} is not
+specified the \code{\link{SpatRaster}} is returned to R.
 }
 \description{
-Calculate the cellwise median of two or more Raster* objects, by layer.
+Calculate the cellwise median of multiple rasters.
 }

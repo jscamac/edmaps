@@ -5,15 +5,11 @@
 \title{Calculate the proportion of total establishment likelihood captured by
 current surveillance}
 \usage{
-surveillance_coverage(
-  establishment_rasters,
-  layer_names,
-  surveillance_locations
-)
+surveillance_coverage(ras, layer_names, surveillance_locations)
 }
 \arguments{
-\item{establishment_rasters}{Character vector. A vector of one or more file
-path to rasters describing establishment likelihood.}
+\item{ras}{\verb{Raster*}, \code{\link{SpatRaster}}, or a character vector of one or more
+paths to raster files describing establishment likelihood.}
 
 \item{layer_names}{Character. Name to be assigned to each establishment
 raster. If not specified, names of the raster layers will be used.}
@@ -23,8 +19,8 @@ surveillance locations, including columns titled "Longitude" and
 "Latitude" with coordinates given in decimal degrees (GDA94).}
 }
 \value{
-The proportion of establishment likelihood captured by current
-surveillance.
+A \code{data.frame} with the proportion of establishment likelihood
+captured by current surveillance.
 }
 \description{
 Calculate the proportion of total establishment likelihood captured by

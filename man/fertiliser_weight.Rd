@@ -7,22 +7,23 @@
 fertiliser_weight(fert_nrm, fert_landuses, outfile, return_rast = FALSE)
 }
 \arguments{
-\item{fert_nrm}{A file path to vector data or an \code{sf} object.}
+\item{fert_nrm}{A \code{\link{SpatVector}}, \code{sf} object, \code{Spatial} (sp) object, or
+file path to vector dataset.}
 
-\item{fert_landuses}{A file path to raster file or  a \code{RasterLayer}
-object.}
+\item{fert_landuses}{A \code{\link{SpatRaster}}, \code{\link{RasterLayer}}, or file path to
+raster file.}
 
-\item{outfile}{Character. Output raster file path. If not provided,
-\code{RasterLayer} will be returned to R.}
+\item{outfile}{Character. Output raster file path. If not provided, the
+resulting \code{\link{SpatRaster}} will be returned to R.}
 
-\item{return_rast}{Logical. Should the \code{RasterLayer} be returned to R?
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} be returned to R?
 Ignored if \code{outfile} is not provided.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{RasterLayer} is
-saved as to that path. If \code{return_rast} is \code{TRUE} or
-\code{outfile} is not specified, the resulting \code{RasterLayer} is
-returned, otherwise \code{NULL} is returned invisibly.
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved as
+to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not specified, the
+resulting \code{\link{SpatRaster}} is returned, otherwise \code{NULL} is returned
+invisibly.
 }
 \description{
 Create a fertiliser weight raster as a function of estimated nrm fertiliser

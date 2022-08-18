@@ -8,18 +8,18 @@ container_weights(
   path,
   sheet_nums,
   range = "A7:M2217",
-  postcode_shp,
+  postcode_poly,
   na = c("", "-", "np"),
   outfile,
-  return_sf = FALSE
+  return_vect = FALSE
 )
 }
 \arguments{
-\item{path}{Character. File path to xls file containing containers by
-postcode for each port.}
+\item{path}{Character. File path to Microsoft Excel .xls file containing
+containers by postcode for each port.}
 
-\item{sheet_nums}{Integer. Vector of integers signifying the sheet numbers
-to read in.}
+\item{sheet_nums}{Integer. Vector of integers signifying the sheet numbers to
+read in.}
 
 \item{range}{A cell range to read from, as described in cell-specification.
 Includes typical \emph{Excel} ranges such as \code{"B3:D87"}, possibly including the
@@ -27,19 +27,21 @@ sheet name like \code{"Budget!B2:G14"}, and more. Interpreted strictly, even if
 the range forces the inclusion of leading or trailing empty rows or
 columns.}
 
-\item{postcode_shp}{Character. File path to postcode shape file.}
+\item{postcode_poly}{Character. File path to postcode vector dataset (e.g.
+ESRI Shapefile).}
 
 \item{na}{Character vector of strings to interpret as missing values. By
 default, \code{readxl} treats blank cells as missing data.}
 
 \item{outfile}{Character. Name of shapefile where output will be saved. If
-not provided, \code{sf} object will be returned to R.}
+not provided, \code{\link{SpatVector}} object will be returned to R.}
 
-\item{return_sf}{Logical. Should the \code{sf} object be returned to R?
-Ignored if \code{outfile} is not provided.}
+\item{return_vect}{Logical. Should the \code{\link{SpatVector}} object be returned to
+R? Ignored if \code{outfile} is not provided.}
 }
 \value{
-An \code{sf} object or shapefile export.
+A \code{\link{SpatVector}} object if \code{return_vect} is \code{TRUE} or if \code{outfile} is
+missing; \code{NULL} otherwise.
 }
 \description{
 Creates a weight by postcode for each major port.

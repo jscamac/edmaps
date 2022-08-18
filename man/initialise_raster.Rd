@@ -17,40 +17,40 @@ initialise_raster(
 )
 }
 \arguments{
-\item{x}{Optional. Raster* object or a file path to template raster. If this
-is provided, \code{extent}, \code{res}, and \code{crs} will be taken from
-this raster unless they are also passed to this function. If \code{x} is
-not provided, then \code{extent} and \code{res} must be provided.}
+\item{x}{Optional. Raster* or \code{\link{SpatRaster}} object or a file path to
+template raster. If this is provided, \code{extent}, \code{res}, and \code{crs} will be
+taken from this raster unless they are also passed to this function. If \code{x}
+is not provided, then \code{extent} and \code{res} must be provided.}
 
 \item{outfile}{Target raster file path. Directory will be created
 (recursively) if it doesn't exist.}
 
 \item{extent}{Either a character path to a raster file, an
-\link[raster:extent]{Extent} object (or an object from which such an extent
+\link[terra:ext]{SpatExtent} object (or an object from which such an extent
 can be extracted), or a numeric vector with four elements giving xmin,
 xmax, ymin, ymax.}
 
 \item{res}{Numeric or integer vector giving the horizontal and vertical
-spatial resolution of the target raster, in units of \code{crs}. If a
-single value is given, it will be used for both horizontal and vertical
+spatial resolution of the target raster, in units of \code{crs}. If a single
+value is given, it will be used for both horizontal and vertical
 resolution.}
 
-\item{crs}{Target coordinate reference system as a PROJ string (character)
-or an object of class CRS. If missing and \code{x} is supplied, the crs
-of \code{x} will be used.}
+\item{crs}{Target coordinate reference system as a PROJ string (character) or
+an object of class CRS. If missing and \code{x} is supplied, the crs of \code{x} will
+be used.}
 
 \item{init}{Numeric. A value assigned to all cells of the created raster.}
 
 \item{datatype}{Character. Data type for the created raster. See
-\code{\link[raster:dataType]{raster::dataType()}}.}
+\code{\link[terra:writeRaster]{terra::writeRaster()}}.}
 
 \item{overwrite}{Logical. Should \code{outfile} be overwritten if it exists?}
 
-\item{return_rast}{Logical. Should the resulting raster be returned?}
+\item{return_rast}{Logical. Should the resulting \code{\link{SpatRaster}} be returned?}
 }
 \value{
 An empty raster is created at \code{outfile}, and the corresponding
-\code{RasterLayer} is returned if \code{return_rast} is \code{TRUE}.
+\code{\link{SpatRaster}} is returned if \code{return_rast} is \code{TRUE}.
 }
 \description{
 Create an empty or constant raster with specified attributes.

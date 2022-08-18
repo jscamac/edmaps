@@ -5,7 +5,7 @@
 \title{Plot a raster}
 \usage{
 plot_raster(
-  object,
+  rast,
   legend_title,
   occurrence_data = NULL,
   pt_col = "red",
@@ -15,15 +15,15 @@ plot_raster(
 )
 }
 \arguments{
-\item{object}{A \code{RasterLayer} or file path to raster file.}
+\item{rast}{A \code{RasterLayer}, single-layer \code{\link{SpatRaster}} or file path to
+raster file.}
 
 \item{legend_title}{Character. If missing, the name of the raster layer will
 be used.}
 
-\item{occurrence_data}{A \code{data.frame}, \code{sf} object,
-\code{SpatialPointsDataFrame} object, or path to a .csv file containing
-columns named "Latitude" and "Longitude". If \code{NULL}, no points will
-be plotted.}
+\item{occurrence_data}{A \code{data.frame}, \code{sf} object, \code{SpatialPointsDataFrame}
+object, \code{\link{SpatVector}} object, or path to a .csv file containing columns
+named "Latitude" and "Longitude". If \code{NULL}, no points will be plotted.}
 
 \item{pt_col}{Character. Colour of points (if plotted).}
 
@@ -35,8 +35,8 @@ Required if \code{outfile} is provided.}
 \item{outfile}{Character. Path to save output.}
 }
 \value{
-A \code{tmap} object. If \code{outfile} is provided, a map will also
-be written to that file.
+A \code{tmap} object. If \code{outfile} is provided, a map will also be written
+to that file.
 }
 \description{
 Plot a raster.

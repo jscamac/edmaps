@@ -7,16 +7,16 @@
 step_function(rast, threshold, lower_value, upper_value)
 }
 \arguments{
-\item{rast}{Raster object}
+\item{rast}{A \verb{Raster*} or \code{\link{SpatRaster}} object.}
 
 \item{threshold}{Numeric. The threshold value.}
 
-\item{lower_value}{Numeric. The value to set below the threshold.}
+\item{lower_value}{Numeric. The value to use below the threshold.}
 
-\item{upper_value}{Numeric. The value to set above the threshold.}
+\item{upper_value}{Numeric. The value to use above the threshold.}
 }
 \value{
-A raster object
+A \code{\link{SpatRaster}} object.
 }
 \description{
 Reclassify raster values either side of a defined threshold value.

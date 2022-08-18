@@ -4,7 +4,7 @@
 \alias{fertiliser_by_nrm}
 \title{Create fertiliser by nrm sf object}
 \usage{
-fertiliser_by_nrm(abs_data, nrm_shapefile, outfile, return_sf = FALSE)
+fertiliser_by_nrm(abs_data, nrm_shapefile, outfile, return_vect = FALSE)
 }
 \arguments{
 \item{abs_data}{Character. File path to ABS .csv file.}
@@ -12,14 +12,16 @@ fertiliser_by_nrm(abs_data, nrm_shapefile, outfile, return_sf = FALSE)
 \item{nrm_shapefile}{Character. File path to NRM shapefile.}
 
 \item{outfile}{Character. Name of shapefile (or other vector data format
-supported by OGR) where output will be saved. If not provided, \code{sf}
-object will be returned to R.}
+supported by OGR) where output will be saved. If not provided, \code{sf} object
+will be returned to R.}
 
-\item{return_sf}{Logical. Should the \code{sf} object be returned to R?
-Ignored if \code{outfile} is not provided.}
+\item{return_vect}{Logical. Should the \code{\link{SpatVector}} object be returned to
+R? Ignored if \code{outfile} is not provided.}
 }
 \value{
-An \code{sf} object or vector data export.
+If \code{return_vect} is \code{TRUE} or \code{outfile} is missing, a \code{\link{SpatVector}}
+object will be returned. Otherwise, the vector dataset is written to
+\code{outfile} and NULL is returned invisibly.
 }
 \description{
 Create fertiliser by nrm sf object.

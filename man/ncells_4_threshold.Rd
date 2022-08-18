@@ -6,21 +6,24 @@
 \usage{
 ncells_4_threshold(
   risk_rasters,
-  names,
+  layer_names,
   proportion_captured = c(0.6, 0.8, 0.9, 0.95)
 )
 }
 \arguments{
-\item{risk_rasters}{Character. File path(s) to rasters to be loaded.}
-
-\item{names}{Character. Names corresponding to \code{infiles}.}
+\item{risk_rasters}{\verb{Raster*}, \code{\link{SpatRaster}}, or character vector of one or
+more pathers to raster files.}
 
 \item{proportion_captured}{Numeric vector. Proportion(s) of risk to be
 captured.}
+
+\item{names}{Character. Optional names corresponding to \code{risk_rasters}. If
+not provided, layer names are used.}
 }
 \value{
-A \code{data.frame} containing the number of cells to be trapped to
-capture given proportion(s) of total risk across multiple input files.
+A \code{tibble} containing the number of cells requiring surveillance in
+order to capture the proportion(s) of total risk given by
+\code{proportion_captured}.
 }
 \description{
 Extract number of cells required to meet threshold proportion of risk.

@@ -15,8 +15,8 @@ arrivals_by_torres(
 )
 }
 \arguments{
-\item{pop_density}{A \code{RasterLayer} or file path to a raster file
-containing population density.}
+\item{pop_density}{A \code{\link{SpatRaster}} or \code{RasterLayer} object, or a file path
+to a raster file containing population density.}
 
 \item{airport_weight}{A \code{RasterLayer} or file path to a raster file
 containing distance from Cairns airport weights.}
@@ -31,21 +31,19 @@ establishment, for leakage events).}
 
 \item{outfile}{Character. Output raster file path. If \code{probability} has
 length > 1, the file type must support multiband rasters (e.g. GeoTiff). If
-not provided, raster object will be returned to R.}
+not provided, the \code{\link{SpatRaster}} object will be returned to R.}
 
-\item{return_rast}{Logical. Should the raster object be returned to R?
-Ignored if \code{outfile} is not provided.}
+\item{return_rast}{Logical. Should the \code{\link{SpatRaster}} object be returned to
+R? Ignored if \code{outfile} is not provided.}
 
-\item{overwrite}{Logical. If \code{TRUE} and \code{outfile} is not missing,
-it will be overwritten if the file specified by \code{outfile} already
-exists.}
+\item{overwrite}{Logical. Should \code{outfile} be overwritten if it exists?
+Default is \code{FALSE}.}
 }
 \value{
-If \code{outfile} is specified, the resulting raster (multiband if
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} (multiband if
 \code{probability} has length > 1) is saved as a tiff at that path. If
-\code{return_rast} is \code{TRUE} or \code{outfile} is not specified the
-resulting raster object is returned, otherwise \code{NULL} is returned
-invisibly.
+\code{return_rast} is \code{TRUE} or \code{outfile} is not specified the resulting
+\code{\link{SpatRaster}} object is returned, otherwise \code{NULL} is returned invisibly.
 }
 \description{
 Estimates pest arrivals due to Torres Strait air passengers coming into

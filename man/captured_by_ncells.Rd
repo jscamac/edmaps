@@ -4,12 +4,13 @@
 \alias{captured_by_ncells}
 \title{Calculate establishment likelihood captured in top n cells}
 \usage{
-captured_by_ncells(infiles, names, n_cells, all = TRUE)
+captured_by_ncells(x, layer_names, n_cells, all = TRUE)
 }
 \arguments{
-\item{infiles}{Character vector. File path(s) to one or more raster files.}
+\item{x}{\verb{Raster*} or \code{SpatRaster} object, or a character vector of file
+path(s) to one or more raster files.}
 
-\item{names}{Character vector. Names corresponding to \code{infiles}.}
+\item{layer_names}{Character vector. Optional names corresponding to \code{x}.}
 
 \item{n_cells}{Integer. The number of cells to consider.}
 
