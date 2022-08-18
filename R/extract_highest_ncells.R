@@ -22,6 +22,7 @@
 #'   run into issues when `n_cells` is high.
 #' @importFrom terra rast global as.data.frame writeRaster
 #' @importFrom methods is
+#' @importFrom stats quantile
 #' @export
 extract_highest_ncells <- function(x, n_cells, outfile, return_rast=FALSE) {
 
@@ -33,8 +34,10 @@ extract_highest_ncells <- function(x, n_cells, outfile, return_rast=FALSE) {
   }
 
   # Convert all cells not captureid by top n_cells to NA
-  q <- quantile(terra::as.data.frame(r)[[1]],
-           1 - n_cells/terra::global(r, function(x) sum(!is.na(x)))[[1]])
+  q <- stats::quantile(
+    terra::as.data.frame(r)[[1]],
+    1 - n_cells/terra::global(r, function(x) sum(!is.na(x)))[[1]]
+  )
   r[r < q] <- NA
 
   if(!missing(outfile)) {

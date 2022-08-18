@@ -30,7 +30,7 @@
 #' @param return_rast Logical. Return object to R?
 #' @return A binarized raster is written to `outfile`, and returned to R as a
 #'   [`SpatRaster`] if `return_rast` is `TRUE`.
-#' @importFrom terra rast ext crs res SpatExtent
+#' @importFrom terra rast ext crs res
 #' @importFrom gdalUtilities gdal_rasterize
 #' @importFrom methods is
 #' @export
