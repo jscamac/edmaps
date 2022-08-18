@@ -8,10 +8,9 @@
 #'   is not provided, then `extent` and `res` must be provided.
 #' @param outfile Target raster file path. Directory will be created
 #'   (recursively) if it doesn't exist.
-#' @param extent Either a character path to a raster file, an
-#'   [SpatExtent][terra::ext()] object (or an object from which such an extent
-#'   can be extracted), or a numeric vector with four elements giving xmin,
-#'   xmax, ymin, ymax.
+#' @param extent Either a character path to a raster file, an [`SpatExtent`]
+#'   object (or an object from which such an extent can be extracted), or a
+#'   numeric vector with four elements giving xmin, xmax, ymin, ymax.
 #' @param res Numeric or integer vector giving the horizontal and vertical
 #'   spatial resolution of the target raster, in units of `crs`. If a single
 #'   value is given, it will be used for both horizontal and vertical

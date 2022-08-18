@@ -3,12 +3,12 @@
 #' Process and rasterize wind data, creating raster datasets that describe wind
 #' speed within a specified distance of the coastline.
 #'
-#' @param data One of: A `SpatVector` object with polygon geometry, an `sf`
+#' @param data One of: A [`SpatVector`] object with polygon geometry, an `sf`
 #'   object with polygon geometry, a `SpatialPolygons` object, or a file path to
 #'   such a file. This object should describe onshore winds.
 #' @param wind_column Character. The column name for the column of the object
 #'   defined by `data` that contains wind speed data.
-#' @param template A `RasterLayer` or `SpatRaster` object, or a character
+#' @param template A `RasterLayer` or [`SpatRaster`] object, or a character
 #'   file path to a file that can be read by GDAL, defining the extent and
 #'   resolution of analysis, and defining the coastline (edge of non-NA values).
 #'   Must have a valid coordinate system. If missing, CRS is assumed to be

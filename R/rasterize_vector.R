@@ -10,7 +10,7 @@
 #'   taken from this raster unless they are also passed to this function. If `x`
 #'   is not provided, then `extent` and `res` must be provided.
 #' @param extent Either a character path to a raster file, an
-#'   [SpatExtent][terra::SpatExtent] object (or an object from which such an
+#'   [`SpatExtent`] object (or an object from which such an
 #'   extent can be extracted), or a numeric vector with four elements giving
 #'   xmin, xmax, ymin, ymax.
 #' @param res Numeric or integer vector giving the horizontal and vertical

@@ -3,7 +3,7 @@
 #' Fit and project range bag model.
 #'
 #' @param occurrence_data `sf` points object, `SpatialPoints` object,
-#'   `SpatVector` points object, `data.frame` or character path to a csv file
+#'   [`SpatVector`] points object, `data.frame` or character path to a csv file
 #'   containing occurrence coordinates (must contain columns named "Latitude"
 #'   and "Longitude"). Note that CRS is assumed to be WGS84 if `occurrence_data`
 #'   is a file path or a `data.frame`.

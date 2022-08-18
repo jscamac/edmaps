@@ -6,7 +6,7 @@
 #' @param xy Coordinates to define host/species' range. This must be one of: a
 #'   matrix with two columns giving longitude and latitude (in that order); a
 #'   file path to a csv file that contains columns "Longitude" and "Latitude"; a
-#'   `SpatVector` with points geom, a SpatialPoints` object; or a `sf`
+#'   [`SpatVector`] with points geom, a SpatialPoints` object; or a `sf`
 #'   multipoints object. Points will be reduced to the subset that falls within
 #'   the `template` extent.
 #' @param method Either `points` to burn `xy` points into raster, or `alphahull`
@@ -22,12 +22,12 @@
 #' @param outfile Optional file path to write out resulting host raster.
 #' @param xy_crs Coordinate reference system of `xy`, passed as
 #'   <authority:number> (e.g. `"EPSG:4326"`), or any other format accepted by
-#'   [terra::crs()]. If missing and `xy` is an `sp`, `sf`, or `SpatVector`
+#'   [terra::crs()]. If missing and `xy` is an `sp`, `sf`, or [`SpatVector`]
 #'   object, the CRS is defined by the object. If the latter is undefined, or if
 #'   `xy_crs` is missing and `xy` is a matrix or path to a csv file, `xy` will
 #'   inherit the CRS of `template`, and if that is undefined, EPSG:4326 (WGS84)
 #'   will be assumed. If `xy_crs` is provided and `xy` is an `sf`, `sp`, or
-#'   `SpatVector` object with a defined CRS, `xy_crs` will be ignored.
+#'   [`SpatVector`] object with a defined CRS, `xy_crs` will be ignored.
 #' @param plot Logical. Plot the resulting raster? Default = `TRUE`.
 #' @return A [`Spatraster`] with the resulting range burnt into it.
 #'   Additionally, if `outfile` is not missing, the raster is written to that

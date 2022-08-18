@@ -14,10 +14,9 @@
 #'   function. If `template_raster` is not provided, then `extent` and `res`
 #'   must be provided. The template raster will also be used to mask the output
 #'   raster so that NA cell values will be propagated.
-#' @param extent Either a character path to a raster file, a
-#'   [SpatExtent][terra::ext()] object (or an object from which such an extent
-#'   can be extracted), or a numeric vector with four elements giving xmin,
-#'   xmax, ymin, ymax.
+#' @param extent Either a character path to a raster file, a [`SpatExtent`] object
+#'   (or an object from which such an extent can be extracted), or a numeric
+#'   vector with four elements giving xmin, xmax, ymin, ymax.
 #' @param res Numeric or integer vector giving the horizontal and vertical
 #'   spatial resolution, in units of `crs`. If a single value is given, it will
 #'   be used for both horizontal and vertical resolution.

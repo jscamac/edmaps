@@ -8,8 +8,8 @@
 #' @param port_data Character. Path to csv file containing Port Names, Port
 #'   Codes, Longitude, Latitude and Container volumes. Column names must be (in
 #'   this order): Name, PortCode, Longitude, Latitude, Count.
-#' @param template_raster [`SpatRaster`] or `RasterLayer` object, or a file path
-#'   to a raster file. This is used to define the extent and resolution of
+#' @param template_raster [`SpatRaster`] or `RasterLayer` object, or a file
+#'   path to a raster file. This is used to define the extent and resolution of
 #'   output. Must be specified in CRS EPSG:3577.
 #' @param leakage_rate Numeric vector of 2 values, giving the lower and upper
 #'   bounds of a 95% CI for leakage rate (the number of pest leakage events in

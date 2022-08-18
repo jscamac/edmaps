@@ -5,7 +5,7 @@
 #'
 #' @param fert_nrm  A [`SpatVector`], `sf` object, `Spatial` (sp) object, or
 #'   file path to vector dataset.
-#' @param fert_landuses A [`SpatRaster`], [`RasterLayer`], or file path to
+#' @param fert_landuses A [`SpatRaster`], `RasterLayer`, or file path to
 #'   raster file.
 #' @param outfile Character. Output raster file path. If not provided, the
 #'   resulting [`SpatRaster`] will be returned to R.

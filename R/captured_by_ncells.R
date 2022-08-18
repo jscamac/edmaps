@@ -2,7 +2,7 @@
 #'
 #' Calculate the proportion of establishment likelihood captured in top n cells.
 #'
-#' @param x `Raster*` or `SpatRaster` object, or a character vector of file
+#' @param x `Raster*` or [`SpatRaster`] object, or a character vector of file
 #'   path(s) to one or more raster files.
 #' @param layer_names Character vector. Optional names corresponding to `x`.
 #' @param n_cells Integer. The number of cells to consider.

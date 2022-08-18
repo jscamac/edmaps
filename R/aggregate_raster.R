@@ -2,7 +2,7 @@
 #'
 #' Aggregate raster cells (and optionally layers) to coarser resolution.
 #'
-#' @param rast `SpatRaster` or `Raster*` object, or file path to a raster file.
+#' @param rast [`SpatRaster`] or `Raster*` object, or file path to a raster file.
 #' @param outfile Character. Output raster file path. If not provided, object
 #'   will be returned to R. Directory will be created  recursively if it does
 #'   not exist.
@@ -13,13 +13,13 @@
 #' @param fun Function. Function used to aggregate values. Default is
 #'   `sum`. The function should accept a `na.rm` argument, or ignore it as a
 #'   `...` argument.
-#' @param return_rast Logical. Should the resulting `SpatRaster` object be
+#' @param return_rast Logical. Should the resulting [`SpatRaster`] object be
 #'   returned to R? Ignored if `outfile` is not provided.
 #' @param overwrite Should `outfile` be overwritten if it exists? Default is
 #'   `TRUE`.
-#' @return If `outfile` is specified, the resulting `SpatRaster` object is saved
+#' @return If `outfile` is specified, the resulting [`SpatRaster`] object is saved
 #'   as a geotiff to that path. If `return_rast` is `TRUE` or `outfile` is not
-#'   specified the resulting `SpatRaster` object is returned, otherwise `NULL`
+#'   specified the resulting [`SpatRaster`] object is returned, otherwise `NULL`
 #'   is returned invisibly.
 #' @importFrom terra rast aggregate writeRaster
 #' @importFrom methods is

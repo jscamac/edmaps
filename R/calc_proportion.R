@@ -2,8 +2,8 @@
 #'
 #' Calculates raster cell values as a proportion of the sum of all cells' values.
 #'
-#' @param rast A `SpatRaster` or `Raster*` object.
-#' @return A `SpatRaster` object.
+#' @param rast A [`SpatRaster`] or `Raster*` object.
+#' @return A [`SpatRaster`] object.
 #' @importFrom terra rast global
 #' @importFrom methods is
 #' @export
