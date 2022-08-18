@@ -226,7 +226,7 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
       container_weights(path = drake::file_in(!!containers_data_path),
                         sheet_nums = c(2:6),
                         range = "A7:M2217",
-                        postcode_shp = drake::file_in(!!postcode_path),
+                        postcode_poly = drake::file_in(!!postcode_path),
                         na = c("", "-", "np")),
 
     NDVI_reproject =

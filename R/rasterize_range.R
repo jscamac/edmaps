@@ -34,7 +34,7 @@
 #'   file.
 #' @importFrom dplyr select
 #' @importFrom readr read_csv
-#' @importFrom terra as.polygons buffer cellFromXY crds crs ext init intersect project rast rasterize res vect writeRaster
+#' @importFrom terra as.polygons buffer cellFromXY crds crs ext init intersect project rast rasterize vect writeRaster
 #' @importFrom tmap tm_dots tm_legend tm_raster tm_rgb tm_shape
 #' @importFrom tmaptools read_osm
 #' @export
@@ -118,8 +118,7 @@ rasterize_range <- function(xy, method, alpha, point_buffer=0, template, outfile
       host[terra::cellFromXY(host, terra::crds(xy)[, 1:2])] <- 1
     }
   } else if(method=='alphahull') {
-    host_poly <- alphahull(terra::crds(xy)[, 1:2], alpha,
-                           buffer_width=terra::res(template)[1]/100)
+    host_poly <- alphahull(terra::crds(xy)[, 1:2], alpha)
     host <- terra::rasterize(host_poly, host)
   }
   if(!missing(outfile)) {
