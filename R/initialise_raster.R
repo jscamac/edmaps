@@ -21,12 +21,12 @@
 #'   be used.
 #' @param init Numeric. A value assigned to all cells of the created raster.
 #' @param datatype Character. Data type for the created raster. See
-#'   [terra::writeraster()].
+#'   [terra::writeRaster()].
 #' @param overwrite Logical. Should `outfile` be overwritten if it exists?
 #' @param return_rast Logical. Should the resulting [`SpatRaster`] be returned?
 #' @return An empty raster is created at `outfile`, and the corresponding
 #'   [`SpatRaster`] is returned if `return_rast` is `TRUE`.
-#' @importFrom tera rast writeRaster ext crs
+#' @importFrom terra rast writeRaster ext crs
 #' @importFrom methods is
 #' @export
 initialise_raster <- function(x, outfile, extent, res, crs, init=NA,
