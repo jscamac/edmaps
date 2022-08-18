@@ -21,9 +21,7 @@
 #'   NA-padded to allow focal computations at the edge (see [terra::focal()]).
 #' @return Returns the resulting [`SpatRaster`] if `return_rast` is `TRUE`.
 #'   Returns the output file path otherwise.
-#' @importFrom dplyr as_tibble group_by mutate
-#' @importFrom terra adjacent as.polygons buffer focal focalMat intersect rast rasterize xres yres
-#' @importFrom magrittr %>%
+#' @importFrom terra focal focalMat rast xres yres
 #' @export
 fill_na <- function(x, fun, dist, outfile, return_rast=FALSE, overwrite=FALSE) {
   if(missing(outfile)) outfile <- tempfile(fileext='.tif')
@@ -38,21 +36,9 @@ fill_na <- function(x, fun, dist, outfile, return_rast=FALSE, overwrite=FALSE) {
   fx <- match.fun(fun)
   if(missing(outfile)) outfile <- tempfile(fileext='.tif')
 
-  p <- terra::as.polygons(!is.na(x)) %>% setNames('value')
-  b <- terra::buffer(subset(p, value==1, NSE=TRUE), width=dist)
-  to_fill <- terra::intersect(b, subset(p, value==0, NSE=TRUE))
-  m <- terra::focalMat(x, dist, type = 'circle')
-  target_cells <- terra::rasterize(to_fill, x)
-  i <- which(values(target_cells) == 1)
+  m <- terra::focalMat(x, dist, type='circle', fillNA=TRUE)
+  out <- terra::focal(x, w=m/m, function(z, ...) fx(z, na.rm=TRUE),
+                      na.policy='only', filename=outfile, overwrite=overwrite)
 
-  nbs <- terra::adjacent(x, i, directions=m, pairs=TRUE)
-
-  vals <- dplyr::as_tibble(nbs) %>%
-    dplyr::mutate(value=x[to][[1]]) %>%
-    dplyr::group_by(from) %>%
-    dplyr::mutate(out=fx(value, na.rm=TRUE))
-
-  x[vals$from] <- vals$out
-
-  if(isTRUE(return_rast)) x else invisible(outfile)
+  if(isTRUE(return_rast)) out else invisible(outfile)
 }
