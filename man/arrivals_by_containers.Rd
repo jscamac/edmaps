@@ -24,8 +24,8 @@ a vector dataset in a format supported by OGR, as produced by
 Codes, Longitude, Latitude and Container volumes. Column names must be (in
 this order): Name, PortCode, Longitude, Latitude, Count.}
 
-\item{template_raster}{\code{\link{SpatRaster}} or \code{RasterLayer} object, or a file path
-to a raster file. This is used to define the extent and resolution of
+\item{template_raster}{\code{\link{SpatRaster}} or \code{RasterLayer} object, or a file
+path to a raster file. This is used to define the extent and resolution of
 output. Must be specified in CRS EPSG:3577.}
 
 \item{leakage_rate}{Numeric vector of 2 values, giving the lower and upper

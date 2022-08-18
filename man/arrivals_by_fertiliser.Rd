@@ -14,8 +14,9 @@ arrivals_by_fertiliser(
 )
 }
 \arguments{
-\item{fertiliser_weight}{A \code{\link{SpatRaster}} or \code{RasterLayer} object, or a file
-path to a raster file containing weights by which to distribute arrivals.}
+\item{fertiliser_weight}{A \code{\link{SpatRaster}} or \code{RasterLayer} object, or a
+file path to a raster file containing weights by which to distribute
+arrivals.}
 
 \item{leakage_rate}{Numeric vector of 2 values, giving the lower and upper
 bounds of a 95\% CI for leakage rate (the number of pest leakage events in

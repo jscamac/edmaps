@@ -25,10 +25,9 @@ is not provided, then \code{extent} and \code{res} must be provided.}
 \item{outfile}{Target raster file path. Directory will be created
 (recursively) if it doesn't exist.}
 
-\item{extent}{Either a character path to a raster file, an
-\link[terra:ext]{SpatExtent} object (or an object from which such an extent
-can be extracted), or a numeric vector with four elements giving xmin,
-xmax, ymin, ymax.}
+\item{extent}{Either a character path to a raster file, an \code{\link{SpatExtent}}
+object (or an object from which such an extent can be extracted), or a
+numeric vector with four elements giving xmin, xmax, ymin, ymax.}
 
 \item{res}{Numeric or integer vector giving the horizontal and vertical
 spatial resolution of the target raster, in units of \code{crs}. If a single

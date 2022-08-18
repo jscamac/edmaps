@@ -16,7 +16,7 @@ range_bag(
 }
 \arguments{
 \item{occurrence_data}{\code{sf} points object, \code{SpatialPoints} object,
-\code{SpatVector} points object, \code{data.frame} or character path to a csv file
+\code{\link{SpatVector}} points object, \code{data.frame} or character path to a csv file
 containing occurrence coordinates (must contain columns named "Latitude"
 and "Longitude"). Note that CRS is assumed to be WGS84 if \code{occurrence_data}
 is a file path or a \code{data.frame}.}

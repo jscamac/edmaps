@@ -30,7 +30,7 @@ taken from this raster unless they are also passed to this function. If \code{x}
 is not provided, then \code{extent} and \code{res} must be provided.}
 
 \item{extent}{Either a character path to a raster file, an
-\link[terra:SpatExtent-class]{SpatExtent} object (or an object from which such an
+\code{\link{SpatExtent}} object (or an object from which such an
 extent can be extracted), or a numeric vector with four elements giving
 xmin, xmax, ymin, ymax.}
 

@@ -30,10 +30,9 @@ function. If \code{template_raster} is not provided, then \code{extent} and \cod
 must be provided. The template raster will also be used to mask the output
 raster so that NA cell values will be propagated.}
 
-\item{extent}{Either a character path to a raster file, a
-\link[terra:ext]{SpatExtent} object (or an object from which such an extent
-can be extracted), or a numeric vector with four elements giving xmin,
-xmax, ymin, ymax.}
+\item{extent}{Either a character path to a raster file, a \code{\link{SpatExtent}} object
+(or an object from which such an extent can be extracted), or a numeric
+vector with four elements giving xmin, xmax, ymin, ymax.}
 
 \item{res}{Numeric or integer vector giving the horizontal and vertical
 spatial resolution, in units of \code{crs}. If a single value is given, it will

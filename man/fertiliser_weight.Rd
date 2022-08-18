@@ -10,7 +10,7 @@ fertiliser_weight(fert_nrm, fert_landuses, outfile, return_rast = FALSE)
 \item{fert_nrm}{A \code{\link{SpatVector}}, \code{sf} object, \code{Spatial} (sp) object, or
 file path to vector dataset.}
 
-\item{fert_landuses}{A \code{\link{SpatRaster}}, \code{\link{RasterLayer}}, or file path to
+\item{fert_landuses}{A \code{\link{SpatRaster}}, \code{RasterLayer}, or file path to
 raster file.}
 
 \item{outfile}{Character. Output raster file path. If not provided, the

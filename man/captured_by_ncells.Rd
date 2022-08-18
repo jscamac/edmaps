@@ -7,7 +7,7 @@
 captured_by_ncells(x, layer_names, n_cells, all = TRUE)
 }
 \arguments{
-\item{x}{\verb{Raster*} or \code{SpatRaster} object, or a character vector of file
+\item{x}{\verb{Raster*} or \code{\link{SpatRaster}} object, or a character vector of file
 path(s) to one or more raster files.}
 
 \item{layer_names}{Character vector. Optional names corresponding to \code{x}.}
