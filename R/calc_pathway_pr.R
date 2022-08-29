@@ -50,7 +50,7 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
 
   # Initialise raster and populate with probability of presence
   out <- terra::init(rast, fun=0)
-  out[d$cell] <- ifelse(is.na(d$prob_absent), 0, 1 - d$prob_absent)
+  out[d$cell][[1]] <- ifelse(is.na(d$prob_absent), 0, 1 - d$prob_absent)
 
 
   if(!missing(outfile)) {
