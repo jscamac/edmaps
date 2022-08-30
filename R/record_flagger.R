@@ -60,7 +60,7 @@ record_flagger <- function(occurrence_records, infected_countries, cabi_ref,
 
     # Get infected_country polygons
     country_polygons <- world %>%
-      terra::subset(iso_n3 %in% unique(infected), NSE=TRUE)
+      terra::subset(world$iso_n3 %in% unique(infected))
 
   } else {
     cabi <- suppressMessages(terra::vect(read.csv(file = cabi_ref,skip = 2),
@@ -74,7 +74,7 @@ record_flagger <- function(occurrence_records, infected_countries, cabi_ref,
 
     # Get CABI country polygons
     country_polygons <- world %>%
-      terra::subset(name %in% cabi_countries, NSE=TRUE)
+      terra::subset(world$name %in% cabi_countries)
   }
 
   # Identify points that are present within CABI identified countries
