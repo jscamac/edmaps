@@ -604,8 +604,9 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       country_reference <-
         {
           rnaturalearth::ne_countries(scale=50, returnclass="sf") %>%
-            terra::vect() %>%
-            terra::buffer(0) %>%
+            sf::st_set_crs("+init=epsg:4326") %>%
+            sf::st_buffer(0) %>%
+            sf::as_Spatial() %>%
             suppressWarnings()
         }
       \n\n', file=f, append=TRUE)
