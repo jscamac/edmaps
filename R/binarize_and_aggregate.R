@@ -86,9 +86,9 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
                     timespent, attr(timespent, 'unit')))
   }
   i <- which(rle$values %in% categories)
-  r0 <- terra::rast(attr(rle, 'extent'), res=attr(rle, 'res'),
-                    crs=attr(rle, 'crs'))
-  r1 <- terra::rast(extent, res=res, crs=attr(rle, 'crs'), vals=0)
+  r0 <- terra::rast(terra::ext(attr(rle, 'extent')),
+                    res=attr(rle, 'res'), crs=attr(rle, 'crs'))
+  r1 <- terra::rast(terra::ext(extent), res=res, crs=attr(rle, 'crs'), vals=0)
   x2 <- cumsum(rle$lengths[i])
   timespent <- Sys.time() - now
   if(!isTRUE(quiet)) {

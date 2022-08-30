@@ -60,7 +60,7 @@ rle_compress <- function(x, outfile, quiet=FALSE, overwrite=FALSE) {
     dplyr::mutate(values=ifelse(is.infinite(values), NA, values),
                   starts=c(1, cumsum(lengths)[-nrow(.)] + 1))
 
-  attr(runs, 'extent') <- terra::ext(x)
+  attr(runs, 'extent') <- terra::ext(x)[1:4] # coerce to numeric vector to prevent passing pointer
   attr(runs, 'res') <- terra::res(x)
   attr(runs, 'crs') <- terra::crs(x)
   class(runs) <- c('raster_rle', class(runs))
