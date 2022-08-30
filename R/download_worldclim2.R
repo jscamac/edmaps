@@ -13,7 +13,7 @@
 #' @references Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
 #'   resolution climate surfaces for global land areas. International Journal of
 #'   Climatology 37 (12): 4302-4315.
-#' @importFrom utils download.file
+#' @importFrom httr GET progress write_disk
 #' @export
 #' @examples
 #' \dontrun{
@@ -34,5 +34,5 @@ download_worldclim2 <- function(outfile, variable, resolution) {
   url <- sprintf('%s_%s_%s.zip', base_url, resolution, variable)
 
   # Download ZIP file
-  download.file(url, outfile, mode='wb')
+  httr::GET(url=url, httr::write_disk(path=outfile), httr::progress())
 }
