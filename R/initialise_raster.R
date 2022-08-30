@@ -59,7 +59,7 @@ initialise_raster <- function(x, outfile, extent, res, crs, init=NA,
   if(!dir.exists(dirname(outfile))) dir.create(dirname(outfile), recursive=TRUE)
   r <- terra::rast(ext=extent, resolution=res, crs=crs, vals=init)
   terra::writeRaster(r, outfile, datatype=datatype, overwrite=overwrite,
-                     options='COMPRESS=LZW')
+                     gdal ='COMPRESS=LZW')
 
   if(isTRUE(return_rast)) r else invisible(NULL)
 }
