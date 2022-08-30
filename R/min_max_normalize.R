@@ -21,7 +21,7 @@ min_max_normalize <- function(rast, outfile) {
   }
 
   # Ensure min and max is calculated
-  rast <- terra::setMinMax(rast)
+  terra::setMinMax(rast)
 
   # Calculate max value
   rng <- terra::minmax(rast)
