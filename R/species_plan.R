@@ -470,7 +470,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   if('containers' %in% pathways) {
     cat(glue::glue('
       container_arrivals <- arrivals_by_containers(
-        container_weights = container_weight,
+        container_weights = terra::vect(container_weight),
         port_data = drake::file_in("{port_data_path}"),
         template_raster = drake::file_in(
           "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"

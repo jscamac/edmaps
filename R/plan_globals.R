@@ -41,6 +41,7 @@
 #' @importFrom rlang !!
 #' @importFrom tmap tmap_save tmap_arrange
 #' @importFrom stats median
+#' @importFrom terra wrap
 plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
                          nrm_path, containers_data_path, postcode_path,
                          pop_density_path, tourist_beds_path, airports_path, airport_beta,
@@ -227,7 +228,8 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
                         sheet_nums = c(2:6),
                         range = "A7:M2217",
                         postcode_poly = drake::file_in(!!postcode_path),
-                        na = c("", "-", "np")),
+                        na = c("", "-", "np")) %>%
+      terra::wrap(),
 
     NDVI_reproject =
       gdal_reproject(
