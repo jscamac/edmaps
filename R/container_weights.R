@@ -27,7 +27,7 @@
 #' @importFrom purrr set_names map_df
 #' @importFrom dplyr rename mutate group_by summarise ungroup left_join across
 #' @importFrom tidyr spread replace_na gather
-#' @importFrom terra vect project writeVector subset
+#' @importFrom terra vect project writeVector subset values
 #' @export
 container_weights <- function(path, sheet_nums, range = "A7:M2217",
                               postcode_poly, na = c("", "-", "np"), outfile,
@@ -65,7 +65,7 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
     mutate(
       dplyr::across(where(is.numeric), ~tidyr::replace_na(.x, 0))
     )
-  values(pc) <- pc_dat # assign attributes back to the geoms
+  terra::values(pc) <- pc_dat # assign attributes back to the geoms
 
   out <- terra::subset(pc, pc$SQKM > 0) %>%
     terra::project('+init=epsg:3577')
