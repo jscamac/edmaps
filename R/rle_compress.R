@@ -15,7 +15,6 @@
 #'   [`SpatExtent`] object, `res`, and `crs`). This object is additionally saved
 #'   in rds format to `outfile`, if provided.
 #' @importFrom terra rast blocks values ext res
-#' @importFrom furrr future_map furrr_options
 #' @importFrom readr write_csv read_csv
 #' @importFrom dplyr bind_rows mutate
 #' @importFrom magrittr %>%
@@ -42,23 +41,21 @@ rle_compress <- function(x, outfile, quiet=FALSE, overwrite=FALSE) {
                     timespent, attr(timespent, 'unit'),
                     outdir))
   }
-  furrr::future_map(1:bs$n, function(i) {
+  ff <- sapply(1:bs$n, function(i) {
     v <- terra::values(x, row=bs$row[i], nrows=bs$nrows[i])[, 1]
     v[is.na(v)] <- Inf
     out <- as.data.frame(unclass(rle(v)))
     f <- sprintf(sprintf('%s/%%0%sd.txt', outdir, nchar(bs$n)), i)
     readr::write_csv(out, f)
     f
-  }, .options=furrr::furrr_options(globals=c('bs', 'x', 'outdir'))
-  )
+  })
 
   timespent <- Sys.time() - now
   if(!isTRUE(quiet)) {
     message(sprintf('%.02f %s: Combining RLE vectors from chunked output',
                     timespent, attr(timespent, 'unit')))
   }
-  runs <- lapply(list.files(outdir, '^\\d+\\.txt$', full.names=TRUE),
-                 readr::read_csv, progress=!quiet, show_col_types=FALSE) %>%
+  runs <- lapply(ff, readr::read_csv, progress=!quiet, show_col_types=FALSE) %>%
     dplyr::bind_rows() %>%
     dplyr::mutate(values=ifelse(is.infinite(values), NA, values),
                   starts=c(1, cumsum(lengths)[-nrow(.)] + 1))
