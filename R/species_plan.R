@@ -114,14 +114,6 @@
 #' @param minimum_probability_for_maps Numeric. A value between 0 and 1,
 #'   defining the minimum establishment probability to be displayed on plotted
 #'   maps. Values below this threshold will be excluded. Default is `1E-5`.
-#' @param manual_check_flagged_records Logical. Should an interactive map be
-#'   used for manually checking flagged occurrence records? If `TRUE`, the
-#'   user will have the opportunity to select dubious points (i.e. occurrences
-#'   in countries for which CABI has no record of the species' establishment),
-#'   to be retained. If `FALSE` (the default), all such dubious points will
-#'   be excluded. Ignored if `climate_suitability_path` is provided. Note
-#'   that manual checking is not possible when using [excel_to_plan()] since the
-#'   required interactivity will interrupt plan processing.
 #' @param wind_effect_width Numeric. For wind pathways, the distance (in metres)
 #'   inland from the coastline, over which wind-based arrival applies. E.g. if
 #'   pests are expected to be carried by wind up to 50 km inland from the coast,
@@ -162,7 +154,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
                          postcode_path, occurrence_path, infected_countries, cabi_path, use_gbif=FALSE,
                          gbif_species, gbif_min_year=1970, gbif_max_uncertainty=20000, gbif_username,
                          gbif_password, basemap_mode=c('osm', 'boundaries'),
-                         minimum_probability_for_maps=1e-5, manual_check_flagged_records=FALSE,
+                         minimum_probability_for_maps=1e-5,
                          wind_effect_width, leakage_tourists, establishment_tourists,
                          leakage_returning, establishment_returning, leakage_torres,
                          establishment_torres, leakage_mail, establishment_mail, leakage_vessels,
@@ -709,7 +701,6 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       }
       cat(glue::glue('
         records <- record_flagger(occurrence_records = {species}_all_records,
-          manual_check = {manual_check_flagged_records},
           return_df = FALSE,
           cabi_ref = drake::file_in("{cabi_path}"))
       \n\n'), file=f, append=TRUE)
@@ -723,7 +714,6 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       }
       cat(glue::glue('
         records <- record_flagger(occurrence_records = <<species>>_all_records,
-          manual_check = <<manual_check_flagged_records>>,
           return_df = FALSE,
           infected_countries = <<paste0(deparse(c(glue::glue("{infected_countries}"))), collapse="")>>)
       \n\n', .open='<<', .close='>>'), file=f, append=TRUE)

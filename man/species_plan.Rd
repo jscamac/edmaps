@@ -42,7 +42,6 @@ species_plan(
   gbif_password,
   basemap_mode = c("osm", "boundaries"),
   minimum_probability_for_maps = 1e-05,
-  manual_check_flagged_records = FALSE,
   wind_effect_width,
   leakage_tourists,
   establishment_tourists,
@@ -223,15 +222,6 @@ states/territories).}
 \item{minimum_probability_for_maps}{Numeric. A value between 0 and 1,
 defining the minimum establishment probability to be displayed on plotted
 maps. Values below this threshold will be excluded. Default is \code{1E-5}.}
-
-\item{manual_check_flagged_records}{Logical. Should an interactive map be
-used for manually checking flagged occurrence records? If \code{TRUE}, the
-user will have the opportunity to select dubious points (i.e. occurrences
-in countries for which CABI has no record of the species' establishment),
-to be retained. If \code{FALSE} (the default), all such dubious points will
-be excluded. Ignored if \code{climate_suitability_path} is provided. Note
-that manual checking is not possible when using \code{\link[=excel_to_plan]{excel_to_plan()}} since the
-required interactivity will interrupt plan processing.}
 
 \item{wind_effect_width}{Numeric. For wind pathways, the distance (in metres)
 inland from the coastline, over which wind-based arrival applies. E.g. if
