@@ -180,7 +180,7 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
     t_srs = "EPSG:3857",
     tr = if(basemap_mode=='osm') basemap_res else c(5000, 5000),
     r = if(scale_type=='discrete') "near" else "bilinear",
-    te=e, te_srs='EPSG:4283')
+    te=e[c(1, 3, 2, 4)], te_srs='EPSG:4283')
   # ^ This will interpolate the aggregated data if
   #   aggregate_raster is not NULL
   ras <- terra::rast(f2)
