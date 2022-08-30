@@ -121,7 +121,7 @@ static_map <- function(ras, xlim, ylim, subset_layers, layer_names, legend_title
   e <- terra::ext(c(xlim, ylim))
 
   if(basemap_mode=='osm') {
-    basemap <- tmaptools::read_osm(e, zoom=NULL)
+    basemap <- tmaptools::read_osm(e[c(1, 3, 2, 4)], zoom=NULL)
     basemap_res <- c(abs(attr(basemap, 'dimensions')$x$delta),
                      abs(attr(basemap, 'dimensions')$y$delta))
   } else {
