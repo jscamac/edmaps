@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_worldclim2.R
 \name{download_worldclim2}
 \alias{download_worldclim2}
-\title{Download climate layers from WorldClim 2.0}
+\title{Download climate layers from WorldClim 2.1}
 \usage{
 download_worldclim2(outfile, variable, resolution)
 }
@@ -10,22 +10,27 @@ download_worldclim2(outfile, variable, resolution)
 \item{outfile}{Character. Target file for downloaded .zip archive.}
 
 \item{variable}{Character. Can be one of \code{"bio"} (19 standard bioclim
-variables), \code{"tmin"}, \code{"tmax"}, \code{"tavg"}, \code{"srad"},
-\code{"wind"} or \code{"vapr"}.}
+variables), \code{"tmin"}, \code{"tmax"}, \code{"tavg"}, \code{"prec"}, \code{"srad"}, \code{"wind"},
+\code{"vapr"}, or \code{"elev"}.}
 
-\item{resolution}{Character. Can be one of \code{"10m"}, \code{"5m"},
-\code{"2.5m"}, or \code{"30s"}.}
+\item{resolution}{Character. Can be one of \code{"10m"}, \code{"5m"}, \code{"2.5m"}, or
+\code{"30s"}.}
 }
 \value{
 A zipfile is downloaded and \code{NULL} is returned invisibly.
 }
 \description{
-Download climate layers from WorldClim 2.0 (current climate only).
+Download historical gridded climate data from WorldClim 2.1
 }
 \examples{
 \dontrun{
 download_worldclim2('bioclim_10m', 'bio', '10m')
 }
+}
+\references{
+Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial
+resolution climate surfaces for global land areas. International Journal of
+Climatology 37 (12): 4302-4315.
 }
 \seealso{
 \code{\link[=extract_worldclim2]{extract_worldclim2()}}
