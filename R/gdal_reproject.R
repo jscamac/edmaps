@@ -102,6 +102,10 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
   args <- args[!sapply(args, is.symbol)]
   names(args) <- name_match[names(args)]
   args <- args[!is.na(names(args))]
+  # If buffer was provided, pass a tempfile instead of outfile to gdalwarp,
+  # since we want to use outfile for fill_na below, and input and output file
+  # paths for terra rast methods can't be the same.
+  if(!missing(buffer)) args$dstfile <- tempfile(fileext='.tif')
 
   # Create directory if it does not exist
   if(!dir.exists(dirname(outfile))) {
@@ -113,7 +117,8 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
 
   if(!missing(buffer)) {
     if(buffer > 0) {
-      r <- terra::rast(outfile)
+      message('Filling raster NAs inside buffer')
+      r <- terra::rast(args$dstfile)
       w <- terra::focalMat(r, buffer, type='circle')
       fill_na(r, median, w, outfile, overwrite=TRUE)
     }
