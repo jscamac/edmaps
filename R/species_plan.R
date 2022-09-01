@@ -813,7 +813,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
   if(isTRUE(include_ndvi)) {
     cat(glue::glue('
       biotic_suitability <- suitability(
-        x = list(
+        x = c(
           drake::file_in("{ndvi_norm_path}"),
           drake::file_in(
             "outputs/{species}/auxiliary/{species}_host_raster_{res[1]}.tif"
@@ -876,7 +876,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
 
     cat(glue::glue('
     suitability <- suitability(
-        x = list(
+        x = c(
           drake::file_in(
             "outputs/{species}/auxiliary/{species}_aust_climsuit_{res[1]}.tif"
           ),
