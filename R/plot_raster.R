@@ -22,6 +22,7 @@
 #' @importFrom utils read.csv
 #' @importFrom dplyr rename_all
 #' @importFrom methods is
+#' @importFrim sf st_as_sf
 #' @export
 plot_raster <- function(rast, legend_title, occurrence_data = NULL,
                         pt_col ="red", height, compass = FALSE, outfile) {
@@ -56,7 +57,7 @@ plot_raster <- function(rast, legend_title, occurrence_data = NULL,
                     title=legend_title,
                     breaks=pretty(x = rng, n = 10, min.n = 5),
                     legend.is.portrait=FALSE) +
-    tmap::tm_shape(world_map) +
+    tmap::tm_shape(sf::st_as_sf(world_map)) + # revert to sf until tmap supports SpatVectors
     tmap::tm_polygons(alpha=0, border.col='black', border.alpha=1) +
     tmap::tm_layout(legend.position=c('left', 'bottom'),
                     inner.margin=c(1/height, 0, 0, 0),
@@ -90,7 +91,7 @@ plot_raster <- function(rast, legend_title, occurrence_data = NULL,
     }
 
     m <- m +
-      tmap::tm_shape(occ) +
+      tmap::tm_shape(sf::st_as_sf(occ)) + # revert to sf until tmap supports SpatVectors
       tmap::tm_dots(col=pt_col, shape=3)
   }
 
