@@ -17,6 +17,8 @@
 #'   how far inland the wind has an effect. E.g. if the pest is thought to be
 #'   carried up to 50km inland by the wind, set this value to `50000`.
 #' @param outfile Character. The target file path for the wind raster.
+#' @param overwrite Logical. Should `outfile` be overwritten if it exists?
+#'   Default is `FALSE`.
 #' @importFrom terra aggregate as.lines as.points as.polygons buffer crs densify
 #'   init intersect makeValid mask merge nearest rast rasterize subset union
 #'   values vect voronoi writeRaster
@@ -24,7 +26,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom methods is
 #' @export
-rasterize_wind <- function(data, wind_column, template, width, outfile) {
+rasterize_wind <- function(data, wind_column, template, width, outfile, overwrite=FALSE) {
 
   if(is.character(data) || is(data, 'SpatialPolygons') || is(data, 'sf')) {
     data <- terra::vect(data)
@@ -137,7 +139,7 @@ rasterize_wind <- function(data, wind_column, template, width, outfile) {
 
   # Write to raster file
   if(!missing(outfile)) {
-    terra::writeRaster(r, outfile)
+    terra::writeRaster(r, outfile, overwrite=overwrite)
   }
 
   r
