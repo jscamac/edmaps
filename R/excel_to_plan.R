@@ -453,7 +453,7 @@ excel_to_plan <- function(file) {
                                    wind_pathways$pathways[i],
                                    format(wind_pathways$wind_effect_width[i],
                                           scientific=FALSE, trim=TRUE))
-                       ))
+                       ), overwrite=TRUE)
       )
     }) %>%
       dplyr::bind_rows() %>%
