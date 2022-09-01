@@ -215,11 +215,12 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
 
     NRM_fertiliser =
       fertiliser_by_nrm(abs_data = drake::file_in(!!fertiliser_data_path),
-                        nrm_shapefile = drake::file_in(!!nrm_path)),
+                        nrm_shapefile = drake::file_in(!!nrm_path)) %>%
+      terra::wrap(),
 
     fert_weight =
       fertiliser_weight(
-        fert_nrm = NRM_fertiliser,
+        fert_nrm = terra::vect(NRM_fertiliser),
         fert_landuses = drake::file_in(!!sprintf(
           "outputs/not_pest_specific/fert_landuses_%s.tif", output_resolution[1]
         )),
