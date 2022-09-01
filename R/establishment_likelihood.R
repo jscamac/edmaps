@@ -31,7 +31,7 @@ establishment_likelihood <- function(total_arrivals, suitability, outfile,
          'character vector to a single raster file.')
   }
 
-  if(is(total_arrivals, 'Raster') || is.character(suitability)) {
+  if(is(total_arrivals, 'Raster') || is.character(total_arrivals)) {
     total_arrivals <- terra::rast(total_arrivals)
   } else if(!is(total_arrivals, 'SpatRaster')) {
     stop('total_arrivals must be a RasterLayer, SpatRaster, or ',
