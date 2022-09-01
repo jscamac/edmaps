@@ -21,7 +21,7 @@
 fertiliser_weight <- function(fert_nrm, fert_landuses, outfile,
   return_rast=FALSE) {
 
-  if(is.character(fert_nrm) || is(fert_nrm, 'Spatial' || is(fert_nrm, 'sf'))) {
+  if(is.character(fert_nrm) || is(fert_nrm, 'Spatial') || is(fert_nrm, 'sf')) {
     fert_nrm <- terra::vect(fert_nrm)
   } else if(!is(fert_nrm, 'SpatVector')) {
     stop('fert_nrm must be a SpatVector, a Spatial (sp) object, an sf object, ',
