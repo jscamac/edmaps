@@ -63,8 +63,8 @@
 #' @importFrom gdalUtilities gdalwarp
 #' @export
 gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
-  resampling_method = "near", tgt_extent, buffer, src_nodata,
-  datatype='Float32',return_rast=FALSE, overwrite=TRUE) {
+                           resampling_method = "near", tgt_extent, buffer, src_nodata,
+                           datatype='Float32',return_rast=FALSE, overwrite=TRUE) {
 
   resampling_method <- match.arg(
     resampling_method,
@@ -125,5 +125,4 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
   }
 
   if(isTRUE(return_rast)) terra::rast(outfile) else invisible(NULL)
-
 }

@@ -19,7 +19,6 @@
 #' @importFrom terra rast writeRaster
 #' @importFrom methods is
 #' @export
-
 establishment_likelihood <- function(total_arrivals, suitability, outfile,
   return_rast = FALSE) {
 
