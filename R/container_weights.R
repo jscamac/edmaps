@@ -47,8 +47,8 @@ container_weights <- function(path, sheet_nums, range = "A7:M2217",
     ) %>%
     tidyr::gather(Month,Containers,-Port,-Postcode) %>%
     dplyr::mutate(Containers = round(
-      as.numeric(ifelse(is.na(Containers), 0, Containers))
-    ), 0) %>%
+      as.numeric(ifelse(is.na(Containers), 0, Containers)), 0
+    )) %>%
     dplyr::group_by(Port, Postcode) %>%
     dplyr::summarise(Containers = sum(Containers)) %>%
     dplyr::ungroup() %>%
