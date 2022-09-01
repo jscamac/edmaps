@@ -86,13 +86,17 @@ plan_globals <- function(clum_path, nvis_path, ndvi_path, fertiliser_data_path,
       rle_compress(x=drake::file_in(!!clum_path),
                    outfile=drake::file_out(
                      !!sprintf('%s/clum_rle_%s.rds', processed_data_path,
-                               output_resolution[1]))),
+                               output_resolution[1])),
+                   overwrite=TRUE
+      ),
 
     compress_nvis =
       rle_compress(x=drake::file_in(!!nvis_path),
                    outfile=drake::file_out(
                      !!sprintf('%s/nvis_rle_%s.rds', processed_data_path,
-                               output_resolution[1]))),
+                               output_resolution[1])),
+                   overwrite=TRUE
+      ),
 
 
     # Create a land mask for Australia based on the CLUM raster, to be used when
