@@ -31,7 +31,7 @@
 #'   _Journal of the Royal Society Interface_, 12(107), 20150086.
 #'   doi:https://doi.org/10.1098/rsif.2015.0086.
 #' @importFrom geometry tsearchn convhulln delaunayn
-#' @importFrom terra rast crop writeRaster as.data.frame cellFromXY vect subset
+#' @importFrom terra rast crop writeRaster as.data.frame cellFromXY vect subset crds
 #' @importFrom utils read.csv
 #' @importFrom stats na.omit
 #' @importFrom rnaturalearth ne_countries
@@ -127,7 +127,8 @@ range_bag <- function(occurrence_data, bioclim_dir, n_dims = 2, n_models = 100,
   # Reduces points to 1 per grid cell
   loc_env <- stats::na.omit(
     terra::as.data.frame(
-      bioclim_stack[unique(terra::cellFromXY(bioclim_stack, occurrence_data))]
+      bioclim_stack[unique(terra::cellFromXY(bioclim_stack,
+                                             terra::crds(occurrence_data)))]
     )
   )
   models <- range_bag_fit(loc_env, n_models = n_models, dimensions = n_dims,
