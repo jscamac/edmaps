@@ -740,7 +740,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
 
       cat(glue::glue('
         plot_global_climsuit <- plot_raster(
-          object = drake::file_in(
+          rast = drake::file_in(
             "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
           ),
           legend_title = "Suitability (10\')",
@@ -768,7 +768,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
 
       cat(glue::glue('
         plot_global_climsuit <- plot_raster(
-          object = drake::file_in(
+          rast = drake::file_in(
             "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
           ),
           legend_title = "Suitability (10\')",
