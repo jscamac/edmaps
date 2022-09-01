@@ -947,10 +947,10 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
 
   cat(glue::glue('
     cumu_establishment_likelihood_agg <- captured_by_ncells(
-      infiles = drake::file_in(
+      x = drake::file_in(
         "outputs/{species}/{species}_edmap_{aggregated_res[1]}.tif"
       ),
-      names = "Cumulative Establishment Likelihood ({round(aggregated_res[1]/1000, 2)}km)",
+      layer_names = "Cumulative Establishment Likelihood ({round(aggregated_res[1]/1000, 2)}km)",
       n_cells = 2000
     )
   \n\n'), file=f, append=TRUE)
