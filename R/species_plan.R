@@ -702,7 +702,8 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       cat(glue::glue('
         records <- record_flagger(occurrence_records = {species}_all_records,
           return_df = FALSE,
-          cabi_ref = drake::file_in("{cabi_path}"))
+          cabi_ref = drake::file_in("{cabi_path}")) %>%
+        terra::wrap()
       \n\n'), file=f, append=TRUE)
     }
 
@@ -715,7 +716,8 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
       cat(glue::glue('
         records <- record_flagger(occurrence_records = <<species>>_all_records,
           return_df = FALSE,
-          infected_countries = <<paste0(deparse(c(glue::glue("{infected_countries}"))), collapse="")>>)
+          infected_countries = <<paste0(deparse(c(glue::glue("{infected_countries}"))), collapse="")>>) %>%
+        terra::wrap()
       \n\n', .open='<<', .close='>>'), file=f, append=TRUE)
     }
 
@@ -724,7 +726,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
     if(do_flag) {
       cat(glue::glue('
         rangebag <- range_bag(
-          occurrence_data = {species}_records,
+          occurrence_data = terra::vect({species}_records),
           bioclim_dir = drake::file_in("{climate_path}"),
           n_dims = 2,
           n_models = 100,
@@ -742,7 +744,7 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
             "outputs/{species}/auxiliary/{species}_global_climsuit_10min.tif"
           ),
           legend_title = "Suitability (10\')",
-          occurrence_data = {species}_records,
+          occurrence_data = terra::vect({species}_records),
           pt_col = "blue",
           height = 4.5,
           outfile = drake::file_out(
