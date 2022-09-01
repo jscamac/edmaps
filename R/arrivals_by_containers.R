@@ -93,7 +93,7 @@ arrivals_by_containers <- function(container_weights, port_data,
   # centres).
   weight <- calc_proportion(weight)
 
-  # Disperse passengers and calculate arrival rate
+  # Calculate arrival rate
   EE <- calc_EE(leakage_rate, establishment_rate)
   out <- calc_pathway_pr(EE, weight, return_rast=TRUE)
 
