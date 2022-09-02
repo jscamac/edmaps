@@ -19,8 +19,7 @@ captured_by_ncells <- function(x, layer_names, n_cells, all=TRUE) {
     stop('x must be a Raster* or SpatRaster object, ',
          'or a vector of raster file paths.', call.=FALSE)
   }
-
-  if(missing(layer_names) || length(layer_names != dim(x)[3])) {
+  if (missing(layer_names) || length(layer_names) != dim(x)[3]) {
     layer_names <- names(x)
   }
   if(any(duplicated(layer_names))) {
