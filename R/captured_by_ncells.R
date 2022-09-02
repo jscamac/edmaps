@@ -28,24 +28,19 @@ captured_by_ncells <- function(x, layer_names, n_cells, all=TRUE) {
   }
 
   n_notna <- terra::global(!is.na(x), sum)$sum
-  n <- pmin(n_cells, n_notna)
-  d <- terra::as.data.frame(x, cells=TRUE)
-  q <- mapply(quantile, d[, -1], pmax(0, 1 - n_cells/n_notna))
-  i <- mapply(function(test, v, q_) {
-    if(test) d$cell[which(v >= q_)] else d$cell[which(v > q_)]
-  }, n_cells >= n_notna, d[, -1], q, SIMPLIFY=FALSE)
-
-  vals <- mapply(function(v, i_) v[i_], d[, -1], i, SIMPLIFY=FALSE)
+  n_cells <- pmin(n_cells, n_notna)
   total <- terra::global(x, sum)$sum
+  d <- terra::as.data.frame(x)
+  cap <- mapply(function(p, n, tot) {
+    # na.last=NA removes NAs
+    sort(p, na.last=NA, decreasing = TRUE)[seq_len(n)]/tot
+  }, d, n_cells, total, SIMPLIFY = FALSE)
 
-  if (isTRUE(all)) {
-    risk_captured <- lapply(vals, function(x) cumsum(sort(x, decreasing=TRUE)))
-    proportion <- mapply(function(risk, tot) risk/tot, risk_captured, total)
-    data.frame(map=rep(layer_names, each=nrow(proportion)),
-               ncell=rep(seq_len(nrow(proportion)), ncol(proportion)),
-               proportion = c(proportion))
+  if(all) {
+    data.frame(map = rep(layer_names, lengths(cap)),
+               ncell = unlist(lapply(n_cells, seq_len)),
+               proportion = unlist(lapply(cap, cumsum), use.names = FALSE))
   } else {
-    proportion <- mapply(function(v, tot) sum(v)/tot, vals, total)
-    data.frame(map = layer_names, ncell = n, proportion = proportion)
+    data.frame(map = layer_names, ncell = n, proportion = sapply(cap, sum))
   }
 }
