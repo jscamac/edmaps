@@ -4,7 +4,7 @@
 \alias{rasterize_wind}
 \title{Rasterize wind data}
 \usage{
-rasterize_wind(data, wind_column, template, width, outfile)
+rasterize_wind(data, wind_column, template, width, outfile, overwrite = FALSE)
 }
 \arguments{
 \item{data}{One of: A \code{\link{SpatVector}} object with polygon geometry, an \code{sf}
@@ -25,6 +25,9 @@ how far inland the wind has an effect. E.g. if the pest is thought to be
 carried up to 50km inland by the wind, set this value to \code{50000}.}
 
 \item{outfile}{Character. The target file path for the wind raster.}
+
+\item{overwrite}{Logical. Should \code{outfile} be overwritten if it exists?
+Default is \code{FALSE}.}
 }
 \description{
 Process and rasterize wind data, creating raster datasets that describe wind
