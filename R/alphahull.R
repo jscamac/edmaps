@@ -8,6 +8,7 @@
 #' @references Adapted from ConR:::.alpha.hull.poly and ConR:::.alpha.hull.poly.
 #' @importFrom alphahull ahull anglesArc
 #' @importFrom terra vect aggregate buffer fillHoles set.crs
+#' @export
 #' @keywords internal
 #' @examples
 #' h <- alphahull(matrix(runif(100), ncol=2), 0.5)

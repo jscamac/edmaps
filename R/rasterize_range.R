@@ -29,7 +29,7 @@
 #'   will be assumed. If `xy_crs` is provided and `xy` is an `sf`, `sp`, or
 #'   [`SpatVector`] object with a defined CRS, `xy_crs` will be ignored.
 #' @param plot Logical. Plot the resulting raster? Default = `TRUE`.
-#' @return A [`Spatraster`] with the resulting range burnt into it.
+#' @return A [`SpatRaster`] with the resulting range burnt into it.
 #'   Additionally, if `outfile` is not missing, the raster is written to that
 #'   file.
 #' @importFrom dplyr select

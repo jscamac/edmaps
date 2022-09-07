@@ -49,7 +49,7 @@ will be assumed. If \code{xy_crs} is provided and \code{xy} is an \code{sf}, \co
 \item{plot}{Logical. Plot the resulting raster? Default = \code{TRUE}.}
 }
 \value{
-A \code{\link{Spatraster}} with the resulting range burnt into it.
+A \code{\link{SpatRaster}} with the resulting range burnt into it.
 Additionally, if \code{outfile} is not missing, the raster is written to that
 file.
 }

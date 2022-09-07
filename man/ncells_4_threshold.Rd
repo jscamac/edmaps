@@ -14,11 +14,11 @@ ncells_4_threshold(
 \item{risk_rasters}{\verb{Raster*}, \code{\link{SpatRaster}}, or character vector of one or
 more pathers to raster files.}
 
+\item{layer_names}{Character. Optional names corresponding to \code{risk_rasters}. If
+not provided, layer names are used.}
+
 \item{proportion_captured}{Numeric vector. Proportion(s) of risk to be
 captured.}
-
-\item{names}{Character. Optional names corresponding to \code{risk_rasters}. If
-not provided, layer names are used.}
 }
 \value{
 A \code{tibble} containing the number of cells requiring surveillance in

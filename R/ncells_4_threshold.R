@@ -4,7 +4,7 @@
 #'
 #' @param risk_rasters `Raster*`, [`SpatRaster`], or character vector of one or
 #'   more pathers to raster files.
-#' @param names Character. Optional names corresponding to `risk_rasters`. If
+#' @param layer_names Character. Optional names corresponding to `risk_rasters`. If
 #'   not provided, layer names are used.
 #' @param proportion_captured Numeric vector. Proportion(s) of risk to be
 #'   captured.

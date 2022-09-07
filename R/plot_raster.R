@@ -22,7 +22,7 @@
 #' @importFrom utils read.csv
 #' @importFrom dplyr rename_all
 #' @importFrom methods is
-#' @importFrim sf st_as_sf
+#' @importFrom sf st_as_sf
 #' @export
 plot_raster <- function(rast, legend_title, occurrence_data = NULL,
                         pt_col ="red", height, compass = FALSE, outfile) {
