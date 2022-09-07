@@ -59,7 +59,7 @@
 #'   non-NODATA contributing pixels. (GDAL >= 2.0.0).
 #' * q3: third quartile resampling, selects the third quartile value of all
 #'   non-NODATA contributing pixels. (GDAL >= 2.0.0).
-#' @importFrom terra rast res focalMat
+#' @importFrom terra rast res
 #' @importFrom gdalUtilities gdalwarp
 #' @export
 gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
@@ -119,8 +119,7 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
     if(buffer > 0) {
       message('Filling raster NAs inside buffer')
       r <- terra::rast(args$dstfile)
-      w <- terra::focalMat(r, buffer, type='circle')
-      fill_na(r, median, w, outfile, overwrite=TRUE)
+      fill_na(r, median, buffer, outfile, overwrite=TRUE)
     }
   }
 
