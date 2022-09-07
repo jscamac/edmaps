@@ -34,7 +34,6 @@ fill_na <- function(x, fun, dist, outfile, return_rast=FALSE, overwrite=FALSE) {
   if(terra::xres(x) != terra::yres(x))
     stop('x must have equal horizontal and vertical resolution.')
   fx <- match.fun(fun)
-  if(missing(outfile)) outfile <- tempfile(fileext='.tif')
 
   m <- terra::focalMat(x, dist, type='circle', fillNA=TRUE)
   out <- terra::focal(x, w=m/m, function(z, ...) fx(z, na.rm=TRUE),
