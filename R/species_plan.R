@@ -597,7 +597,6 @@ host_text, nvis_text, species, res[1], overwrite), file=f, append=TRUE)
         {
           rnaturalearth::ne_countries(scale=50, returnclass="sf") %>%
             sf::st_set_crs("+init=epsg:4326") %>%
-            sf::st_buffer(0) %>%
             sf::as_Spatial() %>%
             suppressWarnings()
         }
