@@ -119,6 +119,7 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
     if(buffer > 0) {
       message('Filling raster NAs inside buffer')
       r <- terra::rast(args$dstfile)
+      names(r) <- names(terra::rast(args$srcfile))
       fill_na(r, median, buffer, outfile, overwrite=TRUE)
     }
   }
