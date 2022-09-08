@@ -310,7 +310,7 @@ species_plan <- function(species, clum_classes, nvis_classes, host_path,
   } else if(length(host_files) == 1) {
     sprintf('r <- terra::rast(%s)', host_files)
   } else {
-    sprintf('r <- sum(terra::rast(%s), na.rm=TRUE) > 0',
+    sprintf('r <- sum(terra::rast(c(%s)), na.rm=TRUE) > 0',
             paste(host_files, collapse=',\n    '))
   }
 
