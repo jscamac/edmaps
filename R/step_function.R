@@ -7,9 +7,11 @@
 #' @param lower_value Numeric. The value to use below the threshold.
 #' @param upper_value Numeric. The value to use above the threshold.
 #' @return A [`SpatRaster`] object.
-#' @importFrom terra setValues values
+#' @importFrom terra classify
 #' @export
 step_function <- function(rast, threshold, lower_value, upper_value) {
-	terra::setValues(rast, ifelse(terra::values(rast) >
-		threshold, upper_value, lower_value))
+  rcl <- matrix(c(-Inf, threshold, lower_value,
+                  threshold, Inf, upper_value),
+                nrow=2, byrow=TRUE)
+  terra::classify(rast, rcl, right=FALSE)
 }
