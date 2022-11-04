@@ -24,7 +24,8 @@
 #' @param overwrite Logical. Should `outfile` be overwritten if it exists?
 #' @param return_rast Logical. Should the resulting [`SpatRaster`] be returned?
 #' @return An empty raster is created at `outfile`, and the corresponding
-#'   [`SpatRaster`] is returned if `return_rast` is `TRUE`.
+#'   [`SpatRaster`] is returned if `return_rast` is `TRUE`. If `return_rast` is
+#'   `FALSE`, then `outfile` is returned invisibly.
 #' @importFrom terra rast writeRaster ext crs
 #' @importFrom methods is
 #' @export
@@ -61,5 +62,5 @@ initialise_raster <- function(x, outfile, extent, res, crs, init=NA,
   terra::writeRaster(r, outfile, datatype=datatype, overwrite=overwrite,
                      gdal ='COMPRESS=LZW')
 
-  if(isTRUE(return_rast)) r else invisible(NULL)
+  if(isTRUE(return_rast)) r else invisible(outfile)
 }

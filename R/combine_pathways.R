@@ -13,7 +13,7 @@
 #' @return If `outfile` is specified, the resulting [`SpatRaster`] is
 #'   saved to `outfile`. If `return_rast` is `TRUE` or
 #'   `outfile` is not specified, the resulting [`SpatRaster`] is
-#'   returned, otherwise `NULL` is returned invisibly.
+#'   returned, otherwise `outfile` is returned invisibly.
 #' @importFrom terra rast writeRaster
 #' @importFrom methods is
 #' @export
@@ -39,6 +39,6 @@ combine_pathways <- function(x, outfile, return_rast = FALSE) {
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

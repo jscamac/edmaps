@@ -38,9 +38,9 @@ Default is \code{FALSE}.}
 }
 \value{
 If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} object is
-saved as a GeoTiff at that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is
-not specified, the resulting \code{\link{SpatRaster}} object is returned, otherwise
-\code{NULL} is returned invisibly.
+saved to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not
+specified, the resulting \code{\link{SpatRaster}} object is returned, otherwise
+\code{outfile} is returned invisibly.
 }
 \description{
 Estimates pest arrivals by containers.

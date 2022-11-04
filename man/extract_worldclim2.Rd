@@ -14,8 +14,8 @@ extract_worldclim2(path_2_zip, outdir)
 extracted. Will be created (recursively) if necessary.}
 }
 \value{
-Raster data are extracted to \code{outdir} and \code{NULL} is
-returned invisibly.
+Raster data are extracted to \code{outdir} and \code{outdir} is returned
+invisibly.
 }
 \description{
 Extract WorldClim 2.0 data

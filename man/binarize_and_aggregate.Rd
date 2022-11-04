@@ -50,7 +50,8 @@ belonging to \code{categories} have their centroids within the new cell.}
 \value{
 A binarized raster layer is written to \code{outfile}, and if
 \code{return_rast} is \code{TRUE}, the raster is additionally returned to R
-as a \code{\link{SpatRaster}} layer.
+as a \code{\link{SpatRaster}} layer. If \code{outfile} is provided and \code{return_rast} is
+\code{FALSE}, then \code{outfile} is returned invisibly.
 }
 \description{
 Binarize a categorical raster and optionally aggregate and/or resample.

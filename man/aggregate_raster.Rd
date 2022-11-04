@@ -36,10 +36,10 @@ returned to R? Ignored if \code{outfile} is not provided.}
 \code{TRUE}.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} object is saved
-as a geotiff to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not
-specified the resulting \code{\link{SpatRaster}} object is returned, otherwise \code{NULL}
-is returned invisibly.
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} object is
+saved to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not
+specified the resulting \code{\link{SpatRaster}} object is returned, otherwise
+\code{outfile} is returned invisibly.
 }
 \description{
 Aggregate raster cells (and optionally layers) to coarser resolution.

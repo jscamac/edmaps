@@ -25,7 +25,8 @@
 #' @param quiet Logical. Should progress messages be suppressed?
 #' @return A binarized raster layer is written to `outfile`, and if
 #'   `return_rast` is `TRUE`, the raster is additionally returned to R
-#'   as a [`SpatRaster`] layer.
+#'   as a [`SpatRaster`] layer. If `outfile` is provided and `return_rast` is
+#'   `FALSE`, then `outfile` is returned invisibly.
 #' @importFrom terra ext res rast xyFromCell cellFromXY writeRaster
 #' @importFrom methods is
 #' @export
@@ -132,5 +133,5 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
   terra::writeRaster(r1, outfile, datatype='INT2U', overwrite=overwrite)
 
   if(isTRUE(return_rast) || missing(outfile))
-    terra::rast(outfile) else invisible(NULL)
+    terra::rast(outfile) else invisible(outfile)
 }

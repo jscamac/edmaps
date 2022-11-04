@@ -6,8 +6,8 @@
 #'   [download_worldclim2()].
 #' @param outdir Character. File path to which contained files should be
 #'   extracted. Will be created (recursively) if necessary.
-#' @return Raster data are extracted to `outdir` and `NULL` is
-#'   returned invisibly.
+#' @return Raster data are extracted to `outdir` and `outdir` is returned
+#'   invisibly.
 #' @seealso [download_worldclim2()]
 #' @importFrom utils unzip
 #' @export
@@ -34,5 +34,5 @@ extract_worldclim2 <- function(path_2_zip, outdir) {
       # ^ 0-padded month/variable number
   )
 
-  return(invisible(NULL))
+  return(invisible(outdir))
 }

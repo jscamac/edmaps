@@ -22,7 +22,7 @@ Ignored if \code{outfile} is not provided.}
 \value{
 If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved as
 to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not specified, the
-resulting \code{\link{SpatRaster}} is returned, otherwise \code{NULL} is returned
+resulting \code{\link{SpatRaster}} is returned, otherwise \code{outfile} is returned
 invisibly.
 }
 \description{

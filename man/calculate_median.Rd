@@ -14,8 +14,8 @@ of file paths to raster files.}
 created recursively if it does not exist.}
 }
 \value{
-If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved as a
-GeoTiff to that path and NULL is returned. If \code{outfile} is not
+If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved to
+that path and \code{outfile} is returned invisibly. If \code{outfile} is not
 specified the \code{\link{SpatRaster}} is returned to R.
 }
 \description{

@@ -15,7 +15,7 @@
 #'   output raster as `c(xmin, xmax, ymin, ymax)`; a [`SpatExtent`] object; or
 #'   an object from which such an object can be extracted.
 #' @return A raster is written to `outfile`, with NA cells transferred from
-#'   `infile` and all other cells set to 1.
+#'   `infile` and all other cells set to 1. `outfile` is returned invisibly.
 #' @importFrom terra rast mask ext
 #' @importFrom gdalUtilities gdalwarp
 #' @importFrom methods is
@@ -48,5 +48,5 @@ na_mask <- function(infile, outfile, res, extent) {
   do.call(gdalUtilities::gdalwarp, args[!sapply(args, is.null)])
   r <- terra::rast(f)
   terra::mask(!is.na(r), r, filename=outfile, overwrite=TRUE)
-  return(invisible(NULL))
+  invisible(outfile)
 }

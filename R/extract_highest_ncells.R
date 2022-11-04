@@ -13,7 +13,7 @@
 #'   Ignored if `outfile` is not provided.
 #' @return If `outfile` is specified, the resulting [`SpatRaster`] is saved as
 #'   to that path. If `return_rast` is `TRUE` or `outfile` is not specified, the
-#'   resulting [`SpatRaster`] is returned, otherwise `NULL` is returned
+#'   resulting [`SpatRaster`] is returned, otherwise `outfile` is returned
 #'   invisibly.
 #' @details This function returns a raster containing values for only the top
 #'   _n_ cells.
@@ -51,6 +51,6 @@ extract_highest_ncells <- function(x, n_cells, outfile, return_rast=FALSE) {
   if(isTRUE(return_rast) || missing(outfile)) {
     r
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

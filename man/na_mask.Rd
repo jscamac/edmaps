@@ -23,7 +23,7 @@ an object from which such an object can be extracted.}
 }
 \value{
 A raster is written to \code{outfile}, with NA cells transferred from
-\code{infile} and all other cells set to 1.
+\code{infile} and all other cells set to 1. \code{outfile} is returned invisibly.
 }
 \description{
 Create a mask raster, retaining NA and setting all non-NA cells to 1. Input

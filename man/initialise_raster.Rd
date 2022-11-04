@@ -49,7 +49,8 @@ be used.}
 }
 \value{
 An empty raster is created at \code{outfile}, and the corresponding
-\code{\link{SpatRaster}} is returned if \code{return_rast} is \code{TRUE}.
+\code{\link{SpatRaster}} is returned if \code{return_rast} is \code{TRUE}. If \code{return_rast} is
+\code{FALSE}, then \code{outfile} is returned invisibly.
 }
 \description{
 Create an empty or constant raster with specified attributes.

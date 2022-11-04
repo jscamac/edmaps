@@ -14,7 +14,7 @@
 #'   Ignored if `outfile` is not provided.
 #' @return If `outfile` is specified, the resulting [`SpatRaster`] is saved as
 #'   to that path. If `return_rast` is `TRUE` or `outfile` is not specified the
-#'   resulting [`SpatRaster`] is returned, otherwise `NULL` is returned
+#'   resulting [`SpatRaster`] is returned, otherwise `outfile` is returned
 #'   invisibly.
 #' @importFrom terra rast writeRaster
 #' @importFrom methods is
@@ -50,6 +50,6 @@ establishment_likelihood <- function(total_arrivals, suitability, outfile,
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

@@ -23,7 +23,7 @@ Ignored if \code{outfile} is not provided.}
 If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is
 saved to \code{outfile}. If \code{return_rast} is \code{TRUE} or
 \code{outfile} is not specified, the resulting \code{\link{SpatRaster}} is
-returned, otherwise \code{NULL} is returned invisibly.
+returned, otherwise \code{outfile} is returned invisibly.
 }
 \description{
 Calculate the probability of arrival across pathways.

@@ -28,8 +28,9 @@
 #'   documentation).
 #' @param overwrite Logical. Should outfile be overwritten if it exists?
 #' @param return_rast Logical. Return object to R?
-#' @return A binarized raster is written to `outfile`, and returned to R as a
-#'   [`SpatRaster`] if `return_rast` is `TRUE`.
+#' @return A binarized raster is written to `outfile`. If `return_rast` is
+#'   `TRUE`, the resulting [`SpatRaster`] is returned, else `outfile` is
+#'   returned invisibly.
 #' @importFrom terra rast ext crs res
 #' @importFrom gdalUtilities gdal_rasterize
 #' @importFrom methods is
@@ -83,5 +84,5 @@ rasterize_vector <- function(vector_data, outfile, template_raster, extent,
                burn=if(!missing(burn_value)) burn_value else NULL)
   do.call(gdalUtilities::gdal_rasterize, args[!sapply(args, is.null)])
 
-  if(isTRUE(return_rast)) terra::rast(outfile) else invisible(NULL)
+  if(isTRUE(return_rast)) terra::rast(outfile) else invisible(outfile)
 }

@@ -36,8 +36,9 @@
 #' @param return_rast Logical. Return [`SpatRaster`] to R?
 #' @param overwrite Logical. Should `outfile` be overwritten if it already
 #'   exists?
-#' @return_rast A raster file is produced on disk. Additionally, if
-#'   `return_rast` is `TRUE` a [`SpatRaster`] object is returned to R.
+#' @return A raster file is produced on disk and `outfile` is returned
+#'   invisibly. Additionally, if `return_rast` is `TRUE` a [`SpatRaster`] object
+#'   is returned to R.
 #' @details The resampling methods available are as follows:
 #' * near: nearest neighbour resampling (default, fastest algorithm, worst
 #' interpolation quality).
@@ -124,5 +125,5 @@ gdal_reproject <- function(infile, outfile, src_proj, tgt_proj, res,
     }
   }
 
-  if(isTRUE(return_rast)) terra::rast(outfile) else invisible(NULL)
+  if(isTRUE(return_rast)) terra::rast(outfile) else invisible(outfile)
 }

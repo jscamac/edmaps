@@ -6,8 +6,8 @@
 #'   of file paths to raster files.
 #' @param outfile Character. Optional output raster file path. Directory will be
 #'   created recursively if it does not exist.
-#' @return If `outfile` is specified, the resulting [`SpatRaster`] is saved as a
-#'   GeoTiff to that path and NULL is returned. If `outfile` is not
+#' @return If `outfile` is specified, the resulting [`SpatRaster`] is saved to
+#'   that path and `outfile` is returned invisibly. If `outfile` is not
 #'   specified the [`SpatRaster`] is returned to R.
 #' @importFrom terra rast median writeRaster
 #' @importFrom methods is
@@ -22,7 +22,7 @@ calculate_median <- function(x, outfile) {
   if(!dir.exists(dirname(outfile))) dir.create(dirname(outfile), recursive=TRUE)
   if(!missing(outfile)) {
     terra::writeRaster(result, outfile)
-    return(NULL)
+    return(outfile)
   } else {
     result
   }

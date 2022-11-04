@@ -66,8 +66,9 @@ information.}
 exists?}
 }
 \value{
-_rast A raster file is produced on disk. Additionally, if
-\code{return_rast} is \code{TRUE} a \code{\link{SpatRaster}} object is returned to R.
+A raster file is produced on disk and \code{outfile} is returned
+invisibly. Additionally, if \code{return_rast} is \code{TRUE} a \code{\link{SpatRaster}} object
+is returned to R.
 }
 \description{
 This function can be used to change resolution, projection and extent of a

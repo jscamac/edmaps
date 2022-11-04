@@ -14,7 +14,7 @@
 #'   Ignored if `outfile` is not provided.
 #' @return If `outfile` is specified, the resulting [`SpatRaster`] is saved to
 #'   `outfile`. If `return_rast` is `TRUE` or `outfile` is not specified, the
-#'   resulting [`SpatRaster`] is returned, otherwise `NULL` is returned
+#'   resulting [`SpatRaster`] is returned, otherwise `outfile` is returned
 #'   invisibly.
 #' @importFrom terra rast minmax setMinMax writeRaster compareGeom
 #' @importFrom methods is
@@ -56,6 +56,6 @@ pr_establishment <- function(rast, suitability, outfile, return_rast) {
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

@@ -17,10 +17,10 @@
 #'   returned to R? Ignored if `outfile` is not provided.
 #' @param overwrite Should `outfile` be overwritten if it exists? Default is
 #'   `TRUE`.
-#' @return If `outfile` is specified, the resulting [`SpatRaster`] object is saved
-#'   as a geotiff to that path. If `return_rast` is `TRUE` or `outfile` is not
-#'   specified the resulting [`SpatRaster`] object is returned, otherwise `NULL`
-#'   is returned invisibly.
+#' @return If `outfile` is specified, the resulting [`SpatRaster`] object is
+#'   saved to that path. If `return_rast` is `TRUE` or `outfile` is not
+#'   specified the resulting [`SpatRaster`] object is returned, otherwise
+#'   `outfile` is returned invisibly.
 #' @importFrom terra rast aggregate writeRaster
 #' @importFrom methods is
 #' @export
@@ -45,6 +45,6 @@ aggregate_raster <- function(rast, outfile, aggregate_factor, fun = sum,
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

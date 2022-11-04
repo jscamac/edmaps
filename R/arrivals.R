@@ -19,9 +19,9 @@
 #' @param overwrite Logical. Should `outfile` be overwritten if it exists?
 #'   Default is `FALSE`.
 #' @return If `outfile` is specified, the resulting [`SpatRaster`] object is
-#'   saved as a GeoTiff at that path. If `return_rast` is `TRUE` or `outfile` is
-#'   not specified, the resulting [`SpatRaster`] object is returned, otherwise
-#'   `NULL` is returned invisibly.
+#'   saved to that path. If `return_rast` is `TRUE` or `outfile` is not
+#'   specified, the resulting [`SpatRaster`] object is returned, otherwise
+#'   `outfile` is returned invisibly.
 #' @family functions estimating arrivals
 #' @importFrom terra rast writeRaster
 #' @export
@@ -56,6 +56,6 @@ arrivals <- function(weight, leakage, viability, outfile, return_rast=FALSE,
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

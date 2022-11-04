@@ -57,8 +57,9 @@ documentation).}
 \item{return_rast}{Logical. Return object to R?}
 }
 \value{
-A binarized raster is written to \code{outfile}, and returned to R as a
-\code{\link{SpatRaster}} if \code{return_rast} is \code{TRUE}.
+A binarized raster is written to \code{outfile}. If \code{return_rast} is
+\code{TRUE}, the resulting \code{\link{SpatRaster}} is returned, else \code{outfile} is
+returned invisibly.
 }
 \description{
 Converts vector object to a raster with specified extent and resolution.

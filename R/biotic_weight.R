@@ -11,7 +11,7 @@
 #'   R? Ignored if `outfile` is not provided.
 #' @return If `outfile` is specified, the resulting [`SpatRaster`] object is
 #'   saved as to that path. If `return_rast` is `TRUE` or `outfile` is not
-#'   specified the resulting [`SpatRaster`] is returned, otherwise `NULL` is
+#'   specified the resulting [`SpatRaster`] is returned, otherwise `outfile` is
 #'   returned invisibly.
 #' @importFrom terra rast setMinMax minmax writeRaster
 #' @importFrom methods is
@@ -45,6 +45,6 @@ suitability <- function(x, outfile, return_rast = FALSE) {
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }
