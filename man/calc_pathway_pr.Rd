@@ -7,7 +7,7 @@
 calc_pathway_pr(EE, rast, outfile, return_rast = TRUE)
 }
 \arguments{
-\item{EE}{\code{data.frame} object obtained from \code{\link[=calc_EE]{calc_EE()}}.}
+\item{EE}{\code{data.frame} object obtained from \code{\link[=calc_establishment]{calc_establishment()}}.}
 
 \item{rast}{RasterLayer object, single-layer SpatRaster object, or character
 path to a single raster file containing dispersal weights.}

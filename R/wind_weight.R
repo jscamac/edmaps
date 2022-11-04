@@ -19,14 +19,15 @@
 #' @param outfile Character. The target file path for the wind raster.
 #' @param overwrite Logical. Should `outfile` be overwritten if it exists?
 #'   Default is `FALSE`.
-#' @importFrom terra aggregate as.lines as.points as.polygons buffer crs densify
-#'   init intersect makeValid mask merge nearest rast rasterize subset union
+#' @importFrom terra aggregate as.points as.polygons buffer crs disagg erase
+#'   expanse init intersect makeValid mask merge rast rasterize subset union
 #'   values vect voronoi writeRaster
 #' @importFrom utils tail
 #' @importFrom magrittr %>%
 #' @importFrom methods is
 #' @export
-rasterize_wind <- function(data, wind_column, template, width, outfile, overwrite=FALSE) {
+rasterize_wind <- function(data, wind_column, template, width, outfile,
+                           return_rast=FALSE, overwrite=FALSE) {
 
   if(is.character(data) || is(data, 'SpatialPolygons') || is(data, 'sf')) {
     data <- terra::vect(data)
@@ -63,14 +64,16 @@ rasterize_wind <- function(data, wind_column, template, width, outfile, overwrit
   # Buffer JW's wind polygons to identify corresponding segments of coastline.
   # We buffer the first and last polygon, as well as polygon O, using a smaller
   # width to avoid including unwanted regions of coastline.
+  # NB: width (inland wind effect width) is a function arg, so the hardcoded
+  # buffers below will be insufficient if user passes a large width.
   wind_buffer <- rbind(
     terra::buffer(terra::subset(
       wind, wind$segment_id %in% c(wind$segment_id[1], 'O', tail(wind$segment_id, 1))),
-      50000
+      100000
     ),
     terra::buffer(terra::subset(
       wind, !wind$segment_id %in% c(wind$segment_id[1], 'O', tail(wind$segment_id, 1))),
-      200000
+      300000
     )
   ) %>% terra::aggregate()
 
@@ -93,30 +96,11 @@ rasterize_wind <- function(data, wind_column, template, width, outfile, overwrit
   aus <- terra::mask(terra::init(template, 1), template) %>%
     terra::as.polygons(values=FALSE) %>%
     terra::makeValid() %>%
-    terra::aggregate() # TODO: test, may not be necessary
+    terra::disagg()
 
-  aus_boundary <- terra::as.lines(aus)
-  aus_subset_boundary <- terra::intersect(aus_boundary, wind_buffer)
-
-  ###  Find closest wind poly id for each segment
-  # https://gis.stackexchange.com/a/358217/1249
-  aus_subset_boundary_pts <- aus_subset_boundary %>%
-    # increase line nodes so minimum dist b/w nodes is no greater then 10km
-    terra::densify(interval=10000) %>%
-    terra::as.points()
-  aus_subset_boundary_pts$id <- seq_along(aus_subset_boundary_pts)
-
-  p <- aus_subset_boundary_pts %>%
-    terra::merge(
-      terra::values(terra::nearest(aus_subset_boundary_pts, wind)),
-      by.x='id', by.y='from_id'
-    )
-  p$segment_id <- wind$segment_id[p$to_id]
-
-  b <- terra::buffer(aus_subset_boundary, width=width) %>%
-    terra::aggregate() %>%
-    terra::intersect(aus) %>%
-    terra::intersect(wind_buffer)
+  aus_shrink <- terra::buffer(aus, -width)
+  aus_shrink <- aus_shrink[which(terra::expanse(aus_shrink) > 0)]
+  b <- terra::intersect(terra::erase(aus, aus_shrink), wind_buffer)
 
   # Convert polygons to grids of points. Note that simply converting the
   # boundary lines to points with as.points can lead to problems (esp. where
@@ -135,12 +119,15 @@ rasterize_wind <- function(data, wind_column, template, width, outfile, overwrit
     terra::subset(wind > 0, NSE=TRUE)
 
   # Rasterise result
-  r <- terra::rasterize(wind_matched, init(template, NA), field='wind')
+  weight <- terra::rasterize(wind_matched, init(template, NA), field='wind')
 
-  # Write to raster file
   if(!missing(outfile)) {
-    terra::writeRaster(r, outfile, overwrite=overwrite)
+    # Create directory if it does not exist
+    if(!dir.exists(dirname(outfile))) {
+      dir.create(dirname(outfile), recursive=TRUE)
+    }
+    terra::writeRaster(weight, outfile, overwrite=TRUE)
   }
 
-  r
+  if(isTRUE(return_rast) || missing(outfile)) weight else invisible(outfile)
 }

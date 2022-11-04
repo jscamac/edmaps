@@ -4,11 +4,13 @@
 \alias{fertiliser_weight}
 \title{Create a fertiliser weight raster}
 \usage{
-fertiliser_weight(fert_nrm, fert_landuses, outfile, return_rast = FALSE)
+fertiliser_weight(abs_data, nrm, fert_landuses, outfile, return_rast = FALSE)
 }
 \arguments{
-\item{fert_nrm}{A \code{\link{SpatVector}}, \code{sf} object, \code{Spatial} (sp) object, or
-file path to vector dataset.}
+\item{abs_data}{Character. File path to ABS .csv file.}
+
+\item{nrm}{Character. File path to Natural Resource Management (NRM)
+shapefile.}
 
 \item{fert_landuses}{A \code{\link{SpatRaster}}, \code{RasterLayer}, or file path to
 raster file.}
@@ -22,7 +24,7 @@ Ignored if \code{outfile} is not provided.}
 \value{
 If \code{outfile} is specified, the resulting \code{\link{SpatRaster}} is saved as
 to that path. If \code{return_rast} is \code{TRUE} or \code{outfile} is not specified, the
-resulting \code{\link{SpatRaster}} is returned, otherwise \code{NULL} is returned
+resulting \code{\link{SpatRaster}} is returned, otherwise \code{outfile} is returned
 invisibly.
 }
 \description{

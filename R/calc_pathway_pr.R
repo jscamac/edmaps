@@ -2,7 +2,7 @@
 #'
 #' Calculate the pathway-specific probability of pest arrival for each raster
 #' cell.
-#' @param EE `data.frame` object obtained from [calc_EE()].
+#' @param EE `data.frame` object obtained from [calc_establishment()].
 #' @param rast RasterLayer object, single-layer SpatRaster object, or character
 #'   path to a single raster file containing dispersal weights.
 #' @param outfile Character. Output raster file path. If not provided, the
@@ -50,20 +50,18 @@ calc_pathway_pr <- function(EE, rast, outfile, return_rast=TRUE) {
 
   # Initialise raster and populate with probability of presence
   out <- terra::init(rast, fun=0)
-  out[d$cell][[1]] <- ifelse(is.na(d$prob_absent), 0, 1 - d$prob_absent)
+  out[d$cell] <- ifelse(is.na(d$prob_absent), 0, 1 - d$prob_absent)
 
 
   if(!missing(outfile)) {
-    # Create directory if it does not exist
     if(!dir.exists(dirname(outfile))) {
       dir.create(dirname(outfile), recursive = TRUE)
     }
-    # write out raster
     terra::writeRaster(out, outfile, overwrite = TRUE)
   }
   if(isTRUE(return_rast) || missing(outfile)) {
     out
   } else {
-    invisible(NULL)
+    invisible(outfile)
   }
 }

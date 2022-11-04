@@ -16,7 +16,7 @@
 #' @importFrom dplyr arrange
 #' @importFrom stats plogis qlogis qnorm rbinom rlnorm rnorm rpois
 #' @export
-calc_EE <- function(n_events, p_establish, nsims = 100000) {
+calc_establishment <- function(n_events, p_establish, nsims = 100000) {
 
   if(length(n_events) != 2) {
     stop('n_events must be a vector of two values.')
