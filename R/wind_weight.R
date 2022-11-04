@@ -26,7 +26,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom methods is
 #' @export
-rasterize_wind <- function(data, wind_column, template, width, outfile,
+wind_weight <- function(data, wind_column, template, width, outfile,
                            return_rast=FALSE, overwrite=FALSE) {
 
   if(is.character(data) || is(data, 'SpatialPolygons') || is(data, 'sf')) {
