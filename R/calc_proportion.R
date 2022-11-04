@@ -14,5 +14,5 @@ calc_proportion <- function(rast) {
          'single layer.')
   }
   total <- terra::global(rast, sum, na.rm=TRUE)$sum
-rast/total
+  rast/total
 }
