@@ -32,7 +32,13 @@
 #' @export
 binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories,
   overwrite=FALSE, return_rast=FALSE, quiet=FALSE) {
+
   now <- Sys.time()
+
+  if(length(setdiff(categories, NA)) == 0) {
+    if(!quiet) warning('No categories specified.')
+    return(NULL)
+  }
 
   # ensure one of infile & rle is provided
   if(missing(infile) && missing(rle))
@@ -42,16 +48,15 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
   if(!missing(infile) && !missing(rle))
     stop('Provide infile or rle, not both.')
 
-  # if outfile is not provided, use a temp file
-  if(missing(outfile)) outfile <- tempfile(fileext='.tif')
-
   # error if outfile exists and overwrite = FALSE
-  if(file.exists(outfile) && !isTRUE(overwrite))
-    stop('outfile exists: ', outfile)
-
-  # Create directory if it does not exist
-  if(!dir.exists(dirname(outfile))) {
-    dir.create(dirname(outfile), recursive = TRUE)
+  if(!missing(outfile)) {
+    if(file.exists(outfile) && !isTRUE(overwrite)) {
+      stop('outfile exists: ', outfile)
+    }
+    # Create directory if it does not exist
+    if(!dir.exists(dirname(outfile))) {
+      dir.create(dirname(outfile), recursive = TRUE)
+    }
   }
 
   # if rle is not provided, create raster_rle from infile
@@ -90,48 +95,54 @@ binarize_and_aggregate <- function(infile, rle, outfile, extent, res, categories
   r0 <- terra::rast(terra::ext(attr(rle, 'extent')),
                     res=attr(rle, 'res'), crs=attr(rle, 'crs'))
   r1 <- terra::rast(terra::ext(extent), res=res, crs=attr(rle, 'crs'), vals=0)
-  x2 <- cumsum(rle$lengths[i])
-  timespent <- Sys.time() - now
-  if(!isTRUE(quiet)) {
-    message(sprintf('%.02f %s: Splitting cells into memory safe chunks',
-                    timespent, attr(timespent, 'unit')))
-  }
-  x3 <- split(i, floor(x2 / 1e6)) # split into groups of max ~1 million cells
-  # Below assumes `result` (a vector of all target cell numbers with 1 or more
-  # (sub)cells belonging to `categories`) can fit in memory. Alternatively can
-  # append cell1 (as xy) to fcsv at each pass through below loop.
-  timespent <- Sys.time() - now
-  if(!isTRUE(quiet)) {
-    message(sprintf('%.02f %s: Reconstructing runs',
-                    timespent, attr(timespent, 'unit')))
-  }
-  result <- unique(unlist(lapply(seq_along(x3), function(j) {
-    if(interactive()) cat(sprintf('\r%.2f%%', j/length(x3)*100))
-    z <- unlist(mapply(
-      seq.int, rle$starts[x3[[j]]], length.out=rle$lengths[x3[[j]]],
-      SIMPLIFY=FALSE))
-    xy0 <- terra::xyFromCell(r0, z)
-    cell1 <- as.integer(setdiff(terra::cellFromXY(r1, xy0), NA))
-    cell1
-  })))
-  cat('\n')
-  timespent <- Sys.time() - now
-  if(!isTRUE(quiet)) {
-    message(sprintf(
-      paste0('%.02f %s: Filling raster output ',
-             '(%s cells belong to categories)\nand writing to %s.',
-             collapse=' '),
-      timespent, attr(timespent, 'unit'), length(result),
-      outfile)
-    )
+  # below conditional: if no values are members of the `categories` set, return early
+  if(length(i) > 0) {
+    x2 <- cumsum(rle$lengths[i])
+    timespent <- Sys.time() - now
+    if(!isTRUE(quiet)) {
+      message(sprintf('%.02f %s: Splitting cells into memory safe chunks',
+                      timespent, attr(timespent, 'unit')))
+    }
+    x3 <- split(i, floor(x2 / 1e6)) # split into groups of max ~1 million cells
+    # Below assumes `result` (a vector of all target cell numbers with 1 or more
+    # (sub)cells belonging to `categories`) can fit in memory. Alternatively can
+    # append cell1 (as xy) to fcsv at each pass through below loop.
+    timespent <- Sys.time() - now
+    if(!isTRUE(quiet)) {
+      message(sprintf('%.02f %s: Reconstructing runs',
+                      timespent, attr(timespent, 'unit')))
+    }
+    result <- unique(unlist(lapply(seq_along(x3), function(j) {
+      if(interactive()) cat(sprintf('\r%.2f%%', j/length(x3)*100))
+      z <- unlist(mapply(
+        seq.int, rle$starts[x3[[j]]], length.out=rle$lengths[x3[[j]]],
+        SIMPLIFY=FALSE))
+      xy0 <- terra::xyFromCell(r0, z)
+      cell1 <- as.integer(setdiff(terra::cellFromXY(r1, xy0), NA))
+      cell1
+    })))
+    cat('\n')
+    timespent <- Sys.time() - now
+    if(!isTRUE(quiet)) {
+      message(sprintf(
+        paste0('%.02f %s: Filling raster output (%s cells belong to categories).',
+               collapse=' '),
+        timespent, attr(timespent, 'unit'), length(result)
+      ))
+    }
+
+    r1[result] <- 1
   }
 
-  r1[result] <- 1
   r1[r1==0] <- NA
   # ^ initialising with 0 above and then reassigning NA avoids warnings about
   #   min/max Inf.
-  terra::writeRaster(r1, outfile, datatype='INT2U', overwrite=overwrite)
 
-  if(isTRUE(return_rast) || missing(outfile))
-    terra::rast(outfile) else invisible(outfile)
+  if(!missing(outfile)) {
+    terra::writeRaster(r1, outfile, datatype='INT2U', overwrite=overwrite)
+  }
+
+  if(isTRUE(return_rast) || missing(outfile)) {
+    r1
+  } else invisible(outfile)
 }
