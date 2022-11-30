@@ -28,10 +28,10 @@
 arrivals <- function(weight, leakage, viability, outfile, return_rast=FALSE,
                      overwrite=FALSE) {
 
-  if(length(leakage) != 2 || diff(leakage) <= 0)
+  if(length(leakage) != 2 || diff(leakage) < 0)
     stop('`leakage` must be a vector of length 2, giving the lower and ',
          'upper bounds of the 95% CI for leakage rate.', call.=FALSE)
-  if(length(viability) != 2 || diff(viability) <= 0)
+  if(length(viability) != 2 || diff(viability) < 0)
     stop('`viability` must be a vector of length 2, giving the lower and ',
          'upper bounds of the 95% CI for viability rate.', call.=FALSE)
 
