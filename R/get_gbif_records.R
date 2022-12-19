@@ -78,7 +78,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
     stop('country must have length 1.')
   }
   if(!missing(country) &&
-     !is.na(countrycode::countrycode(country, origin='iso2c', destination = 'iso2c'))) {
+     is.na(countrycode::countrycode(country, origin='iso2c', destination = 'iso2c'))) {
     stop("country not found. Check allowable values in countrycode::codelist[, c('country.name.en', 'iso2c')]")
   }
   if(method=='auto' & auto_threshold > 100000) {
