@@ -147,7 +147,8 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
             fields=c('key', 'scientificName', 'decimalLongitude',
                      'decimalLatitude', 'coordinateUncertaintyInMeters',
                      'year', 'countryCode'),
-            year=sprintf('%s,%s', min_year, format(Sys.Date(), '%Y'))
+            year=sprintf('%s,%s', min_year, format(Sys.Date(), '%Y')),
+            curlopts=list(http_version=2)
           )$data
         } else {
           n <- rgbif::occ_count(taxonKey=k, georeferenced=TRUE)
