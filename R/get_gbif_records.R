@@ -191,7 +191,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
 
         dl_key <- do.call(rgbif::occ_download, args)
         message('GBIF download key: ', dl_key)
-        dl <- rgbif::occ_download_wait(dl_key)
+        dl <- rgbif::occ_download_wait(dl_key, curlopts=list(http_version=2))
         httr::RETRY(verb = 'GET', url=dl$downloadLink, times=retries + 1,
                     quiet=FALSE, terminate_on=NULL,
                     httr::write_disk(path=f <- tempfile(), overwrite=TRUE))
