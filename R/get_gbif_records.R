@@ -50,7 +50,6 @@
 #' @importFrom magrittr %>%
 #' @importFrom countrycode countrycode
 #' @importFrom dplyr any_of bind_rows filter mutate select
-#' @importFrom edmaps countries
 #' @importFrom rgbif name_backbone occ_count occ_data occ_download occ_download_get occ_download_import occ_download_wait pred pred_gte pred_in pred_isnull pred_lte pred_or
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty,
