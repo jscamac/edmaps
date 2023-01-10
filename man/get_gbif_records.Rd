@@ -78,7 +78,3 @@ Downloads GBIF records of species, removing auxiliary columns and records
 recorded prior to a specified year, or that have coordinate uncertainty
 above a specified amount.
 }
-\details{
-This function is a wrapper of \code{rgbif} such that it can be readily
-used with the \code{CoordinateCleaner} package.
-}
