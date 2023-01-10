@@ -190,7 +190,8 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
       dl_key <- do.call(rgbif::occ_download, args)
       message('GBIF download key: ', dl_key)
       dl <- rgbif::occ_download_wait(dl_key, curlopts=list(http_version=2))
-      f <- rgbif::occ_download_get(dl_key, tempdir(), overwrite=TRUE)
+      f <- rgbif::occ_download_get(dl_key, tempdir(), overwrite=TRUE,
+                                   http_version=2)
       occ <- f %>%
         rgbif::occ_download_import() %>%
         dplyr::select(gbifID, scientificName, decimalLongitude, decimalLatitude,
@@ -203,7 +204,6 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         )
       }
       occ
-
     })
 
   occ <- dplyr::mutate(occ, iso3c=countrycode::countrycode(
