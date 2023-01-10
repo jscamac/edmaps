@@ -193,9 +193,12 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
       f <- rgbif::occ_download_get(dl_key, tempdir(), overwrite=TRUE,
                                    http_version=2)
       occ <- f %>%
-        rgbif::occ_download_import() %>%
-        dplyr::select(gbifID, scientificName, decimalLongitude, decimalLatitude,
-                      coordinateUncertaintyInMeters, year, countryCode)
+        rgbif::occ_download_import(
+          select=c('gbifID', 'scientificName', 'decimalLongitude',
+                   'decimalLatitude', 'coordinateUncertaintyInMeters', 'year',
+                   'countryCode'),
+          quote=""
+        )
       if(isTRUE(cleanup)) {
         unlink(f)
         unlink(
