@@ -71,7 +71,7 @@ be used to notify user when download is ready.}
 \code{'download'} and \code{'auto'} method be deleted? Default is \code{TRUE}.}
 }
 \value{
-A \code{data.frame} of species occurrence records.
+A \code{tibble} of species occurrence records.
 }
 \description{
 Downloads GBIF records of species, removing auxiliary columns and records

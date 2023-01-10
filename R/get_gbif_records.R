@@ -44,9 +44,7 @@
 #'   be used to notify user when download is ready.
 #' @param cleanup Logical. Should temporary files associated with
 #'   `'download'` and `'auto'` method be deleted? Default is `TRUE`.
-#' @details This function is a wrapper of `rgbif` such that it can be readily
-#'   used with the `CoordinateCleaner` package.
-#' @return A `data.frame` of species occurrence records.
+#' @return A `tibble` of species occurrence records.
 #' @importFrom magrittr %>%
 #' @importFrom cli cli_alert_info
 #' @importFrom countrycode countrycode
