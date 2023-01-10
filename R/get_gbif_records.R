@@ -17,10 +17,9 @@
 #'   'MACHINE_OBSERVATION', 'MATERIAL_SAMPLE', 'OBSERVATION',
 #'   'PRESERVED_SPECIMEN', or 'UNKNOWN', giving the set of allowable values for
 #'   the basis of observation.
-#' @param country An optional 2 letter ISO code defining the country within
-#'   which occurrences should be contained. See
-#'   https://www.iso.org/obp/ui/#search for valid ISO codes (see "Alpha-2 code")
-#'   column.
+#' @param country An optional vector of one or more 2-letter codes defining the
+#'   set of countries to which returned occurrences should be restricted. See
+#'   `[edmaps::countries]` for valid country codes.
 #' @param method Either `'search'` (uses the GBIF `/occurrence/search` API
 #'   endpoint), `'download'` (uses the GBIF `/occurrence/download`API endpoint),
 #'   or `'auto'`, which uses `'search'` or `'download'` based on occurrence
@@ -29,7 +28,10 @@
 #'   the resulting dataset to be ready for download). The `'search'` method is
 #'   limited to 100,000 records; for large datasets, consider using `'download'`
 #'   or `'auto'`. When using `'download'` or `'auto'`, the arguments `username`,
-#'   `pwd`, and `email` must be provided. Default is `'auto'`.
+#'   `pwd`, and `email` must be provided. Default is `'auto'`. Note that when
+#'   using `'auto'`, the estimated dataset size max overestimate the true size,
+#'   due to the underlying estimation methods not taking all variables into
+#'   account (e.g. does not account for the `coord_uncertainty` constraint).
 #' @param auto_threshold Integer. If `method` is `'auto'`, this argument defines
 #'   the occurrence count threshold defining whether the `'search'` or
 #'   `'download'` method is used. Default is `10000`, i.e. if fewer than 10000
@@ -40,8 +42,6 @@
 #' @param pwd  GBIF password, required when method is `'download'`.
 #' @param email Email address, required when `method = 'download'`. This _may_
 #'   be used to notify user when download is ready.
-#' @param retries If `method='download'` and file download fails, how many
-#'   additional attempts should be made to download the file?
 #' @param cleanup Logical. Should temporary files associated with
 #'   `'download'` and `'auto'` method be deleted? Default is `TRUE`.
 #' @details This function is a wrapper of `rgbif` such that it can be readily
@@ -49,17 +49,15 @@
 #' @return A `data.frame` of species occurrence records.
 #' @importFrom magrittr %>%
 #' @importFrom countrycode countrycode
-#' @importFrom dplyr bind_rows filter mutate
-#' @importFrom httr RETRY write_disk
-#' @importFrom readr col_character col_double col_integer cols_only read_delim
-#' @importFrom rgbif name_backbone occ_count occ_download occ_download_wait occ_search pred pred_gte pred_in
-#' @importFrom utils unzip
+#' @importFrom dplyr any_of bind_rows filter mutate select
+#' @importFrom edmaps countries
+#' @importFrom rgbif name_backbone occ_count occ_data occ_download occ_download_get occ_download_import occ_download_wait pred pred_gte pred_in pred_isnull pred_lte pred_or
 #' @export
 get_gbif_records <- function(taxon, min_year, coord_uncertainty,
-                             basis_of_record, country,
-                             method=c('auto', 'search', 'download'),
-                             auto_threshold=10000,
-                             username, pwd, email, retries=10, cleanup=TRUE) {
+                              basis_of_record, country,
+                              method=c('auto', 'search', 'download'),
+                              auto_threshold=10000,
+                              username, pwd, email, cleanup=TRUE) {
 
   method <- match.arg(method)
   if (!missing(basis_of_record) &&
@@ -74,12 +72,14 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
          "'LIVING_SPECIMEN', 'MACHINE_OBSERVATION', 'MATERIAL_SAMPLE', ",
          "'OBSERVATION', 'PRESERVED_SPECIMEN', 'UNKNOWN'")
   }
-  if(!missing(country) && length(country) > 1) {
-    stop('country must have length 1.')
-  }
-  if(!missing(country) &&
-     is.na(countrycode::countrycode(country, origin='iso2c', destination = 'iso2c'))) {
-    stop("country not found. Check allowable values in countrycode::codelist[, c('country.name.en', 'iso2c')]")
+  if(!missing(country)) {
+    invalid_country <- setdiff(country, edmaps::countries$gbif2c)
+    if(length(invalid_country) > 0) {
+      stop(sprintf(
+        'Invalid country: %s.\nSee `edmaps::countries` for country codes recognised by the GBIF API.',
+        paste(invalid_country, collapse=', ')
+      ), call.=FALSE)
+    }
   }
   if(method=='auto' & auto_threshold > 100000) {
     warning('auto_threshold can not be greater than 100000. ',
@@ -95,7 +95,7 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
 
   match_species <- function(sp) {
     sapply(sp, function(x) {
-      species_matches <- rgbif::name_backbone(name = x)
+      species_matches <- rgbif::name_backbone(name = x, curlopts=list(http_version=2))
       if(nrow(species_matches)==0) {
         stop('No matches found in GBIF for ', sp)
       }
@@ -107,131 +107,110 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
   }
 
   key <- match_species(taxon)
-  .f <- function(k, min_year, coord_uncertainty, basis_of_record, country) {
 
-    if(method=='auto') {
-      args <- list(taxonKey=k, georeferenced=TRUE)
-      if(!missing(min_year)) args$from <- min_year
-      if(!missing(country)) args$country <- country
-
-      n_occ <- if(!missing(basis_of_record)) {
-        sum(sapply(basis_of_record, function(b) {
-          args$basisOfRecord <- b
-          do.call(rgbif::occ_count, args)
-        }))
-      } else {
-        do.call(rgbif::occ_count, args)
-      }
-      method <- if(n_occ < auto_threshold) 'search' else 'download'
+  if(method != 'download') {
+    args <- list(taxonKey=key)
+    if(!missing(min_year)) args$from <- min_year
+    if(!missing(country)) args$country <- country
+    if(!missing(basis_of_record)) args$basisOfRecord <- basis_of_record
+    args <- expand.grid(args, stringsAsFactors=FALSE) %>%
+      dplyr::mutate(georeferenced=TRUE, curlopts=list(http_version=2)) %>%
+      split(seq_len(nrow(.)))
+    n_occ <- sum(sapply(args, function(x) {
+      do.call(rgbif::occ_count, x)
+    }))
+    if(method == 'auto') {
+      method <- if(n_occ > auto_threshold) 'download' else 'search'
     }
-    switch(
-      method,
-      search={
-        if(!missing(min_year)) {
-          n <- rgbif::occ_count(
-            taxonKey=k, georeferenced=TRUE,
-            year=sprintf('%s,%s', min_year, format(Sys.Date(), '%Y'))
+    if(method == 'search' && n_occ > 100000) {
+      warning(sprintf(paste(
+        '%s records exist for taxon %s. Query limited to first 100,000.\n',
+        'Use method="download" or method="auto" to avoid this limit.'
+      ), n_occ, paste(key, collapse='/')), call.=FALSE)
+    }
+  }
+
+  occ <- switch(
+    method,
+    search={
+      args <- list(
+        taxonKey=paste(key, collapse=';'), limit=100000, hasCoordinate=TRUE,
+        hasGeospatialIssue=FALSE, curlopts=list(http_version=2)
+      )
+      if(!missing(min_year))
+        args$year <- sprintf('%s,%s', min_year, format(Sys.Date(), '%Y'))
+      if(!missing(country)) args$country <- country
+      if(!missing(basis_of_record)) args$basisOfRecord <- basisOfRecord
+      occ <- do.call(rgbif::occ_data, args)
+      # occ_search has a coordinateUncertaintyInMeters arg but not possible to
+      # include null coordinateUncertaintyInMeters via that arg.
+      if("coordinateUncertaintyInMeters" %in% names(occ) &&
+         !missing(coord_uncertainty)) {
+        occ <- occ %>%
+          dplyr::filter(
+            coordinateUncertaintyInMeters <= coord_uncertainty |
+              is.na(coordinateUncertaintyInMeters)
           )
-          if(n > 100000) {
-            warning(
-              sprintf(
-                paste('%s records exist for taxon %s.',
-                      'Query limited to first %s.\n',
-                      'Use method="download" to avoid this limit.'),
-                n, k, 100000)
-            )
-          }
-          dat <- rgbif::occ_search(
-            taxonKey=k, limit=100000, hasCoordinate=TRUE,
-            hasGeospatialIssue=FALSE,
-            fields=c('key', 'scientificName', 'decimalLongitude',
-                     'decimalLatitude', 'coordinateUncertaintyInMeters',
-                     'year', 'countryCode'),
-            year=sprintf('%s,%s', min_year, format(Sys.Date(), '%Y')),
-            curlopts=list(http_version=2)
-          )$data
-        } else {
-          n <- rgbif::occ_count(taxonKey=k, georeferenced=TRUE)
-          if(n > 100000) {
-            warning(
-              sprintf(
-                paste('%s records exist for taxon %s.',
-                      'Query limited to first %s.\n',
-                      'Use method="download" to avoid this limit.'),
-                n, k, 100000)
-            )
-          }
-          args <- list(taxonKey = k, limit = 1e+05, hasCoordinate = TRUE, hasGeospatialIssue = FALSE,
-                       fields = c("key", "scientificName", "decimalLongitude", "decimalLatitude",
-                                  "coordinateUncertaintyInMeters", "year", "countryCode"))
-          if (!missing(country)) args$country <- country
-          dat <- do.call(rgbif::occ_search, args)$data
-        }
-        if("coordinateUncertaintyInMeters" %in% names(dat) &&
-           !missing(coord_uncertainty)) {
-          dat <- dat %>%
-            dplyr::filter(coordinateUncertaintyInMeters <= coord_uncertainty |
-                            is.na(coordinateUncertaintyInMeters))
-        }
-        dat
-      },
-      download={
-        args <- list(
-          rgbif::pred('taxonKey', k),
-          rgbif::pred('hasCoordinate', TRUE),
-          rgbif::pred('hasGeospatialIssue', FALSE),
-          format='SIMPLE_CSV',
-          user=username, pwd=pwd, email=email
-        )
-        if(!missing(min_year)) args <-
-            c(list(rgbif::pred_gte('year', min_year)), args)
-        if (!missing(basis_of_record)) args <- c(list(rgbif::pred_in("basisOfRecord",
-                                                                     basis_of_record)), args)
-        if (!missing(country)) args <- c(list(rgbif::pred_in("country", country)),
-                                         args)
-
-        dl_key <- do.call(rgbif::occ_download, args)
-        message('GBIF download key: ', dl_key)
-        dl <- rgbif::occ_download_wait(dl_key, curlopts=list(http_version=2))
-        httr::RETRY(verb = 'GET', url=dl$downloadLink, times=retries + 1,
-                    quiet=FALSE, terminate_on=NULL,
-                    httr::write_disk(path=f <- tempfile(), overwrite=TRUE))
-        csv <- utils::unzip(f, exdir=tempfile())
-
-        dat <- readr::read_delim(
-          csv, '\t',
-          col_types=readr::cols_only(
-            gbifID=readr::col_character(),
-            scientificName=readr::col_character(),
-            decimalLongitude=readr::col_double(),
-            decimalLatitude=readr::col_double(),
-            coordinateUncertaintyInMeters=readr::col_double(),
-            year=readr::col_integer(),
-            countryCode=readr::col_character())
-        )
-        if(isTRUE(cleanup)) unlink(c(f, dirname(csv)), recursive=TRUE)
-        if(!missing(coord_uncertainty)) {
-          dat <- dat %>% dplyr::filter(coordinateUncertaintyInMeters <=
-                                         coord_uncertainty |
-                                         is.na(coordinateUncertaintyInMeters))
-        }
-        dat
       }
-    )
-  }
-  out <- lapply(key, .f, min_year=min_year, coord_uncertainty=coord_uncertainty,
-                basis_of_record=basis_of_record, country=country)
+      switch(attr(occ, 'type'),
+             single=occ$data,
+             many=dplyr::bind_rows(lapply(occ, '[[', 'data'))
+      ) %>% dplyr::select(dplyr::any_of(c(
+        'key', 'scientificName', 'decimalLongitude',
+        'decimalLatitude', 'coordinateUncertaintyInMeters',
+        'year', 'countryCode'
+      )))
+    },
+    download={
+      args <- list(
+        rgbif::pred_in('taxonKey', key),
+        rgbif::pred('hasCoordinate', TRUE),
+        rgbif::pred('hasGeospatialIssue', FALSE),
+        format='SIMPLE_CSV',
+        user=username, pwd=pwd, email=email,
+        curlopts=list(http_version=2)
+      )
+      if(!missing(min_year)) {
+        args <- append(args, list(rgbif::pred_gte('year', min_year)))
+      }
+      if(!missing(basis_of_record)) {
+        args <- append(args, list(rgbif::pred_in("basisOfRecord", basis_of_record)))
+      }
+      if(!missing(country)) {
+        args <- append(args, list(rgbif::pred_in("country", country)))
+      }
+      if(!missing(coord_uncertainty)) {
+        args <- append(
+          args,
+          list(rgbif::pred_or(
+            rgbif::pred_lte('coordinateUncertaintyInMeters', coord_uncertainty),
+            rgbif::pred_isnull('coordinateUncertaintyInMeters')
+          ))
+        )
+      }
+      dl_key <- do.call(rgbif::occ_download, args)
+      message('GBIF download key: ', dl_key)
+      dl <- rgbif::occ_download_wait(dl_key, curlopts=list(http_version=2))
+      f <- rgbif::occ_download_get(dl_key, tempdir(), overwrite=TRUE)
+      occ <- f %>%
+        rgbif::occ_download_import() %>%
+        dplyr::select(gbifID, scientificName, decimalLongitude, decimalLatitude,
+                      coordinateUncertaintyInMeters, year, countryCode)
+      if(isTRUE(cleanup)) {
+        unlink(f)
+        unlink(
+          file.path(tempdir(), 'gbifdownload', sub('\\.zip', '', basename(f))),
+          recursive=TRUE
+        )
+      }
+      occ
 
-  if(is.list(out)) {
-    out <-  out %>% dplyr::bind_rows()
-  }
+    })
 
-  out <- out %>%
-    dplyr::filter(countryCode != "none") %>% # This causes issues with cleaning
-    dplyr::mutate(countryCode = countrycode::countrycode(
-      countryCode, origin =  'iso2c', destination = 'iso3c')
-    )
-  out <- dplyr::filter(out, !is.na(decimalLongitude), !is.na(decimalLatitude))
+  occ <- dplyr::mutate(occ, iso3c=countrycode::countrycode(
+    countryCode, origin='iso2c', destination='iso3c')
+  )
+  occ <- dplyr::filter(occ, !is.na(decimalLongitude), !is.na(decimalLatitude))
 
-  return(out)
+  return(occ)
 }

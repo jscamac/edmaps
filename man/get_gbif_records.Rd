@@ -15,7 +15,6 @@ get_gbif_records(
   username,
   pwd,
   email,
-  retries = 10,
   cleanup = TRUE
 )
 }
@@ -37,10 +36,9 @@ with no uncertainty documented will be returned regardless of the value of
 'PRESERVED_SPECIMEN', or 'UNKNOWN', giving the set of allowable values for
 the basis of observation.}
 
-\item{country}{An optional 2 letter ISO code defining the country within
-which occurrences should be contained. See
-https://www.iso.org/obp/ui/#search for valid ISO codes (see "Alpha-2 code")
-column.}
+\item{country}{An optional vector of one or more 2-letter codes defining the
+set of countries to which returned occurrences should be restricted. See
+\verb{[edmaps::countries]} for valid country codes.}
 
 \item{method}{Either \code{'search'} (uses the GBIF \verb{/occurrence/search} API
 endpoint), \code{'download'} (uses the GBIF \verb{/occurrence/download}API endpoint),
@@ -50,7 +48,10 @@ the API, while \code{'download'} performs an asynchronous query (but waits for
 the resulting dataset to be ready for download). The \code{'search'} method is
 limited to 100,000 records; for large datasets, consider using \code{'download'}
 or \code{'auto'}. When using \code{'download'} or \code{'auto'}, the arguments \code{username},
-\code{pwd}, and \code{email} must be provided. Default is \code{'auto'}.}
+\code{pwd}, and \code{email} must be provided. Default is \code{'auto'}. Note that when
+using \code{'auto'}, the estimated dataset size max overestimate the true size,
+due to the underlying estimation methods not taking all variables into
+account (e.g. does not account for the \code{coord_uncertainty} constraint).}
 
 \item{auto_threshold}{Integer. If \code{method} is \code{'auto'}, this argument defines
 the occurrence count threshold defining whether the \code{'search'} or
@@ -65,9 +66,6 @@ or greater records, the \code{'download'} method will be used. Ignored when
 
 \item{email}{Email address, required when \code{method = 'download'}. This \emph{may}
 be used to notify user when download is ready.}
-
-\item{retries}{If \code{method='download'} and file download fails, how many
-additional attempts should be made to download the file?}
 
 \item{cleanup}{Logical. Should temporary files associated with
 \code{'download'} and \code{'auto'} method be deleted? Default is \code{TRUE}.}
