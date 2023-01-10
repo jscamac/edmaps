@@ -18,6 +18,7 @@ Depends: R (>= 4.0)
 SystemRequirements: Java (>= 1.5), JRI, GNU make
 Imports:
   alphahull,
+  cli,
   countrycode,
   dplyr,
   drake,

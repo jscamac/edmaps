@@ -48,6 +48,7 @@
 #'   used with the `CoordinateCleaner` package.
 #' @return A `data.frame` of species occurrence records.
 #' @importFrom magrittr %>%
+#' @importFrom cli cli_alert_info
 #' @importFrom countrycode countrycode
 #' @importFrom dplyr any_of bind_rows filter mutate select
 #' @importFrom rgbif name_backbone occ_count occ_data occ_download occ_download_get occ_download_import occ_download_wait pred pred_gte pred_in pred_isnull pred_lte pred_or
@@ -99,8 +100,10 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
         stop('No matches found in GBIF for ', sp)
       }
       key <- species_matches$usageKey[1]
-      message(sprintf('%s matched to %s (key: %s)', x,
-                      species_matches$canonicalName[1], key))
+      cli::cli_alert_info(
+        "{x} matched to {.href [{species_matches$canonicalName[1]}](https://www.gbif.org/species/{key})} (key: {key})."
+      )
+
       key
     })
   }
