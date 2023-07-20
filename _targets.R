@@ -11,27 +11,9 @@ message('no. of cores: ', n_cores)
 future::multicore(workers = n_cores)
 source('R/get_gbif_records.R')
 
-# target_factory <- function(a, b, c) {
-#   mapply(tar_target_raw, c('a', 'b', 'c'), c(a*2, b*3, c*4))
-#   # list(
-#   #   tar_target_raw("file", file, format = "file")
-#   # )
-# }
-#
-# target_factory2 <- function(file) {
-#   list(
-#     tar_target_raw("file2", file, format='file')
-#   )
-# }
-
 # https://wlandau.github.io/targetopia/contributing.html#target-factories
 get_excel_globals <- function(file) {
 
-  # sym_file <- as.symbol(z)
-  # command <- substitute(
-  #   readxl::read_excel(z, sheet='Global parameters', skip=1, col_types=c('text', 'skip', 'list', 'skip')),
-  #   env=list(z=sym_file)
-  # )
   globals <- readxl::read_excel(file, sheet='Global parameters', skip=1,
                                 col_types=c('text', 'skip', 'list', 'skip')) %>%
     tidyr::pivot_wider(names_from=Variable, values_from=Value) %>%
@@ -218,12 +200,6 @@ get_excel_pathways <- function(file) {
   pathways
 }
 
-# list(
-#   tar_target(file, '~/projects/cebra/20121001-multi-pest-early-detection-maps/data/user_input/parameters.xlsx'),
-#   tar_target_raw('data', substitute(readxl::read_excel(file, skip=1, col_types=c('text', 'skip', 'list', 'skip')))),
-#   tar_target(data2, readxl::read_excel(file, skip=1, col_types=c('text', 'skip', 'list', 'skip')))
-# )
-
 make_plan <- function(file) {
   globals <- get_excel_globals(file)
   list(
@@ -375,8 +351,5 @@ make_plan <- function(file) {
     }, pattern=map(species, occurrences), iteration='list')
   )
 }
-
-#excel_to_plan('~/projects/cebra/20121001-multi-pest-early-detection-maps/data/user_input/parameters.xlsx')
-#c(target_factory(2, 3, 4), target_factory2('fdas'))
 
 make_plan('~/projects/cebra/20121001-multi-pest-early-detection-maps/data/user_input/parameters.xlsx')
