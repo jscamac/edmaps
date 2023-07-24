@@ -21,8 +21,6 @@ get_excel_globals <- function(file) {
                   output_res=`Output resolution`,
                   template_raster=`Template raster path`,
                   make_interactive_maps=`Make interactive maps?`,
-                  gbif_username=`GBIF username`,
-                  gbif_password=`GBIF password`,
                   basemap_mode=`Basemap mode`,
                   minimum_probability_for_maps=`Minimum probability threshold`,
                   landuse_path=`Land use class raster path`,
@@ -309,18 +307,23 @@ make_plan <- function(file) {
         }
         if(!all(is.na(unlist(species$gbif_species)))) {
           args <- list(
-            taxon=unlist(species$gbif_species), coord_uncertainty=20000,
-            email='cebra.apps@gmail.com'
+            taxon=unlist(species$gbif_species), coord_uncertainty=20000
           )
           args$min_year <- if(!is.na(species$gbif_min_year)) {
             species$gbif_min_year
           } else {
             1970
           }
-          if(!is.na(gbif_username) & !is.na(gbif_password)) {
-            args$username <- gbif_username
-            args$pwd <- gbif_password
+          if(file.exists('config.yml')) {
+            user <- config::get('gbif_username')
+            pw <- config::get('gbif_password')
+            email <- config::get('gbif_email')
+            if(!is.null(user) && !is.null(pw) && !is.null(email)) {
+              args$username <- user
+              args$pw <- pw
+              args$email <- email
             args$method <- 'download'
+          }
           }
           occ$gbif <- dplyr::select(
             do.call(get_gbif_records, args),

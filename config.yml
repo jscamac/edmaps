@@ -1,0 +1,4 @@
+default:
+  gbif_username:
+  gbif_password:
+  gbif_email:
