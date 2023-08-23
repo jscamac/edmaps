@@ -11,12 +11,11 @@
 #' @param overwrite Logical. Should `outfile` be overwritten if it already
 #'   exists? Ignored if `outfile` is not provided.
 #' @return A `raster_rle` object (extending `tibble`) with three columns
-#'   (`lengths`, `values`, and `starts`) and attributes (`extent`, a
+#'   (`length`, `value`, and `start`) and attributes (`extent`, a
 #'   [`SpatExtent`] object, `res`, and `crs`). This object is additionally saved
 #'   in rds format to `outfile`, if provided.
-#' @importFrom terra rast blocks values ext res
-#' @importFrom readr write_csv read_csv
-#' @importFrom dplyr bind_rows mutate
+#' @importFrom data.table data.table fread fwrite rbindlist rleid
+#' @importFrom terra blocks crs ext rast res values
 #' @importFrom magrittr %>%
 #' @importFrom methods is
 #' @export
@@ -42,11 +41,13 @@ rle_compress <- function(x, outfile, quiet=FALSE, overwrite=FALSE) {
                     outdir))
   }
   ff <- sapply(1:bs$n, function(i) {
-    v <- terra::values(x, row=bs$row[i], nrows=bs$nrows[i])[, 1]
-    v[is.na(v)] <- Inf
-    out <- as.data.frame(unclass(rle(v)))
+    out <- data.table::data.table(
+      value=terra::values(x, row=bs$row[i], nrows=bs$nrows[i])[, 1]
+    )
+    out[, id:=data.table::rleid(value)]
+    out <- out[, .(length=.N), by=.(value, id)][, id:=NULL]
     f <- sprintf(sprintf('%s/%%0%sd.txt', outdir, nchar(bs$n)), i)
-    readr::write_csv(out, f)
+    data.table::fwrite(out, f)
     f
   })
 
@@ -55,10 +56,9 @@ rle_compress <- function(x, outfile, quiet=FALSE, overwrite=FALSE) {
     message(sprintf('%.02f %s: Combining RLE vectors from chunked output',
                     timespent, attr(timespent, 'unit')))
   }
-  runs <- lapply(ff, readr::read_csv, progress=!quiet, show_col_types=FALSE) %>%
-    dplyr::bind_rows() %>%
-    dplyr::mutate(values=ifelse(is.infinite(values), NA, values),
-                  starts=c(1, cumsum(lengths)[-nrow(.)] + 1))
+  runs <- lapply(ff, data.table::fread, colClasses=c('integer', 'numeric')) %>%
+    data.table::rbindlist() %>%
+    .[, start:=c(1, cumsum(length)[-.N] + 1)]
 
   attr(runs, 'extent') <- terra::ext(x)[1:4] # coerce to numeric vector to prevent passing pointer
   attr(runs, 'res') <- terra::res(x)
