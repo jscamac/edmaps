@@ -9,7 +9,9 @@
 #' @keywords internal
 expand_range <- function(x) {
   lapply(x, function(y) {
-    sort(unlist(lapply(gsub('(\\d+)[-:](\\d+)', 'seq.int(\\1, \\2)', y),
-                       function(z) eval(parse(text=z)))))
+    as.integer(sort(unlist(
+      lapply(gsub('(\\d+)[-:](\\d+)', 'seq.int(\\1, \\2)', y),
+             function(z) eval(parse(text=z)))
+    )))
   })
 }
