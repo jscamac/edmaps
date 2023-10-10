@@ -110,11 +110,12 @@ get_gbif_records <- function(taxon, min_year, coord_uncertainty,
 
   if(method != 'download') {
     args <- list(taxonKey=key)
-    if(!missing(min_year)) args$from <- min_year
+    if(!missing(min_year)) args$year <- sprintf('%s,%s', min_year, format(Sys.Date(), "%Y"))
     if(!missing(country)) args$country <- country
     if(!missing(basis_of_record)) args$basisOfRecord <- basis_of_record
     args <- expand.grid(args, stringsAsFactors=FALSE) %>%
-      dplyr::mutate(georeferenced=TRUE, curlopts=list(http_version=2)) %>%
+      dplyr::mutate(hasCoordinate=TRUE, hasGeospatialIssue=FALSE,
+                    curlopts=list(http_version=2)) %>%
       split(seq_len(nrow(.)))
     n_occ <- sum(sapply(args, function(x) {
       do.call(rgbif::occ_count, x)
