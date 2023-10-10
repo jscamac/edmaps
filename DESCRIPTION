@@ -1,7 +1,7 @@
 Package: edmaps
 Type: Package
 Title: Estimate Likelihood of Pest Establishment
-Version: 1.13.0.9000
+Version: 1.14.0.9000
 Authors@R: as.person(c(
     "James Camac <james.camac@gmail.com> [aut, cre]", 
     "John Baumgartner <johnbaums@gmail.com> [aut]"
@@ -20,8 +20,8 @@ Imports:
   alphahull,
   cli,
   countrycode,
+  data.table,
   dplyr,
-  drake,
   gdalUtilities,
   geometry,
   ggplot2,
@@ -32,7 +32,7 @@ Imports:
   leaflet,
   magrittr,
   methods,
-  purrr,
+  Rcpp,
   readr,
   readxl,
   rgbif,
@@ -54,10 +54,13 @@ Suggests:
   styler,
   OpenStreetMap,
   rnaturalearthhires
+LinkingTo: 
+  Rcpp,
+  RcppArmadillo
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
