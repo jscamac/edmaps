@@ -30,8 +30,9 @@
 #' @return A [`SpatRaster`] object if `return_rast` is `TRUE` or if `outfile` is
 #'   missing; otherwise, `outfile` is returned invisibly.
 #' @importFrom dplyr across bind_rows filter group_by left_join mutate n rename summarise ungroup
+#' @importFrom tidyselect where
 #' @importFrom readxl excel_sheets read_excel
-#' @importFrom terra merge project rast rasterize subset values vect writeRaster
+#' @importFrom terra merge project rast rasterize subset values vect writeRaster freq
 #' @importFrom tidyr pivot_longer pivot_wider replace_na
 #' @importFrom utils read.csv
 #' @importFrom magrittr %>%
@@ -74,7 +75,7 @@ container_weight <- function(path, sheet_nums, range = "A7:M2217", postcodes,
   pc_dat <- as.data.frame(pc) %>%
     dplyr::left_join(x, by=c('POA_CODE' = 'Postcode')) %>%
     dplyr::mutate(
-      dplyr::across(where(is.numeric), ~tidyr::replace_na(.x, 0))
+      dplyr::across(tidyselect::where(is.numeric), ~tidyr::replace_na(.x, 0))
     )
   terra::values(pc) <- pc_dat # assign attributes back to the geoms
 
@@ -101,10 +102,8 @@ container_weight <- function(path, sheet_nums, range = "A7:M2217", postcodes,
     weight, y=template_raster, field = "POA_CODE"
   )
 
-  postcode_n <- as.data.frame(postcode_rast) %>%
-    na.omit %>%
-    dplyr::group_by(POA_CODE) %>%
-    dplyr::summarise(n_cells=dplyr::n())
+  postcode_n <- setNames(terra::freq(postcode_rast, bylayer=FALSE),
+                         c('POA_CODE', 'n_cells'))
 
   weight <- terra::merge(weight, postcode_n, by='POA_CODE')
   weight$total_per_cell <- weight$total/weight$n_cells
