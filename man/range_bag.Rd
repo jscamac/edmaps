@@ -6,22 +6,22 @@
 \usage{
 range_bag(
   occurrence_data,
-  bioclim_dir,
+  bioclim,
   n_dims = 2,
   n_models = 100,
   p = 0.5,
   exclude_vars = NULL,
-  outfile
+  outfile,
+  quiet = FALSE
 )
 }
 \arguments{
-\item{occurrence_data}{\code{sf} points object, \code{SpatialPoints} object,
-\code{\link{SpatVector}} points object, \code{data.frame} or character path to a csv file
-containing occurrence coordinates (must contain columns named "Latitude"
-and "Longitude"). Note that CRS is assumed to be WGS84 if \code{occurrence_data}
-is a file path or a \code{data.frame}.}
+\item{occurrence_data}{\code{sf} object, \code{data.frame} or character
+path to a csv file containing occurrence coordinates (must contain
+columns named "Latitude" and "Longitude").}
 
-\item{bioclim_dir}{Path. Path to directory containing WorldClim raster data.}
+\item{bioclim}{\code{SpatRaster} object with layers named using the convention
+"bionn" where \emph{nn} gives the bioclim variable number.}
 
 \item{n_dims}{Integer. The number of dimensions ranges to bag.}
 
@@ -34,26 +34,28 @@ include in bootstrapping .}
 exclude from analysis. Default is \code{NULL}.}
 
 \item{outfile}{Character. Output raster file path. Parent directory will be
-created recursively if required. If \code{NULL}, the \code{RasterLayer} will be
+created recursively if required. If missing, the \code{SpatRaster} will be
 returned in R.}
 }
 \value{
-A \code{\link{SpatRaster}} of model predictions is written to \code{outfile} if
+A \code{SpatRaster} of model predictions is written to \code{outfile} if
 provided, and returned to R otherwise. The raster's extent, resolution and
-CRS are taken from the raster data in \code{bioclim_dir}. Cell values give the
-fraction of bootstrapped models for which the cell's environment fell
-within the species' modelled climate envelope.
+CRS are taken from \code{bioclim}. Cell values give the fraction of bootstrapped
+models for which the cell's environment fell within the species' modelled
+climate envelope.
 }
 \description{
 Fit and project range bag model.
 }
 \references{
-This function is a modified version of the \code{rb} function provided
-in Drake, J.M. & Richards, R.L. (2019)
-\href{https://doi.org/10.5061/dryad.g5p7d1c]}{Data from: Estimating environmental suitability.} Dryad, Dataset, doi:10.5061/dryad.g5p7d1c.
+This function is a modified version of the \code{rb} function
+provided in Drake, J.M. & Richards, R.L. (2019)
+\href{https://doi.org/10.5061/dryad.g5p7d1c}{Data from: Estimating
+environmental suitability.} Dryad, Dataset, doi:10.5061/dryad.g5p7d1c.
 
 See also: Drake, J.M. (2015)
-\href{https://doi.org/10.1098/rsif.2015.0086}{Range bagging: a new method for ecological niche modelling from presence-only data.}
-\emph{Journal of the Royal Society Interface}, 12(107), 20150086.
+\href{https://doi.org/10.1098/rsif.2015.0086}{Range bagging: a new method
+for ecological niche modelling from presence-only data.} \emph{Journal of
+the Royal Society Interface}, 12(107), 20150086.
 doi:https://doi.org/10.1098/rsif.2015.0086.
 }
