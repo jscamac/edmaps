@@ -8,3 +8,4 @@ rosm.cache/*
 /Meta/
 /dev/
 .Renviron
+config.yml

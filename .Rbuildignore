@@ -5,4 +5,7 @@
 ^Meta$
 ^Dockerfile$
 ^dev
+_targets
+_targets.R
 ^data-raw$
+config.yml
