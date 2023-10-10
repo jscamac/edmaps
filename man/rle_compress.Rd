@@ -21,7 +21,7 @@ exists? Ignored if \code{outfile} is not provided.}
 }
 \value{
 A \code{raster_rle} object (extending \code{tibble}) with three columns
-(\code{lengths}, \code{values}, and \code{starts}) and attributes (\code{extent}, a
+(\code{length}, \code{value}, and \code{start}) and attributes (\code{extent}, a
 \code{\link{SpatExtent}} object, \code{res}, and \code{crs}). This object is additionally saved
 in rds format to \code{outfile}, if provided.
 }

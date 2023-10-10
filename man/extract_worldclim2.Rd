@@ -4,18 +4,18 @@
 \alias{extract_worldclim2}
 \title{Extract WorldClim 2.0 data}
 \usage{
-extract_worldclim2(path_2_zip, outdir)
+extract_worldclim2(file, outdir)
 }
 \arguments{
-\item{path_2_zip}{Character. Path to .zip archive downloaded by
+\item{file}{Character. Path to .zip archive downloaded by
 \code{\link[=download_worldclim2]{download_worldclim2()}}.}
 
 \item{outdir}{Character. File path to which contained files should be
 extracted. Will be created (recursively) if necessary.}
 }
 \value{
-Raster data are extracted to \code{outdir} and \code{outdir} is returned
-invisibly.
+Raster data are extracted to \code{outdir} and file paths of extracted
+files are returned invisibly.
 }
 \description{
 Extract WorldClim 2.0 data

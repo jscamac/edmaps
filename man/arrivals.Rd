@@ -43,6 +43,7 @@ specified, the resulting \code{\link{SpatRaster}} object is returned, otherwise
 \code{outfile} is returned invisibly.
 }
 \description{
-Estimates pest arrivals by containers.
+Estimates pest arrivals across a landscape given leakage, viability, and the
+spatial distribution of arrival weights.
 }
 \concept{functions estimating arrivals}

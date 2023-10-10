@@ -9,6 +9,7 @@ binarize_and_aggregate(
   rle,
   outfile,
   extent,
+  crs,
   res,
   categories,
   overwrite = FALSE,
@@ -30,6 +31,9 @@ which a \code{\link{SpatExtent}} object can be extracted. If not provided, exten
 will be taken from input. If \code{extent} differs from that of \code{infile}, new
 cells will be assigned value 1 if any original cells belonging to
 \code{categories} have their centroids within the new cell.}
+
+\item{crs}{Coordinate reference system expressed in a form accepted by
+\code{\link[terra:crs]{terra::crs()}} (e.g. \code{'ESRI:54009'}, WKT, or a \verb{Spat*} object).}
 
 \item{res}{output resolution as a numeric vector of 1 or 2 elements, or a
 \code{\link{SpatRaster}} or \verb{Raster*} object from which resolution can be extracted.
