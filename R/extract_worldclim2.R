@@ -2,12 +2,12 @@
 #'
 #' Extract WorldClim 2.0 data
 #'
-#' @param path_2_zip Character. Path to .zip archive downloaded by
+#' @param file Character. Path to .zip archive downloaded by
 #'   [download_worldclim2()].
 #' @param outdir Character. File path to which contained files should be
 #'   extracted. Will be created (recursively) if necessary.
-#' @return Raster data are extracted to `outdir` and `outdir` is returned
-#'   invisibly.
+#' @return Raster data are extracted to `outdir` and file paths of extracted
+#'   files are returned invisibly.
 #' @seealso [download_worldclim2()]
 #' @importFrom utils unzip
 #' @export
@@ -16,23 +16,18 @@
 #' download_worldclim2('bioclim_10m.zip', 'bio', '10m')
 #' extract_worldclim2('bioclim_10m.zip', outdir='bioclim')
 #' }
-extract_worldclim2 <- function(path_2_zip, outdir) {
+extract_worldclim2 <- function(file, outdir) {
 
   # Unzip and return tif filenames
-  x <- grep('\\.tif$', utils::unzip(path_2_zip, exdir = outdir),
-            value=TRUE)
-
-  # Rename files into something more managable
-  file.rename(
-    from=x,
-    to=sprintf(
-      fmt='%s/%s%02d.tif',
-      dirname(x),
-      gsub('wc2\\.0|\\d+[ms]|_|\\d+\\.tif', '', basename(x)),
-      # ^ strip out all but variable name
-      as.numeric(sub('.*_(\\d+)\\.tif', '\\1', basename(x))))
-      # ^ 0-padded month/variable number
+  x <- grep('\\.tif$', utils::unzip(file, exdir = outdir), value=TRUE)
+  x_new <- sprintf(
+    '%s/%s%02d.tif', dirname(x),
+    sub('wc[0-9.]+_\\d+[ms]_([^_]+)_.*', '\\1', basename(x)),
+    as.numeric(gsub('^.*_(\\d+)\\.tif$', '\\1', basename(x)))
   )
 
-  return(invisible(outdir))
+  # Rename files into something more managable
+  file.rename(from=x, to=x_new)
+
+  return(invisible(sort(x_new)))
 }
